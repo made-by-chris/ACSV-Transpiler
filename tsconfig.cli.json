@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "noEmit": false,
+    "outDir": "./cli",
+    "allowImportingTsExtensions": false
+  },
+  "include": ["src/ACSV.ts"]
+}
