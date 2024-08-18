@@ -394,7 +394,7 @@ level=2
 ,,,,,
 
 
-# ACSV is Auto-Comma-Separated-Values, a CSV-like format that allows for automatic population of cells in your data.
+# ACSV is Auto Comma-Separated Values, a CSV-like format that allows for automatic population of cells in your data.
 # CSV is valid ACSV, but ACSV is not valid CSV. It is a superset of CSV, and needs to be compiled into CSV before it can be used.
 
 

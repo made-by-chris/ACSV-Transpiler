@@ -1,4 +1,4 @@
-// ACSV is Auto-Comma-Separated-Values, a CSV-like format that allows for automatic population of cells in your data.
+// ACSV is Auto Comma-Separated Values, a CSV-like format that allows for automatic population of cells in your data.
 // It is a superset of CSV, so any valid CSV is also valid ACSV.
 // ACSV is not valid CSV, so it needs to be transpiled into CSV before it can be used.
 // ACSV syntax and operators:
