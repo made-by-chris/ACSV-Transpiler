@@ -1,11 +1,10 @@
 import { createSignal } from "solid-js";
+import logo from "./ascv-logo-walter-modern-techno-sci-fi-typeface.png";
 
 export default function UtilityBar() {
   const title_from_local_storage =
     localStorage.getItem("ACSVEditor_title") ||
     "acsv-document-" + new Date().toLocaleString().replaceAll("/", "-").replaceAll(" ", "-").replaceAll(":", "-").replaceAll(",", "") + ".csv";
-  // to deal with the above Property 'replaceAll' does not exist on type 'string'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2021' or later.
-  // we need to change tsconfig.json to "target": "es2021" to fix this issue
 
   const [title, setTitle] = createSignal(title_from_local_storage);
   const [copyButtonText, setCopyButtonText] = createSignal("Copy");
@@ -13,7 +12,6 @@ export default function UtilityBar() {
   const [deleteButtonText, setDeleteButtonText] = createSignal("Delete");
 
   const handleTitleChange = (e: Event) => {
-    // to deal with e.target is possibly null, we need to cast it to HTMLInputElement lik this
     setTitle((e.target as HTMLInputElement).value);
     localStorage.setItem("ACSVEditor_title", (e.target as HTMLInputElement).value);
   };
@@ -53,13 +51,16 @@ export default function UtilityBar() {
     <div class="flex flex-row justify-between items-center h-12 w-full bg-gray-200">
       <input type="text" placeholder="Untitled" class="w-1/2 h-full p-4" value={title()} onInput={(e) => handleTitleChange(e)}></input>
       <div class="flex flex-row justify-between items-center h-full w-1/2">
-        <button class="h-full w-1/3 bg-gray-400 hover:bg-gray-500" onClick={handleCopyButtonClick}>
+        <div class="h-full w-1/4 bg-gray-400 hover:bg-gray-500" >
+          <img src={logo} alt="logo" />
+        </div>
+        <button class="h-full w-1/4 bg-gray-400 hover:bg-gray-500" onClick={handleCopyButtonClick}>
           {copyButtonText()}
         </button>
-        <button class="h-full w-1/3 bg-gray-400 hover:bg-gray-500" onClick={handleDownloadButtonClick}>
+        <button class="h-full w-1/4 bg-gray-400 hover:bg-gray-500" onClick={handleDownloadButtonClick}>
           {downloadButtonText()}
         </button>
-        <button class="h-full w-1/3 bg-gray-400 hover:bg-gray-500" onClick={handleTrashButtonClick}>
+        <button class="h-full w-1/4 bg-gray-400 hover:bg-gray-500" onClick={handleTrashButtonClick}>
           {deleteButtonText()}
         </button>
       </div>
