@@ -1,0 +1,4 @@
+# main.acsv
+id,name
+
+include "./common.acsv"

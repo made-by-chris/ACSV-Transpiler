@@ -1,0 +1,11 @@
+id,group
+
+id++
+,,
+
+id++2,group=A
+,,,
+# end scope
+id++STOP
+
+,,

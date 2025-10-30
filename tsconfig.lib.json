@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "allowImportingTsExtensions": false,
+    "noEmit": false,
+    "module": "ESNext",
+    "target": "ES2021"
+  },
+  "include": ["src/ACSVTranspiler.ts"]
+}

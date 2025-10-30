@@ -1,0 +1,3 @@
+status
+
+status=choiceWeighted(["PAID":0.8,"DUE":0.2], seed=42)

@@ -1,13 +1,26 @@
 {
   "name": "acsv-transpiler",
-  "private": true,
+  "main": "dist/ACSVTranspiler.js",
+  "module": "dist/ACSVTranspiler.js",
+  "types": "dist/ACSVTranspiler.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/ACSVTranspiler.js",
+      "require": "./dist/ACSVTranspiler.js",
+      "types": "./dist/ACSVTranspiler.d.ts"
+    }
+  },
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "build:cli": "tsc --project tsconfig.cli.json"
+    "build:cli": "tsc --project tsconfig.cli.json",
+    "build:lib": "tsc --project tsconfig.lib.json",
+    "test:acsv": "npm run build:lib && node scripts/acsv-test-runner.mjs",
+    "test": "npm run build:lib && vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "solid-js": "^1.7.8"
@@ -19,6 +32,7 @@
     "tailwindcss": "^3.3.3",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
-    "vite-plugin-solid": "^2.7.0"
+    "vite-plugin-solid": "^2.7.0",
+    "vitest": "^4.0.5"
   }
 }
