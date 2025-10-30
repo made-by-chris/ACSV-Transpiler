@@ -1,6 +1,7 @@
 // ACSV is Auto Comma-Separated Values, a CSV-like format that allows for automatic population of cells in your data.
 // It is a superset of CSV, so any valid CSV is also valid ACSV.
 // ACSV is not valid CSV, so it needs to be transpiled into CSV before it can be used.
+// ACSV was made originally as a language for LLMs (language AI models) to efficiently generate data.
 // ACSV syntax and operators:
 // * a blank line * - indicates the next line is an ACSV control line
 // # - lines starting with a # are comments and will be removed from the compiled CSV

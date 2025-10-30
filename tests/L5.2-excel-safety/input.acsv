@@ -1,0 +1,4 @@
+#safety excel=true
+formula
+
+formula==SUM(A1:A2)

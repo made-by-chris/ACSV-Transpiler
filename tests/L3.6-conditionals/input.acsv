@@ -1,0 +1,4 @@
+spend,tier
+
+spend=900,tier=if(spend>1000,"GOLD","SILVER")
+spend=1200,tier=if(spend>1000,"GOLD","SILVER")

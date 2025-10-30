@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>ACSV Dummy Consumer</title>
+    <style>body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:20px} textarea{width:100%;height:160px} pre{background:#f6f6f6;padding:10px;white-space:pre-wrap}</style>
+  </head>
+  <body>
+    <h1>ACSV Dummy Consumer</h1>
+    <p>Browser test: transpile ACSV to CSV using the library served from <code>/lib/ACSVTranspiler.js</code>.</p>
+    <textarea id="acsv">id,name
+
+id++,name=Jane
+,,,
+</textarea>
+    <div><button id="run">Transpile</button></div>
+    <h3>Output</h3>
+    <pre id="out"></pre>
+    <script type="module">
+      import transpile from '/lib/ACSVTranspiler.js';
+      const inputEl = document.getElementById('acsv');
+      const outEl = document.getElementById('out');
+      document.getElementById('run').addEventListener('click', () => {
+        try {
+          const csv = transpile({ input: inputEl.value, streaming: false, stats: false });
+          outEl.textContent = csv;
+        } catch (e) {
+          outEl.textContent = 'Error: ' + e;
+        }
+      });
+
+      // Auto-test mode: if ?autotest=1, run and report to server
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('autotest') === '1') {
+        try {
+          const csv = transpile({ input: inputEl.value, streaming: false, stats: false });
+          outEl.textContent = csv;
+          fetch('/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input: inputEl.value, csv })
+          }).catch(() => {});
+        } catch (e) {
+          fetch('/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input: inputEl.value, error: String(e) })
+          }).catch(() => {});
+        }
+      }
+    </script>
+  </body>
+</html>

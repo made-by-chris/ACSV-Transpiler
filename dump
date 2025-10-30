@@ -1,0 +1,64 @@
+
+> acsv-transpiler@0.0.0 test
+> npm run build:lib && vitest run
+
+
+> acsv-transpiler@0.0.0 build:lib
+> tsc --project tsconfig.lib.json
+
+
+[1m[46m RUN [49m[22m [36mv4.0.5 [39m[90mC:/Users/Christopher/projects/acsv-transpiler[39m
+
+ [32m✓[39m tests/L1.1-basics/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 5[2mms[22m[39m
+ [31m❯[39m tests/L6.2-validation-api/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+[31m   [31m×[31m L6.2-validation-api[39m[32m 14[2mms[22m[39m
+ [31m❯[39m tests/L4.2-rand/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 14[2mms[22m[39m
+[31m   [31m×[31m L4.2-rand[39m[32m 13[2mms[22m[39m
+ [31m❯[39m tests/L3.7-templates/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 13[2mms[22m[39m
+[31m   [31m×[31m L3.7-templates[39m[32m 12[2mms[22m[39m
+ [31m❯[39m tests/L4.1-seed/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+[31m   [31m×[31m L4.1-seed[39m[32m 13[2mms[22m[39m
+ [31m❯[39m tests/L4.3-choice/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 12[2mms[22m[39m
+[31m   [31m×[31m L4.3-choice[39m[32m 11[2mms[22m[39m
+ [31m❯[39m tests/L3.8-format-helpers/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+[31m   [31m×[31m L3.8-format-helpers[39m[32m 14[2mms[22m[39m
+ [31m❯[39m tests/L3.12-includes/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 13[2mms[22m[39m
+[31m   [31m×[31m L3.12-includes[39m[32m 12[2mms[22m[39m
+ [31m❯[39m tests/L5.2-excel-safety/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 16[2mms[22m[39m
+[31m   [31m×[31m L5.2-excel-safety[39m[32m 15[2mms[22m[39m
+ [31m❯[39m tests/L6.1-streamed-api/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 14[2mms[22m[39m
+[31m   [31m×[31m L6.1-streamed-api[39m[32m 12[2mms[22m[39m
+ [31m❯[39m tests/L3.9-dates/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 14[2mms[22m[39m
+[31m   [31m×[31m L3.9-dates[39m[32m 12[2mms[22m[39m
+ [31m❯[39m tests/L4.4-faker/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+[31m   [31m×[31m L4.4-faker[39m[32m 13[2mms[22m[39m
+ [31m❯[39m tests/L5.1-dialect/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 19[2mms[22m[39m
+[31m   [31m×[31m L5.1-dialect[39m[32m 18[2mms[22m[39m
+ [31m❯[39m tests/L3.5-prev-helpers/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 17[2mms[22m[39m
+[31m   [31m×[31m L3.5-prev-helpers[39m[32m 15[2mms[22m[39m
+ [31m❯[39m tests/L3.3-step-units/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 19[2mms[22m[39m
+[31m   [31m×[31m L3.3-step-units[39m[32m 17[2mms[22m[39m
+ [31m❯[39m tests/L3.6-conditionals/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+[31m   [31m×[31m L3.6-conditionals[39m[32m 14[2mms[22m[39m
+ [31m❯[39m tests/L3.4-expressions/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 19[2mms[22m[39m
+[31m   [31m×[31m L3.4-expressions[39m[32m 18[2mms[22m[39m
+ [31m❯[39m tests/L6.3-cli/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 16[2mms[22m[39m
+[31m   [31m×[31m L6.3-cli[39m[32m 15[2mms[22m[39m
+ [31m❯[39m tests/L3.11-groups/test.mjs [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 13[2mms[22m[39m
+[31m   [31m×[31m L3.11-groups[39m[32m 11[2mms[22m[39m
+ [32m✓[39m tests/L2.2-one-shot-inc-dec/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/L2.3-accumulating/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/L3.2-ranges/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/L3.10-null/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/L2.1-assign/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/L1.3-control-indicator/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/L3.1-row-repeat/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/L1.2-comments/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/L2.4-stop/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/L6.4-diagnostics/test.mjs [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m18 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (29)[39m
+[2m      Tests [22m [1m[31m18 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (29)[39m
+[2m   Start at [22m 16:33:11
+[2m   Duration [22m 914ms[2m (transform 888ms, setup 0ms, collect 2.03s, tests 324ms, environment 8ms, prepare 334ms)[22m
+

@@ -18,11 +18,51 @@ Try out ACSV in our online editor: [ACSV Editor Demo](https://acsv.vercel.app/)
 
 ## Installation
 
-To use ACSV in your project, you can install it via npm:
-
+Clone locally for now (not yet published to npm):
 ```bash
+git clone <this_repo_url>
+cd acsv-transpiler
 npm install
 ```
+
+Build CLI and library outputs:
+```bash
+npm run build:cli   # → outputs CLI to cli/ACSVTranspiler.js
+npm run build:lib   # → outputs library to dist/ACSVTranspiler.js
+```
+
+## CLI Usage
+
+Transpile ACSV to CSV using the CLI:
+```bash
+node cli/ACSV.js path/to/input.acsv path/to/output.csv
+```
+
+## Library Usage
+
+You can import the library in Node.js or ESM (after building):
+
+```js
+// test-acsv-usage.mjs (Node ESM, after npm run build:lib)
+import transpile from './dist/ACSVTranspiler.js';
+
+const input = `id,name
+
+id++,name=John Doe
+,,,
+`;
+const csv = transpile({ input, streaming: false, stats: false });
+console.log(csv);
+```
+
+Also works in TypeScript:
+```ts
+import transpile from './dist/ACSVTranspiler.js';
+```
+
+## Development
+- `npm run build:cli` — Builds CLI script in `cli/`
+- `npm run build:lib` — Builds library to `dist/` (includes types)
 
 ## Usage
 

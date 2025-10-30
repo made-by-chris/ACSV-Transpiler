@@ -1,0 +1,5 @@
+value,diff
+
+value=10
+,,
+value=15,diff=value - prev(value)

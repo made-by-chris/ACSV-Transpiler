@@ -1,0 +1,24 @@
+{
+  "name": "dummy-consumer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run node:test && npm run cli:test && npm run web:test",
+    "start": "node server.mjs",
+    "node:test": "node node-test.mjs",
+    "cli:test": "node cli-test.mjs sample.acsv sample.out.csv",
+    "web:test": "node web-test.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "acsv-transpiler": "file:..",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.27.0"
+  }
+}
