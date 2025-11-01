@@ -1,3 +1,2 @@
 id,sku
-
-id=42,sku="SKU-" + pad(id,5)
+> id=42,sku="SKU-" + pad(id,5)

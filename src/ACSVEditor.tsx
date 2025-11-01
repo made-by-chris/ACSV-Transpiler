@@ -1,6 +1,6 @@
 
 import { createSignal, createEffect } from "solid-js";
-import { example_placeholder_syntax_tutorial } from "./exampleACSV.ts";
+import example_placeholder_syntax_tutorial from "./exampleACSV.ts";
 import transpile from "./ACSVTranspiler.ts";
 import { ACSV_Transpilation_Config } from "./ACSVTranspiler.ts";
 

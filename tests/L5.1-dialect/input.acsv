@@ -1,5 +1,4 @@
 #dialect delimiter=";" quote='"' newline="\r\n"
 id;name
-
-id++;name=Jane
+> id++;name=Jane
 ,,

@@ -1,422 +1,171 @@
-export default `stage,level,wave,element,staticWaveForm,pathRotation,pathRotationModifier,pathMovement,mesh,enemyEffect,moduleType,shootingEffect,shieldEffect,speedEffect,otherEffect,custom,winCondition,loseCondition
-
-stage=1,level=1,wave=1,winCondition=FinishLine,loseCondition=PlayerLostAllHealth
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Points,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-
-wave+
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-,,,Point,StraightLine,spinReverse,,,,,,,,,,,,
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-,,,Point,StraightLine,spinReverse,,,,,,,,,,,,
-
-wave+
-,,,Points,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-
-wave+
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-
-wave+
-,,,Enemy,SpiralRight,spin,,,,,,,,,,,,
-,,,Point,SpiralLeft,,,,,,,,,,,,,
-,,,Enemy,SpiralRight,spin,,,,,,,,,,,,
-,,,Point,SpiralLeft,,,,,,,,,,,,,
-
-wave+
-,,,Point,HalfRingFlip,,,,,,,,,,,,,
-,,,Enemy,HalfRingFlip,,,,,,,,,,,,,
-
-wave+
-,,,Points,SingleItem,,,,,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,,,,,,,,,,,,,
-
-wave+
-,,,Points,MeshNet,,,,,,,,,,,,,
-
-wave+
-,,,Enemy,SpiralLeft,,,,,,,,,,,,,
-
-wave+
-,,,Flow,SpiralRight,,,,,,,,,,,,,
-
-wave+
-,,,Enemy,SingleItem,,,,,,,,,,,,,
-
-wave+
-,,,Enemy,HalfRingFlip,,,,,,,,,,,,,
-
-wave+
-,,,Points,StraightLine,,,,,,,,,,,,,
-
-wave+
-,,,Points,SingleItem,spin,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spin,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralRight,spinReverse,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spinReverse,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spinReverse,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spinReverse,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SingleItem,spinReverse,,backward,ArcHalf,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spinReverse,,backward,ArcHalf,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spin,,forward,orb,,,,,,,,,
-
-wave+
-,,,Points,SingleItem,spin,,forward,orb,,,,,,,,,
-
-wave+
-,,,ModuleStation,,,,forward,,,Shoot,EchoCharge,,,,,,
-
-wave+
-,,,Flow,SpiralRight,,,forward,,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spinReverse,,forward,orb,,,,,,,,,
-,,,Points,SpiralRight,,,forward,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spinReverse,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spin,,forward,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,spinReverse,,forward,orb,,,,,,,,,
-
-wave+
-,,,Enemy,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Enemy,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralRight,spin,,forward,orb,,,,,,,,,
-
-wave+
-,,,ModuleStation,,,,forward,orb,,,,,,,,,
-
-wave+
-,,,Flow,SpiralLeft,spin,,forward,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeftLong,spinReverse,,forward,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-
-wave+
-,,,Points,SingleItem,spin,,forward,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralRightLong,spin,,forward,orb,,,,,,,,,
-
-wave+
-,,,Gimmick,,,,forward,,,,,,,,,,
-stage+,level+,wave=0
-
-wave+
-,,,ModuleStation,,,,forward,,,,,,,,,,
-
-wave+
-,,,Flow,SpiralRight,,,forward,,,,,,,,,,
-
-wave+
-,,,Gimmick,,,,,orb,,,,,,,,,
-
-wave+
-,,,Enemy,SingleItem,spinReverse,,,orb,,,,,,,,,
-
-wave+
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-
-wave+
-,,,Enemy,SpiralLeft,,,,,,,,,,,,,
-,,,Points,SpiralLeft,,,,,,,,,,,,,
-,,,Points,SpiralLeft,,,,,,,,,,,,,
-,,,Points,SingleItem,spin,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-
-wave+
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-
-wave+
-,,,Enemy,SingleItem,spinReverse,,,orb,,,,,,,,,
-
-wave+
-,,,ModuleStation,,,,,,,,,,,,,,
-
-wave+
-,,,Flow,SpiralRight,,,,,,,,,,,,,
-
-wave+
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-
-wave+
-,,,Points,SpiralRight,,,,orb,,,,,,,,,
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralRightspinReverse,,,,orb,,,,,,,,,
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralLeft,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,ModuleStation,,,,,,,,,,,,,,
-,,,Flow,SpiralRight,spin,,,,,,,,,,,,
-,,,Points,SpiralRightLong,spin,,,orb,,,,,,,,,
-,,,Points,SpiralRight,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spinReverse,,,orb,,,,,,,,,
-,,,Enemy,SpiralRightLong,spinReverse,,,orb,,,,,,,,,
-,,,Gimmick,,,,,orb,,,,,,,,,
-,,,ModuleStation,,,,,orb,,,,,,,,,
-,,,Flow,SpiralLeftLong,,,,,,,,,,,,,
-,,,Gimmick,,,,,,,,,,,,,,
-,,,Points,SingleItem,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spin,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spinReverse,,,orb,,,,,,,,,
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralLeft,spinReverse,,,orb,,,,,,,,,
-,,,ModuleStation,,,,,orb,,,,,,,,,
-,,,Flow,SpiralRight,,,,orb,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,orb,,,,,,,,,
-,,,Points,DoubleSpiral,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeft,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spin,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spin,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spin,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,ModuleStation,,,,,,,,,,,,,,
-,,,Flow,SpiralLeftLong,,,,,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,orb,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeftLong,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Points,SpiralRightLong,spinReverse,,,orb,,,,,,,,,
-,,,Point,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Point,SpiralLeftLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,
-
-,,,Points,SingleItem,mimic,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,mimic,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,mimic,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,mimic,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,mimic,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,mimic,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,mimic,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,mimic,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Points,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-,,,Point,StraightLine,spinReverse,,,,,,,,,,,,
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-,,,Point,StraightLine,spinReverse,,,,,,,,,,,,
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-,,,Point,StraightLine,spin,,,,,,,,,,,,
-,,,Enemy,SpiralRight,spin,,,,,,,,,,,,
-,,,Point,SpiralLeft,,,,,,,,,,,,,
-,,,Enemy,SpiralRight,spin,,,,,,,,,,,,
-,,,Point,SpiralLeft,,,,,,,,,,,,,
-,,,Point,HalfRingFlip,,,,,,,,,,,,,
-,,,Enemy,HalfRingFlip,,,,,,,,,,,,,
-,,,Points,SingleItem,,,,,,,,,,,,,
-,,,Points,SpiralLeft,,,,,,,,,,,,,
-,,,Points,MeshNet,,,,,,,,,,,,,
-,,,Enemy,SpiralLeft,,,,,,,,,,,,,
-,,,Flow,SpiralRight,,,,,,,,,,,,,
-,,,Enemy,SingleItem,,,,,,,,,,,,,
-,,,Enemy,HalfRingFlip,,,,,,,,,,,,,
-,,,Points,StraightLine,,,,,,,,,,,,,
-,,,Points,SingleItem,spin,,,orb,,,,,,,,,
-,,,Points,SpiralLeft,spin,,,orb,,,,,,,,,
-,,,Points,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralLeft,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-,,,Points,SpiralLeft,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-,,,Points,SpiralLeft,spinReverse,,,orb,,,,,,,,,
-,,,Points,SingleItem,spinReverse,,backward,ArcHalf,,,,,,,,,
-,,,Points,SpiralLeft,spinReverse,,backward,ArcHalf,,,,,,,,,
-,,,Points,SpiralLeft,spin,,forward,orb,,,,,,,,,
-,,,Points,SingleItem,spin,,forward,orb,,,,,,,,,
-,,,ModuleStation,,,,forward,,,Shoot,EchoCharge,,,,,,
-,,,Flow,SpiralRight,,,forward,,,,,,,,,,
-,,,Points,SpiralLeft,spinReverse,,forward,orb,,,,,,,,,
-,,,Points,SpiralRight,,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,spinReverse,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,spin,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,spinReverse,,forward,orb,,,,,,,,,
-,,,Enemy,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Enemy,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Points,SpiralRight,spin,,forward,orb,,,,,,,,,
-,,,ModuleStation,,,,forward,orb,,,,,,,,,
-,,,Flow,SpiralLeft,spin,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeftLong,spinReverse,,forward,orb,,,,,,,,,
-,,,Points,SpiralLeft,,,forward,orb,,,,,,,,,
-,,,Points,SingleItem,spin,,forward,orb,,,,,,,,,
-,,,Points,SpiralRightLong,spin,,forward,orb,,,,,,,,,
-,,,Gimmick,,,,forward,,,,,,,,,,
-,,,ModuleStation,,,,forward,,,,,,,,,,
-,,,Flow,SpiralRight,,,forward,,,,,,,,,,
-,,,Gimmick,,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spinReverse,,,orb,,,,,,,,,
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeft,,,,,,,,,,,,,
-,,,Points,SpiralLeft,,,,,,,,,,,,,
-,,,Points,SpiralLeft,,,,,,,,,,,,,
-,,,Points,SingleItem,spin,,,orb,,,,,,,,,
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spinReverse,,,orb,,,,,,,,,
-,,,ModuleStation,,,,,,,,,,,,,,
-,,,Flow,SpiralRight,,,,,,,,,,,,,
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-,,,Points,SpiralRight,,,,orb,,,,,,,,,
-,,,Points,SpiralRight,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralRightspinReverse,,,,orb,,,,,,,,,
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralLeft,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,ModuleStation,,,,,,,,,,,,,,
-,,,Flow,SpiralRight,spin,,,,,,,,,,,,
-,,,Points,SpiralRightLong,spin,,,orb,,,,,,,,,
-,,,Points,SpiralRight,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spinReverse,,,orb,,,,,,,,,
-,,,Enemy,SpiralRightLong,spinReverse,,,orb,,,,,,,,,
-,,,Gimmick,,,,,orb,,,,,,,,,
-,,,ModuleStation,,,,,orb,,,,,,,,,
-,,,Flow,SpiralLeftLong,,,,,,,,,,,,,
-,,,Gimmick,,,,,,,,,,,,,,
-,,,Points,SingleItem,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spin,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spinReverse,,,orb,,,,,,,,,
-,,,Enemy,SpiralRight,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralLeft,spinReverse,,,orb,,,,,,,,,
-,,,ModuleStation,,,,,orb,,,,,,,,,
-,,,Flow,SpiralRight,,,,orb,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,orb,,,,,,,,,
-,,,Points,DoubleSpiral,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeft,,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spin,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spin,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,spin,,,orb,,,,,,,,,
-,,,Enemy,SingleItem,,,,orb,,,,,,,,,
-,,,ModuleStation,,,,,,,,,,,,,,
-,,,Flow,SpiralLeftLong,,,,,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,orb,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Enemy,SpiralLeftLong,spinReverse,,,orb,,,,,,,,,
-,,,Points,SpiralLeftLong,spin,,,orb,,,,,,,,,
-,,,Points,SpiralRightLong,spinReverse,,,orb,,,,,,,,,
-,,,Point,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Enemy,SpiralLeftLong,,,,,,,,,,,,,
-,,,Point,SpiralLeftLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,
-,,,Point,SpiralRightLong,,,,,,,,,,,,,`
-
-
-
-export const example_placeholder_syntax_tutorial = `row,chapter,level,type,points
-
-row++,chapter=1,level=1,type++,points=100
-,,,,,
-,,,,,
-
-level=2
-,,,,,
-,,,,,
-,,,,,
-
-
-# ACSV is Auto Comma-Separated Values, a CSV-like format that allows for automatic population of cells in your data.
-# CSV is valid ACSV, but ACSV is not valid CSV. It is a superset of CSV, and needs to be compiled into CSV before it can be used.
-
-
-
-
-# ACSV syntax and operators:
-# * a blank line * - indicates the next line is an ACSV control line
-# # - lines starting with a # are comments and will be removed from the compiled CSV
-# col_4+,col_2--,col_19=4 - this is what a typical control line looks like. the order of the instructions do not correspond to the order of the columns in the CSV.
-# the instructions are matched to columns simply by their names.
-
-# the basic operators are as follows:
-# col_name+ - increment value of col_name by 1 for all following rows. (this is one-shot, not accumulating per-row)
-# col_name- - decrement value of col_name by 1 for all following rows. (this is one-shot, not accumulating per-row)
-# col_name=explicit_value - set value of col_name to explicit_value for all following rows (unless an accumulator is already set)
-
-# accumulating operators:
-# col_name++ - increment value of col_name by 1 for all following rows. (this is accumulating per-row)
-# col_name-- - decrement value of col_name by 1 for all following rows. (this is accumulating per-row)
-# col_name++STOP - stop the accumulation of col_name++.
-# col_name--STOP - stop the accumulation of col_name--.
-
-
+export default `# ACSV (Auto Comma-Separated Values) - Syntax Tutorial
+# ACSV is a superset of CSV that allows automatic cell population using simple operators.
+# Any valid CSV is also valid ACSV, but ACSV needs to be transpiled to CSV before use.
+
+# ============================================================================
+# BASICS
+# ============================================================================
+# Lines starting with > are ACSV control lines (new explicit syntax!)
+# Lines starting with # are comments and will be removed from the output
+
+# Basic example - header row followed by data rows
+id,name,status
+1,Alice,active
+2,Bob,inactive
+3,Charlie,active
+
+# ============================================================================
+# BASIC OPERATORS
+# ============================================================================
+# col_name=value - Assign a static value to a column for all following rows
+
+product,price,category
+> price=19.99,category=Electronics
+iPhone,,
+Laptop,,
+
+# ============================================================================
+# ONE-SHOT INCREMENT/DECREMENT OPERATORS
+# ============================================================================
+# col_name+ - Increment by 1 once (one-shot, not per-row)
+# col_name- - Decrement by 1 once (one-shot, not per-row)
+
+session,count
+> count=100
+Event 1,,
+> count+
+Event 2,,
+> count+
+Event 3,,
+
+# ============================================================================
+# ACCUMULATING OPERATORS
+# ============================================================================
+# col_name++ - Increment by 1 for each following row (accumulating per-row)
+# col_name-- - Decrement by 1 for each following row (accumulating per-row)
+
+id,name,score
+> id++,name=Player A,score=100
+,,
+,,
+,,
+
+# ============================================================================
+# STOP OPERATOR
+# ============================================================================
+# col_name++STOP - Stop the accumulation of col_name++
+# After STOP, the column value remains at the last emitted value
+
+order_id,status
+> order_id++
+Order 1,,
+> order_id++STOP
+Order 2,,
+Order 3,,
+
+# ============================================================================
+# STEP VALUES
+# ============================================================================
+# col_name++N - Increment by N for each row (e.g., id++2 increments by 2)
+# Works with accumulating operators
+
+id,value
+> id++2,value=100
+,,
+,,
+,,
+
+# ============================================================================
+# DATE INCREMENTS
+# ============================================================================
+# Dates in YYYY-MM-DD format automatically increment day by day
+# Works seamlessly with step values for skipping days
+
+id,date,event
+> id++,date=2025-01-01,event=Meeting
+,,
+,,
+,,
+
+# Example with step values - increments date every 2 days
+id,date,event
+> id++2,date=2025-01-01,event=Meeting
+,,
+,,
+,,
+
+# ============================================================================
+# RANGE OPERATOR
+# ============================================================================
+# col_name=start..end - Generate a sequence from start to end
+
+id,task
+> id=1..5,task=Task
+,,
+,,
+,,
+
+# ============================================================================
+# ROW REPEAT OPERATOR
+# ============================================================================
+# xN - Repeat a control line's effect N times, generating N data rows
+
+id,name,role
+> id++,name=Alice,role=Developer x3
+,,
+
+# ============================================================================
+# EXPRESSIONS
+# ============================================================================
+# You can use mathematical expressions that reference other columns
+# Supported operations: +, -, *, /, parentheses for grouping
+
+price,qty,total,discount,final_total
+> price=10,qty=5,total=price*qty,discount=total*0.1,final_total=total - discount
+,,
+
+price=20,qty=3,total=price*qty,discount=total*0.15,final_total=total - discount
+,,
+
+# ============================================================================
+# prev() HELPER
+# ============================================================================
+# prev(column_name) - Reference the value of a column from the previous row
+# Useful for calculating differences, running totals, etc.
+
+value,diff,running_total
+> value=10,diff=,running_total=value
+,,
+value=15,diff=value - prev(value),running_total=prev(running_total) + value
+,,
+value=20,diff=value - prev(value),running_total=prev(running_total) + value
+,,
+
+# ============================================================================
+# COMBINING FEATURES - COMPLEX EXAMPLE
+# ============================================================================
+# Here's a more realistic example combining multiple features
+
+order_id,customer,order_date,item_price,quantity,subtotal,tax,total
+> order_id++,customer=Alice,order_date=2025-01-01,item_price=19.99,quantity=2,subtotal=item_price*quantity,tax=subtotal*0.08,total=subtotal + tax
+,,
+,
+
+> order_id++
+> customer=Bob
+> item_price=29.99,quantity=1,subtotal=item_price*quantity,tax=subtotal*0.08,total=subtotal + tax
+,,
+,,
+
+# ============================================================================
+# ADDITIONAL NOTES
+# ============================================================================
+# - Control lines are prefixed with > and can have any order of column instructions
+# - Column names are matched by name, not position
+# - Blank rows (,,) generate data rows with accumulated values
+# - Multiple blank rows generate multiple data rows
+# - Control lines apply to all following rows until a new control line changes them
+# - Expression evaluation happens per row, so column references are current row values
+# - prev() accesses the previous row's value for the same column
 
 `
