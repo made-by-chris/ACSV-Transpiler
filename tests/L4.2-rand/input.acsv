@@ -1,4 +1,3 @@
 id,rand
-
-id++,rand=randFloat(0,1, seed=5, precision=2)
+> id++,rand=randFloat(0,1, seed=5, precision=2)
 ,,,

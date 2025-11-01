@@ -1,4 +1,3 @@
 price,qty,total
-
-price=10,qty=3,total=price*qty
+> price=10,qty=3,total=price*qty
 ,,,

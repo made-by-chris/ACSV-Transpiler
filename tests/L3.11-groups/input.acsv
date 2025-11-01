@@ -1,11 +1,10 @@
 id,group
-
-id++
+> id++
 ,,
 
-id++2,group=A
+> id++2,group=A
 ,,,
 # end scope
-id++STOP
+> id++STOP
 
 ,,

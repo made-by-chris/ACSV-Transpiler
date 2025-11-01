@@ -1,3 +1,2 @@
 order_at,ship_at
-
-order_at=2025-01-01,ship_at=formatDate(order_at + 3d, "YYYY-MM-DD")
+> order_at=2025-01-01,ship_at=formatDate(order_at + 3d, "YYYY-MM-DD")

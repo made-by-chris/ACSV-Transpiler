@@ -1,5 +1,4 @@
 id,rand
-
-id++,rand=randInt(1,10, seed=123)
+> id++,rand=randInt(1,10, seed=123)
 ,,,
 ,,,

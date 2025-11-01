@@ -1,3 +1,2 @@
 first,last,phone
-
-first=faker.firstName(seed=7),last=faker.lastName(seed=7),phone=faker.phone(seed=7)
+> first=faker.firstName(seed=7),last=faker.lastName(seed=7),phone=faker.phone(seed=7)

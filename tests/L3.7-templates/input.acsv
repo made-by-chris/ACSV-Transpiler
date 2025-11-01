@@ -1,3 +1,2 @@
 first,last,email
-
-first=Jane,last=Doe,email="{first}.{last}@example.com".lower()
+> first=Jane,last=Doe,email="{first}.{last}@example.com".lower()
