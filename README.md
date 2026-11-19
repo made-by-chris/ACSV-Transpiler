@@ -38,6 +38,15 @@ The editor offers app/game examples, table/CSV/JSON previews, explicit input/exp
 
 Library files live in `dist/`, CLI files in `cli/`, and the website in `dist/web/`. The public [editor](https://acsv.majaku.com/) and [conversion API](https://acsv.majaku.com/api/) run on Cloudflare.
 
+## Install the released package
+
+```sh
+npm install https://github.com/made-by-chris/ACSV-Transpiler/releases/download/v0.1.0/acsv-transpiler-0.1.0.tgz
+npx acsv users.acsv users.csv
+```
+
+The installed library exports `compile`, `validate`, `serializeJSON` and `toRecords` from `acsv-transpiler`. The release package is versioned and the website API reports its version in responses.
+
 ## CLI
 
 ```sh
