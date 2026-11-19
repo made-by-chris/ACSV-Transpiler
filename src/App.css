@@ -569,3 +569,5 @@ tbody th {
 @media(max-width:760px){.creator{font-size:11px}.export-actions{width:auto;margin-left:auto}.app-header{gap:10px 16px}.export-actions .majaku-link{margin-left:0}.output-actions{gap:5px}.download-select{padding:6px}.output-panel>.panel-heading{align-items:flex-start}.output-panel .panel-label{padding-top:7px}}
 
 .brand-mark{display:inline-flex;align-items:center;gap:9px;text-decoration:none;letter-spacing:-.7px;color:#0209b0}.brand-mark img{display:block;object-fit:contain;flex-shrink:0}
+.app-header,.export-actions{min-width:0}
+@media(max-width:760px){.export-actions{width:100%;justify-content:center;margin:0}.creator{min-width:0;white-space:normal}}
