@@ -1,7 +1,10 @@
-import { test, expect } from 'vitest';
-import { getActualExpected } from '../_helpers.mjs';
+import { expect, test } from 'vitest';
+import { isValid, validate } from '../../dist/ACSVTranspiler.js';
 
-test('L6.2-validation-api', () => {
-  const { actual, expected } = getActualExpected(import.meta.url.replace(/test.mjs$/, ''));
-  expect(actual).toBe(expected);
+test('validation reports errors without partial output or callbacks', () => {
+  expect(isValid({input:'id,name\n> name=Jane\n1,',mode:'acsv'})).toBe(true);
+  const calls=[];
+  const result=validate({input:'id,name\n> typo++',mode:'acsv',streaming:true,streaming_callback:r=>calls.push(r)});
+  expect(result).toMatchObject({valid:false,diagnostics:[{code:'E_COLUMN',line:2}]});
+  expect(calls).toEqual([]);
 });

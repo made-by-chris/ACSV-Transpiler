@@ -1,0 +1,23 @@
+[
+  {
+    "name": "typed-named-rows",
+    "input": "id:int,name,active:bool\n@expect 3\n@unique id\n@set id=seq(),active=true\n@rows 2 with name=cycle(\"Ada\",\"Bo\")\n@row name=Cy,active=false",
+    "csv": "id,name,active\n1,Ada,true\n2,Bo,true\n3,Cy,false",
+    "records": [{"id":1,"name":"Ada","active":true},{"id":2,"name":"Bo","active":true},{"id":3,"name":"Cy","active":false}]
+  },
+  {
+    "name": "scoped-override-and-reset",
+    "input": "id:int,kind\n@set id=seq(10,2),kind=cycle(\"A\",\"B\")\n@row\n@row id=99,kind=X\n@row\n@set id=seq(100)\n@row",
+    "csv": "id,kind\n10,A\n99,X\n14,A\n100,B",
+    "records": [{"id":10,"kind":"A"},{"id":99,"kind":"X"},{"id":14,"kind":"A"},{"id":100,"kind":"B"}]
+  },
+  {
+    "name": "utc-leap-day",
+    "input": "date:date\n@set date=seq(\"2024-03-01\",-1)\n@rows 3",
+    "csv": "date\n2024-03-01\n2024-02-29\n2024-02-28",
+    "records": [{"date":"2024-03-01"},{"date":"2024-02-29"},{"date":"2024-02-28"}]
+  },
+  {"name":"truncated-recipe","input":"id\n@expect 3\n@set id=seq()\n@rows 2","error":"E_ASSERT"},
+  {"name":"invalid-boolean","input":"active:bool\n@row active=1","error":"E_TYPE"},
+  {"name":"duplicate-typed-key","input":"id:int\n@unique id\n001\n1","error":"E_UNIQUE"}
+]
