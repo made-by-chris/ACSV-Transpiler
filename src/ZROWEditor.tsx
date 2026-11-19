@@ -54,9 +54,9 @@ function readDraft(): Draft {
 }
 
 export default function ZROWEditor() {
-  const [draft, setDraft] = createSignal(readDraft());
+  const [draft, setDraft] = createSignal<Draft>({ ...readDraft(), format: "csv" });
   const [undo, setUndo] = createSignal<Draft>();
-  const [view, setView] = createSignal<"table" | "csv" | "json">("table");
+  const [view, setView] = createSignal<"table" | "csv" | "json">("csv");
   const [notice, setNotice] = createSignal("");
   const [selection, setSelection] = createSignal<{
     row: number;
@@ -341,7 +341,7 @@ export default function ZROWEditor() {
                 }}
                 placeholder={
                   draft().mode !== "csv"
-                    ? "id:int,name\n@set id=seq(),name=Player\n@rows 5"
+                    ? "# ZROW 0.3\n(cols id:int,name)\n(id=seq(),name=\"User {id}\")\n(rows 5)"
                     : "id,name\n1,Player"
                 }
               />
