@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "node scripts/build-redirect.mjs",
   "outputDirectory": "dist/web",
   "redirects": [
     {
@@ -7,5 +7,6 @@
       "destination": "https://acsv.majaku.com/",
       "permanent": true
     }
-  ]
+  ],
+  "installCommand": "node --version"
 }
