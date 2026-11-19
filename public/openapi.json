@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "XCSV conversion API",
+    "title": "ZROW conversion API",
     "version": "0.2.0"
   },
   "servers": [
@@ -31,9 +31,10 @@
                     "enum": [
                       "csv",
                       "xcsv",
-                      "acsv"
+                      "acsv",
+                      "zrow"
                     ],
-                    "default": "xcsv"
+                    "default": "zrow"
                   },
                   "format": {
                     "enum": [

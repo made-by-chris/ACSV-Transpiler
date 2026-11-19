@@ -20,7 +20,7 @@ export type { ColumnSchema, ColumnType, DataValue } from "./schema.js";
 export { ACSVError } from "./errors.js";
 export { parseCSV, serializeCSV } from "./csv.js";
 
-export type InputMode = "csv" | "acsv" | "xcsv";
+export type InputMode = "csv" | "acsv" | "xcsv" | "zrow";
 export interface ACSV_Transpilation_Config {
   input: string;
   mode?: InputMode;
@@ -77,7 +77,7 @@ const MAX_ROWS = 10_000,
 export function compile(config: ACSV_Transpilation_Config): Compilation {
   if (!config || typeof config.input !== "string")
     fail("E_CONFIG", "Provide text in the input property.");
-  const mode = config.mode === "xcsv" ? "acsv" : config.mode ?? "csv";
+  const mode = (config.mode === "xcsv" || config.mode === "zrow") ? "acsv" : config.mode ?? "csv";
   if (mode !== "csv" && mode !== "acsv")
     fail("E_CONFIG", "Mode must be csv or acsv.");
   const records = scanRecords(config.input, mode === "acsv");
@@ -441,11 +441,11 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
     let declaredVersion = false;
     for (const record of list) {
       if (record.kind === "comment") {
-        if (/^#\s*XCSV\b/i.test(record.raw)) {
+        if (/^#\s*(?:ZROW|XCSV)\b/i.test(record.raw)) {
           if (declaredVersion || (haveHeader && !includeHeader))
-            fail("E_VERSION", "Place one # XCSV 0.1 declaration before the header.", record.line);
-          if (!/^# XCSV 0\.1\s*$/.test(record.raw))
-            fail("E_VERSION", "Unsupported or malformed XCSV declaration. This compiler supports # XCSV 0.1.", record.line);
+            fail("E_VERSION", "Place one # ZROW 0.1 declaration before the header.", record.line);
+          if (!/^# (?:ZROW|XCSV) 0\.1\s*$/.test(record.raw))
+            fail("E_VERSION", "Unsupported or malformed ZROW declaration. This compiler supports # ZROW 0.1.", record.line);
           declaredVersion = true;
         }
         if (/^#(?:dialect|safety)\b/.test(record.raw))

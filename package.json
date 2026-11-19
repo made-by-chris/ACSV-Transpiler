@@ -1,5 +1,5 @@
 {
-  "name": "@basiclaser/xcsv",
+  "name": "zrow-js",
   "main": "dist/ACSVTranspiler.js",
   "module": "dist/ACSVTranspiler.js",
   "types": "dist/ACSVTranspiler.d.ts",
@@ -21,7 +21,7 @@
     "preview": "vite preview",
     "build:cli": "tsc --project tsconfig.cli.json",
     "build:lib": "tsc --project tsconfig.lib.json",
-    "test:acsv": "npm run build:lib && node scripts/acsv-test-runner.mjs",
+    "test:acsv": "npm run build:lib && npm run build:cli && node scripts/acsv-test-runner.mjs",
     "test": "npm run build:lib && npm run build:cli && vitest run",
     "test:watch": "vitest",
     "deploy": "npm run build && npx wrangler@4.165.0 deploy",
@@ -54,16 +54,15 @@
     "LICENSE"
   ],
   "bin": {
-    "acsv": "cli/ACSV.js",
-    "xcsv": "cli/ACSV.js"
+    "zrow": "cli/ACSV.js"
   },
   "description": "Readable, deterministic recipes for CSV and typed JSON fixtures.",
   "keywords": [
+    "zrow",
     "csv",
     "json",
     "fixtures",
     "test-data",
-    "game-data",
-    "acsv"
+    "game-data"
   ]
 }

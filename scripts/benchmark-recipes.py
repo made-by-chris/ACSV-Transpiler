@@ -11,7 +11,7 @@ import {compile,serializeJSON} from './dist/ACSVTranspiler.js';
 const result=compile({input:fs.readFileSync(0,'utf8'),mode:'acsv'});
 console.log(JSON.stringify({csv:result.csv,json:serializeJSON(result,false)}));'''
 encoders={name:tiktoken.get_encoding(name) for name in ['o200k_base','cl100k_base']}
-guide=(ROOT/'src/llmGuide.ts').read_text().split('`')[1]
+guide=(ROOT/'src/authoringGuide.ts').read_text().split('`')[1]
 def expand(source):
     return json.loads(subprocess.check_output(['node','--input-type=module','-e',JS],input=source,text=True,cwd=ROOT))
 def counts(value):

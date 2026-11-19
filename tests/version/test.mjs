@@ -11,3 +11,5 @@ test.each(['# XCSV 9.0\nid','# XCSV banana\nid','id\n# XCSV 0.1','# XCSV 0.1\n# 
 test('literal CSV remains unchanged',()=>{
  const input='# XCSV 9.0\nid';expect(compile({input,mode:'csv'}).csv).toBe(input);
 });
+
+test("ZROW declaration and mode are supported",()=>{expect(compile({input:"# ZROW 0.1\nid:int\n@set id=seq()\n@rows 2",mode:"zrow"}).rows).toEqual([["1"],["2"]]);});

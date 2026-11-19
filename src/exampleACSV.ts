@@ -4,7 +4,7 @@ export const examples = [
     label: "App fixtures",
     title: "app-fixtures",
     mode: "acsv" as const,
-    source: `# XCSV 0.1
+    source: `# ZROW 0.1
 id:int,email,role,active:bool
 @expect 25
 @unique id
@@ -23,7 +23,7 @@ id:int,email,role,active:bool
     label: "Game progression",
     title: "game-progression",
     mode: "acsv" as const,
-    source: `# XCSV 0.1
+    source: `# ZROW 0.1
 level:int,enemy,hp:int,damage:int,reward:int
 @expect 24
 @unique level

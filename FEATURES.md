@@ -20,5 +20,3 @@ The executable contract is [docs/core.md](docs/core.md). Historical feature IDs 
 ## Still deferred
 
 Randomness, seeds, Faker catalogs, nullable generators, nested scopes/tables, custom dialects, spreadsheet-safety transformations, and asynchronous constant-memory streaming. Historical implicit group syntax remains unsupported; explicit row/block overrides now provide a small, well-defined scope mechanism.
-
-Original aspirational examples remain in [roadmap-fixtures](docs/roadmap-fixtures/). Their rejection tests have not been silently removed to advertise those proposals as working features.

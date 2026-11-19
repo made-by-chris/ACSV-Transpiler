@@ -25,3 +25,11 @@ dist-ssr
 
 .wrangler/
 portfolio-build/
+
+# Generated CLI and package archives
+cli/
+*.tgz
+.env
+.env.*
+!.env.example
+.dev.vars

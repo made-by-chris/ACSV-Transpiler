@@ -56,11 +56,11 @@ export default {
       if (
         !b ||
         typeof b.input !== "string" ||
-        !["csv", "acsv", "xcsv"].includes(b.mode ?? "xcsv") ||
+        !["csv", "acsv", "xcsv", "zrow"].includes(b.mode ?? "zrow") ||
         !["csv", "json"].includes(b.format ?? "csv")
       )
         return json({ error: "Invalid input, mode or format" }, 400);
-      const c = compile({ input: b.input, mode: b.mode ?? "xcsv" });
+      const c = compile({ input: b.input, mode: b.mode ?? "zrow" });
       console.info(
         JSON.stringify({
           event: "conversion",

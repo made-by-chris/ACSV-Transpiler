@@ -1,27 +1,53 @@
-# XCSV — readable data recipes
+# ZROW
 
-Generate predictable app fixtures and game tables without repeating every value or counting empty comma cells. Name the pattern, then name the exceptions.
+ZROW compiles data recipes into CSV and typed JSON. It includes a JavaScript library, a command-line tool, a browser editor and a conversion API.
 
-```acsv
+```text
+# ZROW 0.1
 id:int,email,role,active:bool
 @expect 6
 @unique id
 @set id=seq(),email="user{id}@example.test"
-@set role=member,active=true
+@set role="member",active=true
 @rows 3
-@row email="admin@example.test",role=admin
-@rows 2 with role=guest,active=false
+@row email="admin@example.test",role="admin"
+@rows 2 with role="guest",active=false
 ```
 
-This produces six ordinary CSV rows or six JSON objects with numeric IDs and boolean `active` values. Named overrides affect only their rows. Adding a column does not shift an override into the wrong field.
+This recipe produces six rows. `@set` defines defaults, `@rows` generates rows, and `@row` supplies named overrides. Numeric and boolean types are preserved in JSON. CSV output contains ordinary fields and no recipe directives.
 
-- **Readable:** `@set`, `@row`, `@rows`; optional comments and literal CSV rows.
-- **Expressive:** sequences, cycles, per-row formulas, conditions, dates, rounding and bounded game curves.
-- **Checkable:** optional types, expected row counts, unique keys, source diagnostics and cell tracing.
-- **Portable output:** CSV, typed JSON, an ESM library, a Node CLI and a browser editor using the same core.
-- **Useful for LLMs:** a copyable authoring guide, explicit generation counts and validation. Size savings depend on the data; see the [measured examples](docs/size-experiment.md).
+[Language reference](docs/core.md) · [Authoring guide](docs/authoring.md) · [Examples](examples.md) · [Feature status](FEATURES.md) · [Portable profile](docs/portable-profile.md)
 
-[Working examples](examples.md) · [Language contract](docs/core.md) · [LLM guide](docs/llm-guide.md) · [Feature status](FEATURES.md) · [Portable profile](docs/portable-profile.md)
+## Install
+
+```sh
+npm install zrow-js
+npx zrow users.zrow users.csv
+npx zrow users.zrow users.json
+```
+
+## JavaScript
+
+```js
+import { compile, toRecords, serializeJSON, validate } from 'zrow-js';
+
+const input = '# ZROW 0.1\nid:int,active:bool\n@set id=seq(),active=true\n@rows 3';
+const result = compile({ input, mode: 'zrow' });
+console.log(result.csv);
+console.log(toRecords(result));
+console.log(serializeJSON(result));
+console.log(validate({ input, mode: 'zrow' }));
+```
+
+The default input mode is literal CSV, which preserves valid input without interpreting recipe syntax. Use `mode: "zrow"` to compile recipes. The optional `# ZROW 0.1` declaration identifies the language version independently of the npm package version. Unsupported, malformed, repeated or misplaced declarations are rejected.
+
+The portable core has no filesystem access or dynamic JavaScript evaluation. The `zrow-js/node` adapter enables confined file includes. Existing `acsv` and `xcsv` modes, file extensions and the `# XCSV 0.1` declaration remain supported for compatibility.
+
+## Editor and API
+
+The [editor](https://acsv.majaku.com/) runs locally in your browser and stores drafts on your device. It previews tables, CSV and JSON and exports the full generated output. The table preview displays the first 100 rows.
+
+The [conversion API](https://acsv.majaku.com/api/) runs on Cloudflare. Its [OpenAPI schema](https://acsv.majaku.com/openapi.json) documents requests, limits and diagnostics. The [agent index](https://acsv.majaku.com/llms.txt) links to machine-readable documentation.
 
 ## Run locally
 
@@ -34,63 +60,10 @@ npm run build
 npm run preview
 ```
 
-The editor offers app/game examples, table/CSV/JSON previews, explicit input/export modes, typed headers, cell-to-source tracing, saved drafts, undo replacement, and source/data copy/download. The table previews the first 100 rows; exports include all output. Processing stays on your device.
+`src/` contains the compiler and editor. `worker/` contains the conversion API. `tests/` contains compatibility, conformance and browser/Node runtime checks. `docs/` contains the language documentation. Builds generate `dist/` and `cli/`; generated files are excluded from Git.
 
-Library files live in `dist/`, CLI files in `cli/`, and the website in `dist/web/`. The public [editor](https://acsv.majaku.com/) and [conversion API](https://acsv.majaku.com/api/) run on Cloudflare.
+Changes to language behavior should include tests and compatibility notes. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Install the released package
+## License and maintainer
 
-The npm package is `@basiclaser/xcsv`. The 0.2.0 release is being submitted to npm; until accepted, the existing [0.1.0 package](https://www.npmjs.com/package/acsv-transpiler) remains available.
-
-```sh
-npm install @basiclaser/xcsv
-npx xcsv users.xcsv users.csv
-```
-
-## CLI
-
-```sh
-node cli/ACSV.js users.acsv users.csv
-node cli/ACSV.js users.acsv users.json
-node cli/ACSV.js --mode acsv --format json recipe.txt output.txt
-node cli/ACSV.js existing.csv unchanged.csv
-```
-
-`.acsv` selects recipe mode; `.json` output selects JSON. Failed compilation or conversion leaves the output file untouched.
-
-## Library
-
-The GitHub installation above exposes the portable core as `xcsv`:
-
-```js
-import { compile, toRecords, serializeJSON, validate } from '@basiclaser/xcsv';
-const input = 'id:int,active:bool\n@set id=seq(),active=true\n@rows 3';
-const result = compile({ input, mode: 'acsv' });
-console.log(result.csv);
-console.log(toRecords(result)); // [{ id: 1, active: true }, ...]
-console.log(serializeJSON(result));
-console.log(validate({ input, mode: 'acsv' }));
-```
-
-The default export still returns CSV text. The default **input** mode is literal CSV: it never interprets formulas or directives and returns valid input unchanged. File includes require the explicit `./dist/node.js` adapter (package export `@basiclaser/xcsv/node`); the portable core has no filesystem access or dynamic JavaScript evaluation.
-
-## Compatibility
-
-Existing `>` controls and ordinary CSV rows continue working. New recipes can use named directives throughout. `@` lines and unquoted `:type` header annotations are now reserved in XCSV mode; quote literal fields that resemble them. See the [contract](docs/core.md) for complete behavior and limits.
-
-Created by Christopher Shelley. [MIT license](LICENSE).
-
-## Maintainer and contributions
-
-[Christopher Shelley on X](https://x.com/househuman) · [GitHub](https://github.com/made-by-chris) · [majaku](https://majaku.com). See [CONTRIBUTING.md](CONTRIBUTING.md) for bug reports and review expectations.
-
-## Guides
-
-- [App fixtures with named exceptions](https://acsv.majaku.com/guides/app-fixtures/)
-- [Game progression tables](https://acsv.majaku.com/guides/game-data/)
-- [Reading generated CSV in Python](https://acsv.majaku.com/guides/python/)
-- [Conversion API and limits](https://acsv.majaku.com/api/)
-
-## Language declaration
-
-Start new recipes with `# XCSV 0.1` on its own line before the column header. It is optional for existing recipes, emits no output row, and declares the language version rather than the package version. Unsupported, malformed, duplicate or misplaced declarations are rejected. Literal CSV mode never interprets it. `mode: "xcsv"` selects recipes; `mode: "acsv"` remains a compatibility alias. The current website stays at https://acsv.majaku.com.
+[MIT](LICENSE). Maintained by [Christopher Shelley](https://x.com/househuman) at [Majaku](https://majaku.com).

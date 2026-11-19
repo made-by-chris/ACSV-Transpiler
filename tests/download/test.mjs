@@ -7,7 +7,7 @@ test("native save uses a dated suggestion and writes exactly the exported bytes"
   const picker=vi.fn(async()=>({name:"my-fixtures.csv",createWritable:async()=>({write,close})}));
   vi.stubGlobal("window",{showSaveFilePicker:picker});
   expect(await saveFile("id,name\r\n1,Player", ".csv", date)).toBe("my-fixtures.csv");
-  expect(picker.mock.calls[0][0]).toEqual({suggestedName:"xcsv-2026-11-19.csv",types:[{description:"CSV",accept:{"text/csv":[".csv"]}}]});
+  expect(picker.mock.calls[0][0]).toEqual({suggestedName:"zrow-2026-11-19.csv",types:[{description:"CSV",accept:{"text/csv":[".csv"]}}]});
   expect(await write.mock.calls[0][0].text()).toBe("id,name\r\n1,Player");
   expect(close).toHaveBeenCalledOnce();
 });
@@ -25,7 +25,7 @@ test("fallback accepts a custom filename, adds its extension and releases its UR
   vi.stubGlobal("window",{prompt});vi.stubGlobal("document",{createElement:()=>link});
   vi.spyOn(URL,"createObjectURL").mockReturnValue("blob:test");const revoke=vi.spyOn(URL,"revokeObjectURL").mockImplementation(()=>{});
   expect(await saveFile("[]", ".json",date)).toBe("my-fixtures.json");
-  expect(prompt).toHaveBeenCalledWith("Save as","xcsv-2026-11-19.json");expect(link.download).toBe("my-fixtures.json");expect(click).toHaveBeenCalledOnce();
+  expect(prompt).toHaveBeenCalledWith("Save as","zrow-2026-11-19.json");expect(link.download).toBe("my-fixtures.json");expect(click).toHaveBeenCalledOnce();
   vi.runAllTimers();expect(revoke).toHaveBeenCalledWith("blob:test");
 });
 test("cancelling the fallback creates no download",async()=>{

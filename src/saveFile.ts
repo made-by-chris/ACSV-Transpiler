@@ -13,7 +13,7 @@ interface SavePickerWindow extends Window {
 
 export async function saveFile(text: string, extension: string, now = new Date()) {
   const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-  const suggestedName = `xcsv-${date}${extension}`;
+  const suggestedName = `zrow-${date}${extension}`;
   const mime = extension === ".csv" ? "text/csv" : extension === ".json" ? "application/json" : "text/plain";
   const blob = new Blob([text], { type: `${mime};charset=utf-8` });
   const picker = (window as SavePickerWindow).showSaveFilePicker;

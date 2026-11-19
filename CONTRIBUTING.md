@@ -4,4 +4,4 @@ Open an issue with a small input, expected output, actual output and the compile
 
 Run `npm ci`, `npm test`, `npm run test:acsv` and `npm run build` before opening a pull request. Changes to language behavior need examples, compatibility notes and meaningful tests. Documentation examples should execute against the compiler.
 
-External reviewers and contributors are welcome; contributor count is not a release criterion. Review should focus on CSV compatibility, determinism, diagnostics, resource bounds and browser/Node parity.
+Review should focus on CSV compatibility, determinism, diagnostics, resource bounds and browser/Node parity.
