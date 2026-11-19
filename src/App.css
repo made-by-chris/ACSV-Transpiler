@@ -567,3 +567,5 @@ tbody th {
 .download-select{font-size:11px;border:1px solid var(--border);border-radius:6px;padding:7px;background:white;color:#304767;max-width:110px}
 .output-panel>.panel-heading{height:auto;min-height:57px;flex-basis:auto;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
 @media(max-width:760px){.creator{font-size:11px}.export-actions{width:auto;margin-left:auto}.app-header{gap:10px 16px}.export-actions .majaku-link{margin-left:0}.output-actions{gap:5px}.download-select{padding:6px}.output-panel>.panel-heading{align-items:flex-start}.output-panel .panel-label{padding-top:7px}}
+
+.brand-mark{display:inline-flex;align-items:center;gap:9px;text-decoration:none;letter-spacing:-.7px;color:#0209b0}.brand-mark img{display:block;object-fit:contain;flex-shrink:0}
