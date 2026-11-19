@@ -2,7 +2,7 @@ export default function UtilityBar() {
   return (
     <header class="app-header">
       <div class="brand">
-        <a class="brand-mark" href="/" aria-label="ZROW home"><img src="/zrow.svg" alt="" width="29" height="35" />ZROW</a>
+        <a class="brand-mark" href="/" aria-label="ZROW home"><img src="/zrow.svg" alt="" width="40" height="40" />ZROW</a>
       </div>
       <div class="creator">made by <a href="https://x.com/househuman" target="_blank" rel="noopener noreferrer">Christopher Shelley</a><a class="majaku-link" href="https://majaku.com" aria-label="Majaku"><img src="/majaku.svg" alt="" width="28" height="28" /></a></div>
       <nav class="export-actions" aria-label="Main navigation">
