@@ -1,7 +1,6 @@
 import { test, expect } from 'vitest';
-import { getActualExpected } from '../_helpers.mjs';
+import { validate } from '../../dist/ACSVTranspiler.js';
 
-test('L4.1-seed', () => {
-  const { actual, expected } = getActualExpected(import.meta.url.replace(/test.mjs$/, ''));
-  expect(actual).toBe(expected);
+test('L4.1-seed: reject unsupported syntax instead of producing misleading data', () => {
+  expect(validate({input:"id,rand\n> id++,rand=randInt(1,10, seed=123)",mode:'acsv'})).toMatchObject({valid:false, diagnostics:[{code:'E_UNSUPPORTED'}]});
 });

@@ -1,0 +1,64 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ACSV conversion API",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://acsv.majaku.com"
+    }
+  ],
+  "paths": {
+    "/api/v1/convert": {
+      "post": {
+        "summary": "Compile a bounded ACSV recipe or preserve literal CSV",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["input"],
+                "properties": {
+                  "input": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "mode": {
+                    "enum": ["csv", "acsv"],
+                    "default": "acsv"
+                  },
+                  "format": {
+                    "enum": ["csv", "json"],
+                    "default": "csv"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conversion result"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "413": {
+            "description": "Body too large"
+          },
+          "415": {
+            "description": "Content type"
+          },
+          "422": {
+            "description": "Compilation diagnostic"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        }
+      }
+    }
+  }
+}

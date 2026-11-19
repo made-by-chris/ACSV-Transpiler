@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest';
-import { getActualExpected } from '../_helpers.mjs';
+import { validate } from '../../dist/ACSVTranspiler.js';
 
-test('L6.4-diagnostics', () => {
-  const { actual, expected } = getActualExpected(import.meta.url.replace(/test.mjs$/, ''));
-  expect(actual).toBe(expected);
+test('unknown controls and ragged rows have actionable source locations', () => {
+  expect(validate({input:'id,name\n> unknown++',mode:'acsv'})).toMatchObject({valid:false,diagnostics:[{code:'E_COLUMN',line:2,message:expect.stringContaining('unknown')}]});
+  expect(validate({input:'id,name\n1,Jane,extra',mode:'acsv'})).toMatchObject({valid:false,diagnostics:[{code:'E_WIDTH',line:2,message:'Expected 2 fields, received 3.'}]});
 });

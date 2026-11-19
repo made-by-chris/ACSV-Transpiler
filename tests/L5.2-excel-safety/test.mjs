@@ -1,7 +1,6 @@
 import { test, expect } from 'vitest';
-import { getActualExpected } from '../_helpers.mjs';
+import { validate } from '../../dist/ACSVTranspiler.js';
 
-test('L5.2-excel-safety', () => {
-  const { actual, expected } = getActualExpected(import.meta.url.replace(/test.mjs$/, ''));
-  expect(actual).toBe(expected);
+test('L5.2-excel-safety: reject unsupported syntax instead of producing misleading data', () => {
+  expect(validate({input:"#safety excel=true\nformula",mode:'acsv'})).toMatchObject({valid:false, diagnostics:[{code:'E_UNSUPPORTED'}]});
 });

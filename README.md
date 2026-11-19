@@ -1,117 +1,80 @@
-# ACSV (Auto Comma-Separated Values)
+# ACSV — readable data recipes
 
-![ACSV Logo](src/ascv-logo-walter-modern-techno-sci-fi-typeface.png "ACSV Logo")
-
-## About
-
-ACSV (Auto Comma-Separated Values) is a superset of CSV that allows for automatic population of cells in your data. It's designed to make data generation and manipulation more efficient, especially for large datasets or when working with repetitive patterns.
-
-Key features:
-- Fully compatible with standard CSV
-- Automatic cell population using simple operators
-- Support for incremental and decremental values
-- Easy-to-use syntax for data manipulation
-
-## Demo
-
-Try out ACSV in our online editor: [ACSV Editor Demo](https://acsv.vercel.app/)
-
-## Installation
-
-Clone locally for now (not yet published to npm):
-```bash
-git clone <this_repo_url>
-cd acsv-transpiler
-npm install
-```
-
-Build CLI and library outputs:
-```bash
-npm run build:cli   # → outputs CLI to cli/ACSVTranspiler.js
-npm run build:lib   # → outputs library to dist/ACSVTranspiler.js
-```
-
-## CLI Usage
-
-Transpile ACSV to CSV using the CLI:
-```bash
-node cli/ACSV.js path/to/input.acsv path/to/output.csv
-```
-
-## Library Usage
-
-You can import the library in Node.js or ESM (after building):
-
-```js
-// test-acsv-usage.mjs (Node ESM, after npm run build:lib)
-import transpile from './dist/ACSVTranspiler.js';
-
-const input = `id,name
-
-id++,name=John Doe
-,,,
-`;
-const csv = transpile({ input, streaming: false, stats: false });
-console.log(csv);
-```
-
-Also works in TypeScript:
-```ts
-import transpile from './dist/ACSVTranspiler.js';
-```
-
-## Development
-- `npm run build:cli` — Builds CLI script in `cli/`
-- `npm run build:lib` — Builds library to `dist/` (includes types)
-
-## Usage
-
-Here's a simple example of ACSV syntax:
+Generate predictable app fixtures and game tables without repeating every value or counting empty comma cells. Name the pattern, then name the exceptions.
 
 ```acsv
-id,name,value
-
-id++,name=John Doe,value=100
-,,,
-,,,
-
-name=Jane Smith,value=200
-,,,
-,,,
+id:int,email,role,active:bool
+@expect 6
+@unique id
+@set id=seq(),email="user{id}@example.test"
+@set role=member,active=true
+@rows 3
+@row email="admin@example.test",role=admin
+@rows 2 with role=guest,active=false
 ```
 
-This will generate:
+This produces six ordinary CSV rows or six JSON objects with numeric IDs and boolean `active` values. Named overrides affect only their rows. Adding a column does not shift an override into the wrong field.
 
-```csv
-id,name,value
-1,John Doe,100
-2,John Doe,100
-3,John Doe,100
-4,Jane Smith,200
-5,Jane Smith,200
-6,Jane Smith,200
+- **Readable:** `@set`, `@row`, `@rows`; optional comments and literal CSV rows.
+- **Expressive:** sequences, cycles, per-row formulas, conditions, dates, rounding and bounded game curves.
+- **Checkable:** optional types, expected row counts, unique keys, source diagnostics and cell tracing.
+- **Portable output:** CSV, typed JSON, an ESM library, a Node CLI and a browser editor using the same core.
+- **Useful for LLMs:** a copyable authoring guide, explicit generation counts and validation. Size savings depend on the data; see the [measured examples](docs/size-experiment.md).
+
+[Working examples](examples.md) · [Language contract](docs/core.md) · [LLM guide](docs/llm-guide.md) · [Feature status](FEATURES.md) · [Portable profile](docs/portable-profile.md)
+
+## Run locally
+
+```sh
+npm ci
+npm run dev
+npm test
+npm run test:acsv
+npm run build
+npm run preview
 ```
 
-## Contributing
+The editor offers app/game examples, table/CSV/JSON previews, explicit input/export modes, typed headers, cell-to-source tracing, saved drafts, undo replacement, and source/data copy/download. The table previews the first 100 rows; exports include all output. Processing stays on your device.
 
-We welcome contributions to ACSV! If you'd like to contribute, please follow these steps:
+Library files live in `dist/`, CLI files in `cli/`, and the website in `dist/web/`. The public [editor](https://acsv.majaku.com/) and [conversion API](https://acsv.majaku.com/api/) run on Cloudflare.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## CLI
 
-Please make sure to update tests as appropriate and adhere to the [Contributor Covenant](https://www.contributor-covenant.org/) code of conduct.
+```sh
+node cli/ACSV.js users.acsv users.csv
+node cli/ACSV.js users.acsv users.json
+node cli/ACSV.js --mode acsv --format json recipe.txt output.txt
+node cli/ACSV.js existing.csv unchanged.csv
+```
 
-## License
+`.acsv` selects recipe mode; `.json` output selects JSON. Failed compilation or conversion leaves the output file untouched.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Library
 
-## Credits
+The project is not yet published to npm. After `npm run build:lib`:
 
-ACSV was created by Christopher Shelley.
+```js
+import { compile, toRecords, serializeJSON, validate } from './dist/ACSVTranspiler.js';
+const input = 'id:int,active:bool\n@set id=seq(),active=true\n@rows 3';
+const result = compile({ input, mode: 'acsv' });
+console.log(result.csv);
+console.log(toRecords(result)); // [{ id: 1, active: true }, ...]
+console.log(serializeJSON(result));
+console.log(validate({ input, mode: 'acsv' }));
+```
 
-## Support
+The default export still returns CSV text. The default **input** mode is literal CSV: it never interprets formulas or directives and returns valid input unchanged. File includes require the explicit `./dist/node.js` adapter (package export `acsv-transpiler/node`); the portable core has no filesystem access or dynamic JavaScript evaluation.
 
-If you encounter any issues or have questions, please file an issue on our [GitHub issue tracker](https://github.com/made-by-chris/acsv/issues).
+## Compatibility
+
+Existing `>` controls and ordinary CSV rows continue working. New recipes can use named directives throughout. `@` lines and unquoted `:type` header annotations are now reserved in ACSV mode; quote literal fields that resemble them. See the [contract](docs/core.md) for complete behavior and limits.
+
+Created by Christopher Shelley. [MIT license](LICENSE).
+
+## Maintainer and contributions
+
+[Christopher Shelley on X](https://x.com/househuman) · [GitHub](https://github.com/made-by-chris) · [majaku](https://majaku.com). See [CONTRIBUTING.md](CONTRIBUTING.md) for bug reports and review expectations.
+
+## Moving from the old editor
+
+Browser drafts are scoped to their website. Before moving an old draft, use [the export page on the old host](https://acsv.vercel.app/migration.html), then paste the saved source into the new editor. Exported source files work across hosts.

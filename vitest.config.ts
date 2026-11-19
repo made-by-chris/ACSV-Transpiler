@@ -1,11 +1,12 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    include: ['tests/**/test.mjs'],
-    exclude: ['tests/_helpers.mjs'],
-    reporters: ['default'],
+    include: ["tests/**/test.mjs"],
+    exclude: ["tests/_helpers.mjs"],
+    reporters: ["default"],
     watch: false,
-    pool: 'threads',
+    pool: "threads",
+    maxWorkers: 4,
   },
 });
