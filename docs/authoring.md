@@ -31,5 +31,5 @@ Example:
 (rows 2)
 3,"Shelley, Chris",admin
 
-Forms start in column 1 and occupy one physical line. Full-line # comments and blank lines emit no rows. Limits: 10,000 rows, 250,000 cells. No arbitrary JavaScript evaluation, Faker, nested tables or browser file/network access. Use literal records for irregular cases. Validate with the ZROW compiler before claiming that a recipe is executable.
+Forms start in column 1 and occupy one physical line. Full-line # comments and blank lines emit no rows. Add a trailing # comment after a complete form: (rows 6) # generate six rows. Hashes inside quoted strings and literal CSV fields remain data. Limits: 10,000 rows, 250,000 cells. No arbitrary JavaScript evaluation, Faker, nested tables or browser file/network access. Use literal records for irregular cases. Validate with the ZROW compiler before claiming that a recipe is executable.
 ```

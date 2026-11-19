@@ -87,3 +87,16 @@ Changes to language behavior should include tests and compatibility notes. See [
 ## License and maintainer
 
 [MIT](LICENSE). Maintained by [Christopher Shelley](https://x.com/househuman) at [Majaku](https://majaku.com).
+
+### Inline comments
+
+Explain a recipe next to the instructions:
+
+```text
+# ZROW 0.3
+(cols id:int,name)          # two columns
+(id=seq(),name="User {id}") # number each name
+(rows 6)                   # generate six rows
+```
+
+Comments after instructions do not appear in the output. Hashes in quoted strings and literal CSV fields remain data.

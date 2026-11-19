@@ -23,7 +23,7 @@ id,name,role
 
 The version declaration is optional; an omitted declaration uses the current language, 0.3. Declare it before the header. Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is independent of the npm package version. Earlier ZROW versions remain readable for existing files.
 
-Forms begin in column 1 and occupy one physical line. Parenthesized forms use comma-separated expressions. Blank lines and full-line comments beginning with `#` do not emit rows. A document contains one column header. Metadata declarations can precede it.
+Forms begin in column 1 and occupy one physical line. Parenthesized forms use comma-separated expressions. Blank lines and full-line comments beginning with `#` do not emit rows. A trailing `#` comment can follow a complete form, for example `(rows 6) # generate six rows`. Comments on other instruction lines need a space before `#`. Hashes inside quoted strings and literal CSV fields remain data. A document contains one column header. Metadata declarations can precede it.
 
 ## Columns and types
 

@@ -14,6 +14,27 @@ export interface RecordLine {
 }
 export const MAX_INPUT = 1_000_000;
 
+/** Strip annotations from instructions only; literal CSV is never changed. */
+function withoutInlineComment(raw: string): string {
+  let quote = "", depth = 0;
+  const columns = /^\(cols\s/.test(raw);
+  for (let i = 0; i < raw.length; i++) {
+    const ch = raw[i];
+    if (quote) {
+      if (!columns && ch === "\\") i++;
+      else if (ch === quote) {
+        if (raw[i + 1] === quote) i++;
+        else quote = "";
+      }
+    } else if (ch === '"' || (!columns && ch === "'")) quote = ch;
+    else if (ch === "(") depth++;
+    else if (ch === ")") depth--;
+    else if (ch === "#" && depth === 0 && i > 0 && /[\t )]/.test(raw[i - 1]))
+      return raw.slice(0, i).trimEnd();
+  }
+  return raw;
+}
+
 /** Scan records, not physical lines: quoted fields may contain any line ending. */
 export function scanRecords(
   input: string,
@@ -63,6 +84,7 @@ export function scanRecords(
     ) {
       while (i < input.length && input[i] !== "\n" && input[i] !== "\r") take();
       let raw = input.slice(start, i);
+      if (!raw.startsWith("#")) raw = withoutInlineComment(raw);
       if (parenthesized) {
         if (!raw.trimEnd().endsWith(")"))
           fail(
