@@ -19,26 +19,18 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "input"
-                ],
+                "required": ["input"],
                 "properties": {
                   "input": {
                     "type": "string",
                     "maxLength": 65536
                   },
                   "mode": {
-                    "enum": [
-                      "csv",
-                      "acsv"
-                    ],
+                    "enum": ["csv", "acsv"],
                     "default": "acsv"
                   },
                   "format": {
-                    "enum": [
-                      "csv",
-                      "json"
-                    ],
+                    "enum": ["csv", "json"],
                     "default": "csv"
                   }
                 }

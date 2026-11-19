@@ -36,17 +36,31 @@ export default function UtilityBar(props: Props) {
         </span>
       </div>
       <nav class="export-actions" aria-label="Main navigation">
-        <a href="/docs/">Docs</a><a href="/about/">About</a><a href="https://majaku.com/account/">Account</a>
-        <select aria-label="Download" value="" onChange={(e) => {
-          const value = e.currentTarget.value;
-          if (value === "source") props.onSaveSource();
-          else if (value) props.onDownloadFormat(value as "csv" | "json");
-          e.currentTarget.value = "";
-        }}>
-          <option value="" disabled selected>Download</option>
-          <option value="source" disabled={!props.hasSource}>Source</option>
-          <option value="csv" disabled={!props.canExport}>CSV</option>
-          <option value="json" disabled={!props.canExport}>JSON</option>
+        <a href="/docs/">Docs</a>
+        <a href="/about/">About</a>
+        <a href="https://majaku.com/account/">Account</a>
+        <select
+          aria-label="Download"
+          value=""
+          onChange={(e) => {
+            const value = e.currentTarget.value;
+            if (value === "source") props.onSaveSource();
+            else if (value) props.onDownloadFormat(value as "csv" | "json");
+            e.currentTarget.value = "";
+          }}
+        >
+          <option value="" disabled selected>
+            Download
+          </option>
+          <option value="source" disabled={!props.hasSource}>
+            Source
+          </option>
+          <option value="csv" disabled={!props.canExport}>
+            CSV
+          </option>
+          <option value="json" disabled={!props.canExport}>
+            JSON
+          </option>
         </select>
       </nav>
     </header>
