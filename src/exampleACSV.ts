@@ -1,7 +1,9 @@
+import gallery from "../content/gallery.json";
+import type { InputMode } from "./ACSVTranspiler";
 export const examples = [
   {
     id: "app-fixtures",
-    label: "App fixtures",
+    label: "Account test data",
     title: "app-fixtures",
     mode: "acsv" as const,
     source: `# ZROW 0.1
@@ -18,6 +20,7 @@ id:int,email,role,active:bool
 @row email="",role=guest
 `,
   },
+  ...gallery.map(item => ({ ...item, mode: item.mode as InputMode })),
   {
     id: "game-progression",
     label: "Game progression",

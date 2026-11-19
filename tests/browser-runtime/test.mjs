@@ -108,7 +108,7 @@ test("includes reject cycles and paths outside the selected directory", () => {
 });
 
 test("game example keeps the boss override and resumes the formula curve", () => {
-  const result = compile({ input: examples[1].source, mode: examples[1].mode });
+  const result = compile({ input: examples.find(example => example.id === "game-progression").source, mode: examples.find(example => example.id === "game-progression").mode });
   expect(result.rows).toHaveLength(24);
   expect(result.rows[0]).toEqual(["1", "slime", "80", "8", "25"]);
   expect(result.rows[20]).toEqual(["21", "guardian", "1500", "80", "525"]);
@@ -116,8 +116,8 @@ test("game example keeps the boss override and resumes the formula curve", () =>
 });
 
 test("literal editor example is unchanged and retains multiline values", () => {
-  const result = compile({ input: examples[2].source, mode: examples[2].mode });
-  expect(result.csv).toBe(examples[2].source);
+  const result = compile({ input: examples.find(example => example.id === "literal-csv").source, mode: examples.find(example => example.id === "literal-csv").mode });
+  expect(result.csv).toBe(examples.find(example => example.id === "literal-csv").source);
   expect(result.rows.at(-1)).toEqual(["multiline", "First line\nSecond line"]);
 });
 

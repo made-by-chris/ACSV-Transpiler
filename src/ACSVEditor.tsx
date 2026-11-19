@@ -5,6 +5,7 @@ import {
   For,
   Show,
   onCleanup,
+  onMount,
 } from "solid-js";
 import {
   compile,
@@ -181,6 +182,15 @@ export default function ACSVEditor() {
       announce(error instanceof Error ? `Save failed: ${error.message}` : "Save failed. Try again.");
     }
   }
+
+  onMount(() => {
+    const id = new URLSearchParams(location.search).get("example");
+    const example = examples.find(item => item.id === id);
+    if (example) {
+      replace({ input: example.source, title: example.title, mode: example.mode, format: draft().format });
+      history.replaceState(null, "", location.pathname);
+    }
+  });
 
   function chooseDownload(format: string) {
     if (format === "source") {

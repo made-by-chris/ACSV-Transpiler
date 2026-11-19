@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { marked } from "marked";
+import { compile } from "../dist/ACSVTranspiler.js";
 const dir = "dist/web",
   host = "https://acsv.majaku.com";
 const links =
@@ -30,6 +31,12 @@ function html(title, source, path) {
     `${title}: documentation and reproducible examples for ZROW data recipes.`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${title} — ZROW</title><meta name="description" content="${description}"><link rel="canonical" href="${host}${path}"><meta property="og:title" content="${title} — ZROW"><meta property="og:url" content="${host}${path}"><meta property="og:type" content="website"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><link rel="stylesheet" href="/sponsor.css"><style>body{font:17px/1.65 system-ui;max-width:1000px;margin:36px auto;padding:0 24px;color:#18212c}nav,footer{margin:24px 0}footer{text-align:center}a{color:#175bc0}pre{overflow:auto;background:#f1f4f7;padding:20px}table{border-collapse:collapse;display:block;overflow:auto;max-width:100%}main{min-width:0;overflow-wrap:anywhere}td,th{border:1px solid #ddd;padding:8px}</style></head><body>${links}<main>${marked.parse(source)}</main>${path === "/privacy/" || path === "/about/" || path === "/404.html" ? "" : ad}${footer}${analytics}</body></html>`;
 }
+const gallery = JSON.parse(fs.readFileSync("content/gallery.json", "utf8"));
+const galleryMarkdown = "# Example gallery\n\nZROW describes repeated values, sequences, formulas and exceptions in a table. These examples show generated data, configuration and blank templates. It does not infer rules from an arbitrary CSV file.\n\n" + gallery.map(item => {
+  const result = compile({ input: item.source, mode: "zrow" });
+  if (result.rows.length !== item.expectedRows) throw Error(`Invalid gallery example: ${item.id}`);
+  return `## ${item.label}\n\n${item.category}. ${item.description}\n\n\`\`\`text\n${item.source}\`\`\`\n\nProduces ${result.rows.length} rows. First rows:\n\n\`\`\`csv\n${result.csv.split("\n").slice(0, 5).join("\n")}\n\`\`\`\n\n[Open this example in the editor](/?example=${item.id}).\n\n`;
+}).join("");
 const pages = [];
 function page(path, title, source) {
   source = source.replace(
@@ -62,8 +69,7 @@ const map = {
   "examples.md": "/examples/",
 };
 for (const [path, title, file] of docs) {
-  let s = fs
-    .readFileSync(file, "utf8")
+  let s = (file === "examples.md" ? galleryMarkdown : fs.readFileSync(file, "utf8"))
     .replace(
       /\]\(([^)]+)\)/g,
       (_, u) =>
@@ -127,7 +133,7 @@ let s = fs
   .readFileSync(dir + "/index.html", "utf8")
   .replace(
     "<title>ZROW</title>",
-    `<title>ZROW — CSV and JSON fixture generator</title><meta name="description" content="Generate app fixtures and game data from readable recipes. Edit locally and export CSV or typed JSON."><link rel="canonical" href="${host}/"><meta property="og:title" content="ZROW — CSV and JSON fixture generator"><meta property="og:type" content="website"><meta property="og:url" content="${host}/"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "ZROW", url: host + "/" })}</script>`,
+    `<title>ZROW — CSV and JSON fixture generator</title><meta name="description" content="Describe tables with sequences, formulas and named exceptions. Generate CSV or typed JSON in your browser."><link rel="canonical" href="${host}/"><meta property="og:title" content="ZROW — CSV and JSON fixture generator"><meta property="og:type" content="website"><meta property="og:url" content="${host}/"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "ZROW", url: host + "/" })}</script>`,
   );
 s = s.replace(
   "</body>",
