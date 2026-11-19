@@ -13,7 +13,7 @@ if (!src || !dest) usage();
 
 try {
   const input = fs.readFileSync(src, 'utf8');
-  const csv = transpile({ input, streaming: false, stats: false });
+  const csv = transpile({ input, mode: 'acsv', streaming: false, stats: false });
   fs.writeFileSync(dest, csv, 'utf8');
   console.log(`Wrote ${dest}`);
 } catch (e) {

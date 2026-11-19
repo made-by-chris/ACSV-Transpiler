@@ -1,5 +1,4 @@
-id,name
-
-id++,name=John Doe
-,,,
-
+id:int,name,active:bool
+@expect 3
+@set id=seq(),name=Player,active=true
+@rows 3

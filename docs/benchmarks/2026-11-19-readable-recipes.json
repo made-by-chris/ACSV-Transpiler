@@ -1,0 +1,193 @@
+{
+  "method": "Hand-authored examples expanded by the compiler; CSV rows checked and equivalent legacy recipe compared. JSON is compact, not pretty-printed. Counts exclude task prompts, Markdown fences, reasoning, retries and execution. The complete copyable LLM guide is counted separately, not hidden in recipe savings. No LLM accuracy or human usability experiment was performed. Small or irregular datasets may not benefit; new keywords may cost more tokens than legacy notation.",
+  "tokenizer_version": "0.14.0",
+  "llm_guide_overhead": {
+    "characters": 2112,
+    "utf8_bytes": 2112,
+    "tokens": {
+      "o200k_base": 489,
+      "cl100k_base": 487
+    }
+  },
+  "cases": [
+    {
+      "case": "3 regular app rows",
+      "rows": 3,
+      "formats": {
+        "recipe": {
+          "characters": 60,
+          "utf8_bytes": 60,
+          "tokens": {
+            "o200k_base": 23,
+            "cl100k_base": 23
+          }
+        },
+        "legacy_recipe": {
+          "characters": 48,
+          "utf8_bytes": 48,
+          "tokens": {
+            "o200k_base": 17,
+            "cl100k_base": 17
+          }
+        },
+        "csv": {
+          "characters": 56,
+          "utf8_bytes": 56,
+          "tokens": {
+            "o200k_base": 20,
+            "cl100k_base": 20
+          }
+        },
+        "json": {
+          "characters": 130,
+          "utf8_bytes": 130,
+          "tokens": {
+            "o200k_base": 39,
+            "cl100k_base": 39
+          }
+        }
+      },
+      "source": "id,role,active\n@set id=seq(),role=member,active=true\n@rows 3"
+    },
+    {
+      "case": "25 regular app rows",
+      "rows": 25,
+      "formats": {
+        "recipe": {
+          "characters": 61,
+          "utf8_bytes": 61,
+          "tokens": {
+            "o200k_base": 23,
+            "cl100k_base": 23
+          }
+        },
+        "legacy_recipe": {
+          "characters": 49,
+          "utf8_bytes": 49,
+          "tokens": {
+            "o200k_base": 17,
+            "cl100k_base": 17
+          }
+        },
+        "csv": {
+          "characters": 380,
+          "utf8_bytes": 380,
+          "tokens": {
+            "o200k_base": 130,
+            "cl100k_base": 130
+          }
+        },
+        "json": {
+          "characters": 1092,
+          "utf8_bytes": 1092,
+          "tokens": {
+            "o200k_base": 303,
+            "cl100k_base": 303
+          }
+        }
+      },
+      "source": "id,role,active\n@set id=seq(),role=member,active=true\n@rows 25"
+    },
+    {
+      "case": "250 regular app rows",
+      "rows": 250,
+      "formats": {
+        "recipe": {
+          "characters": 62,
+          "utf8_bytes": 62,
+          "tokens": {
+            "o200k_base": 23,
+            "cl100k_base": 23
+          }
+        },
+        "legacy_recipe": {
+          "characters": 50,
+          "utf8_bytes": 50,
+          "tokens": {
+            "o200k_base": 17,
+            "cl100k_base": 17
+          }
+        },
+        "csv": {
+          "characters": 3906,
+          "utf8_bytes": 3906,
+          "tokens": {
+            "o200k_base": 1255,
+            "cl100k_base": 1255
+          }
+        },
+        "json": {
+          "characters": 11143,
+          "utf8_bytes": 11143,
+          "tokens": {
+            "o200k_base": 3003,
+            "cl100k_base": 3003
+          }
+        }
+      },
+      "source": "id,role,active\n@set id=seq(),role=member,active=true\n@rows 250"
+    },
+    {
+      "case": "100 game levels",
+      "rows": 100,
+      "formats": {
+        "recipe": {
+          "characters": 110,
+          "utf8_bytes": 110,
+          "tokens": {
+            "o200k_base": 46,
+            "cl100k_base": 45
+          }
+        },
+        "csv": {
+          "characters": 1191,
+          "utf8_bytes": 1191,
+          "tokens": {
+            "o200k_base": 698,
+            "cl100k_base": 698
+          }
+        },
+        "json": {
+          "characters": 3577,
+          "utf8_bytes": 3577,
+          "tokens": {
+            "o200k_base": 1295,
+            "cl100k_base": 1295
+          }
+        }
+      },
+      "source": "level:int,hp:int,damage:int\n@set level=seq(),hp=round(80*pow(1.12,level-1)),damage=min(99,5+level*3)\n@rows 100"
+    },
+    {
+      "case": "5 irregular literal records",
+      "rows": 5,
+      "formats": {
+        "recipe": {
+          "characters": 59,
+          "utf8_bytes": 59,
+          "tokens": {
+            "o200k_base": 37,
+            "cl100k_base": 39
+          }
+        },
+        "csv": {
+          "characters": 59,
+          "utf8_bytes": 59,
+          "tokens": {
+            "o200k_base": 37,
+            "cl100k_base": 39
+          }
+        },
+        "json": {
+          "characters": 151,
+          "utf8_bytes": 151,
+          "tokens": {
+            "o200k_base": 60,
+            "cl100k_base": 61
+          }
+        }
+      },
+      "source": "key,value\nj7Q,cobalt\nm2R,17.38\nz8T,plum\nb3K,-8.04\nv9P,linen"
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 import { test, expect } from 'vitest';
-import { getActualExpected } from '../_helpers.mjs';
+import { validate } from '../../dist/ACSVTranspiler.js';
 
-test('L3.11-groups', () => {
-  const { actual, expected } = getActualExpected(import.meta.url.replace(/test.mjs$/, ''));
-  expect(actual).toBe(expected);
+test('L3.11-groups: reject unsupported syntax instead of producing misleading data', () => {
+  expect(validate({input:"id,group\n> scope group",mode:'acsv'})).toMatchObject({valid:false, diagnostics:[{code:'E_CONTROL'}]});
 });

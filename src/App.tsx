@@ -1,15 +1,6 @@
-import './App.css'
-import ACSVEditor from './ACSVEditor'
-import UtilityBar from './UtilityBar'
+import "./App.css";
+import ACSVEditor from "./ACSVEditor";
 
-function App() {
-
-  return (
-    <>
-      <UtilityBar />
-      <ACSVEditor />
-    </>
-  )
+export default function App() {
+  return <ACSVEditor />;
 }
-
-export default App

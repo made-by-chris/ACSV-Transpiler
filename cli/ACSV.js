@@ -1,17 +1,66 @@
-import transpile from "./ACSVTranspiler.js";
-import * as fs from "fs";
+#!/usr/bin/env node
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { randomUUID } from "node:crypto";
+import { ACSVError, serializeJSON } from "./ACSVTranspiler.js";
+import { compileNode } from "./node.js";
 const args = process.argv.slice(2);
-const src = args[0];
-const dest = args[1];
-if (src && dest) {
-    const config = {
-        input: fs.readFileSync(src, "utf8"),
-        streaming: false,
-        stats: false,
-    };
-    const result = transpile(config);
-    fs.writeFileSync(dest, result);
+let mode;
+let format;
+const formatIndex = args.indexOf("--format");
+if (formatIndex >= 0) {
+    const value = args[formatIndex + 1];
+    if (value !== "csv" && value !== "json") {
+        console.error("--format must be csv or json");
+        process.exit(1);
+    }
+    format = value;
+    args.splice(formatIndex, 2);
+}
+const modeIndex = args.indexOf("--mode");
+if (modeIndex >= 0) {
+    const value = args[modeIndex + 1];
+    if (value !== "csv" && value !== "acsv") {
+        console.error("--mode must be csv or acsv");
+        process.exit(1);
+    }
+    mode = value;
+    args.splice(modeIndex, 2);
+}
+if (args.includes("--help")) {
+    console.log("Usage: node cli/ACSV.js [--mode csv|acsv] [--format csv|json] <input.csv|input.acsv> <output.csv|output.json>\nMode defaults to the input extension; format defaults to the output extension. CSV input is literal.");
+}
+else if (args.length !== 2) {
+    console.error("Usage: node cli/ACSV.js [--mode csv|acsv] [--format csv|json] <input.csv|input.acsv> <output.csv|output.json>");
+    process.exitCode = 1;
 }
 else {
-    console.log("Usage: node ACSV.js <src> <dest>");
+    let temporary;
+    try {
+        const [src, dest] = args;
+        mode ??= path.extname(src).toLowerCase() === ".acsv" ? "acsv" : "csv";
+        const sourceName = fs.realpathSync(src);
+        const result = compileNode({
+            input: fs.readFileSync(src, "utf8"),
+            mode,
+            baseDir: path.dirname(sourceName),
+            sourceName,
+        });
+        format ??= path.extname(dest).toLowerCase() === ".json" ? "json" : "csv";
+        const output = format === "json" ? serializeJSON(result) : result.csv;
+        temporary = path.join(path.dirname(dest), `.acsv-${randomUUID()}.tmp`);
+        fs.writeFileSync(temporary, output, { flag: "wx" });
+        fs.renameSync(temporary, dest);
+        temporary = undefined;
+    }
+    catch (error) {
+        if (temporary)
+            fs.rmSync(temporary, { force: true });
+        console.error(error instanceof ACSVError
+            ? `${error.code} at line ${error.line}, column ${error.column}: ${error.message}`
+            : error instanceof Error
+                ? error.message
+                : error);
+        process.exitCode = 1;
+    }
 }

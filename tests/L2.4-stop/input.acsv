@@ -1,6 +1,3 @@
 id
-> id++
-,
-,
-> id++STOP
-,
+> id++ x2
+> id++STOP x1

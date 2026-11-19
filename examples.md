@@ -1,385 +1,92 @@
-# ACSV Examples
+# Working recipes
 
-This file shows short, focused examples for proposed ACSV features. Each block is intentionally small to illustrate intent, followed by expected CSV output.
+Use ACSV mode. Each example below is compiled and compared with its expected CSV by the test suite. The same typed recipes can be exported as JSON.
 
-## Basics: headers, assign, increment
+## App fixtures: named exceptions
+
 ```acsv
-id,name
-
-id++,name=John Doe
-,,,
-,,,
+id:int,email,role,active:bool
+@expect 6
+@unique id
+@set id=seq(),email="user{id}@example.test"
+@set role=member,active=true
+@rows 3
+@row email="admin@example.test",role=admin
+@rows 2 with role=guest,active=false
 ```
 
 ```csv
-id,name
-1,John Doe
-2,John Doe
-3,John Doe
+id,email,role,active
+1,user1@example.test,member,true
+2,user2@example.test,member,true
+3,user3@example.test,member,true
+4,admin@example.test,admin,true
+5,user5@example.test,guest,false
+6,user6@example.test,guest,false
 ```
 
-## Variables: assign once, reuse
-```acsv
-id,project,version
+Check account roles and inactive access with predictable IDs. Use `@row email=""` for an explicit missing-email case; no placeholder commas are needed.
 
-id++,project=ACME,version=1.2.3
-,,,
+## Game progression: a curve with a boss
+
+```acsv
+level:int,enemy,hp:int,damage:int,reward:int
+@expect 6
+@unique level
+@set level=seq(),enemy=cycle("slime","golem")
+@set hp=round(100*pow(1.2,level-1))
+@set damage=min(20,5+level*3),reward=level*25
+@rows 3
+@row enemy=guardian,hp=500,damage=30
+@rows 2 with enemy=elite
 ```
 
 ```csv
-id,project,version
-1,ACME,1.2.3
-2,ACME,1.2.3
-3,ACME,1.2.3
+level,enemy,hp,damage,reward
+1,slime,100,8,25
+2,golem,120,11,50
+3,slime,144,14,75
+4,guardian,500,30,100
+5,elite,207,20,125
+6,elite,249,20,150
 ```
 
-## Row repeat counts
-```acsv
-id,name
+The boss overrides HP/damage while reward follows the same formula. The progression resumes afterward; damage caps at 20 for ordinary encounters.
 
-id++,name=John x3
+## Shop variants: preserve relationships
+
+```acsv
+sku,price:number,quantity:int,total:number
+@unique sku
+@set quantity=2,total=round(price*quantity,2)
+@row sku="POTION, RED",price=12.5
+@row sku=SWORD,price=99.95,quantity=3
 ```
 
 ```csv
-id,name
-1,John
-2,John
-3,John
+sku,price,quantity,total
+"POTION, RED",12.5,2,25
+SWORD,99.95,3,299.85
 ```
 
-## Ranges / series
-```acsv
-id
+Named formulas can appear before their inputs. JSON preserves the numeric types. Binary floating point is suitable for fixtures; use an exact decimal system for accounting.
 
-id=1..5
+## Calendar fixtures: explicit dates
+
+```acsv
+id:int,date:date,ship_date:date
+@set id=seq(),date=seq("2026-01-30")
+@set ship_date=formatDate(date+3d,"YYYY-MM-DD")
+@rows 3
 ```
 
 ```csv
-id
-1
-2
-3
-4
-5
+id,date,ship_date
+1,2026-01-30,2026-02-02
+2,2026-01-31,2026-02-03
+3,2026-02-01,2026-02-04
 ```
 
-## Step and units for accumulators
-Assume `date++1d` is implied per data row when a date is present.
-```acsv
-id,date
+## Irregular real data
 
-id++2,date=2025-01-01
-,,
-,,
-,,
-```
-
-```csv
-id,date
-2,2025-01-01
-4,2025-01-02
-6,2025-01-03
-8,2025-01-04
-```
-
-## Column references and expressions
-```acsv
-price,qty,total
-
-price=10,qty=3,total=price*qty
-,,,
-```
-
-```csv
-price,qty,total
-10,3,30
-10,3,30
-10,3,30
-```
-
-## prev()/row()/col() helpers
-```acsv
-value,diff
-
-value=10
-,,
-value=15,diff=value - prev(value)
-```
-
-```csv
-value,diff
-10,
-10,
-15,5
-```
-
-## Conditional assignment (if/else)
-```acsv
-spend,tier
-
-spend=900,tier=if(spend>1000,"GOLD","SILVER")
-spend=1200,tier=if(spend>1000,"GOLD","SILVER")
-```
-
-```csv
-spend,tier
-900,SILVER
-1200,GOLD
-```
-
-## Templates / interpolation
-```acsv
-first,last,email
-
-first=Jane,last=Doe,email="{first}.{last}@example.com".lower()
-```
-
-```csv
-first,last,email
-Jane,Doe,jane.doe@example.com
-```
-
-## Formatting helpers
-```acsv
-id,sku
-
-id=42,sku="SKU-" + pad(id,5)
-```
-
-```csv
-id,sku
-42,SKU-00042
-```
-
-## Dates/times: arithmetic and formatting
-```acsv
-order_at,ship_at
-
-order_at=2025-01-01,ship_at=formatDate(order_at + 3d, "YYYY-MM-DD")
-```
-
-```csv
-order_at,ship_at
-2025-01-01,2025-01-04
-```
-
-## Deterministic random (seeded)
-```acsv
-id,rand
-
-id++,rand=randInt(1,10, seed=123)
-,,,
-,,,
-```
-
-Example expected (illustrative; must be defined by implementation):
-```csv
-id,rand
-1,3
-2,9
-3,7
-```
-
-## Distributions (weighted choice)
-```acsv
-status
-
-status=choiceWeighted(["PAID":0.8,"DUE":0.2], seed=42)
-```
-
-Example expected with the given seed:
-```csv
-status
-PAID
-```
-
-## Faker-like generators (deterministic)
-```acsv
-first,last,phone
-
-first=faker.firstName(seed=7),last=faker.lastName(seed=7),phone=faker.phone(seed=7)
-```
-
-Example expected with the given seed:
-```csv
-first,last,phone
-Alice,Johnson,555-0107
-```
-
-## Null/blank control
-```acsv
-email
-
-email=maybe(null, p=0.1)
-```
-
-Example output (null may occur ~10%):
-```csv
-email
-
-```
-
-## Groups / scoped state
-```acsv
-id,group
-
-id++
-,,
-
-# begin scoped controls
-id++2,group=A
-,,,
-# STOP scope
-id++STOP
-
-# normal increment resumes
-,,
-```
-
-```csv
-id,group
-1,
-3,A
-5,A
-7,A
-7,
-8,
-```
-
-## STOP with scope
-```acsv
-id
-
-id++
-,,,
-
-id++STOP
-,,
-```
-
-```csv
-id
-1
-2
-3
-3
-4
-```
-
-## Includes / composition
-```acsv
-# main.acsv
-id,name
-
-include "./common.acsv"
-```
-
-```acsv
-# common.acsv
-id++,name=Shared
-,,,
-```
-
-```csv
-id,name
-1,Shared
-2,Shared
-3,Shared
-```
-
-## CSV dialect controls in-file
-```acsv
-#dialect delimiter=";" quote='"' newline="\r\n"
-id;name
-
-id++;name=Jane
-,,
-```
-
-```csv
-id;name
-1;Jane
-2;Jane
-```
-
-## Safety mode for Excel injection
-```acsv
-#safety excel=true
-formula
-
-formula==SUM(A1:A2)
-```
-
-```csv
-formula
-'=SUM(A1:A2)
-```
-
----
-
-# Library API sketches (proposals)
-
-## Transpile (existing)
-```js
-import transpile from 'acsv-transpiler';
-const csv = transpile({ input, streaming: false, stats: false });
-```
-
-## Streamed generation (proposal)
-```js
-import { transpileStream } from 'acsv-transpiler';
-for await (const row of transpileStream({ input })) {
-  process.stdout.write(row + '\n');
-}
-```
-
-## Validation (proposal)
-```js
-import { validate, isValid } from 'acsv-transpiler';
-
-const report = validate({ input, strict: true });
-if (!report.ok) {
-  for (const err of report.errors) {
-    console.error(`${err.code} at row ${err.row}, col ${err.col}: ${err.message}`);
-  }
-}
-
-if (!isValid({ input })) {
-  console.error('Invalid ACSV');
-}
-```
-
-Validation report shape (proposal):
-```ts
-interface ValidationError {
-  code: string;        // e.g. "E_UNKNOWN_COLUMN"
-  row: number;         // 1-based input line
-  col?: number;        // optional cell index
-  message: string;     // human-readable
-}
-interface ValidationReport {
-  ok: boolean;
-  errors: ValidationError[];
-  warnings?: ValidationError[];
-  stats?: Record<string, number>;
-}
-```
-
-# CLI sketches (proposals)
-
-## Transpile
-```bash
-npx acsv transpile --in input.acsv --out output.csv --strict --excel-safe --delimiter ';'
-```
-
-## Validate
-```bash
-npx acsv validate --in input.acsv --strict
-# exit code 0 on ok, 1 on errors; prints a report
-```
-
-## Preview (first N rows)
-```bash
-npx acsv preview --in input.acsv --rows 50
-```
-
+Choose **Literal CSV** for an existing dataset or whenever there is no useful pattern to express. ACSV is not required to be smaller for every table. CSV cells such as `1+2`, `a=b`, `#urgent` and `@rows 20` remain literal in that mode.

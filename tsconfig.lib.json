@@ -9,5 +9,8 @@
     "module": "ESNext",
     "target": "ES2021"
   },
-  "include": ["src/ACSVTranspiler.ts"]
+  "include": [
+    "src/ACSVTranspiler.ts",
+    "src/node.ts"
+  ]
 }

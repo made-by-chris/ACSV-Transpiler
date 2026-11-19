@@ -1,51 +1,38 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import transpile from '../dist/ACSVTranspiler.js';
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import transpileNode from "../dist/node.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const root = path.resolve(__dirname, '..');
-const testsDir = path.join(root, 'tests');
-
-function findTests(dir) {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  return entries.flatMap(e => {
-    const p = path.join(dir, e.name);
-    if (e.isDirectory()) return findTests(p);
-    return [];
-  }).filter(() => true);
-}
-
-function* testCases() {
-  const groups = fs.readdirSync(testsDir, { withFileTypes: true }).filter(d => d.isDirectory());
-  for (const g of groups) {
-    const dir = path.join(testsDir, g.name);
-    const input = path.join(dir, 'input.acsv');
-    const expected = path.join(dir, 'expected.csv');
-    if (fs.existsSync(input) && fs.existsSync(expected)) {
-      yield { id: g.name, input, expected };
-    }
-  }
-}
-
-let failed = 0, passed = 0;
-for (const t of testCases()) {
-  const input = fs.readFileSync(t.input, 'utf8');
-  const want = fs.readFileSync(t.expected, 'utf8').trim();
-  const got = transpile({ input, streaming: false, stats: false }).trim();
-  if (got === want) {
-    console.log(`PASS  ${t.id}`);
+const testsDir = fileURLToPath(new URL("../tests/", import.meta.url));
+let passed = 0,
+  failed = 0;
+for (const entry of fs.readdirSync(testsDir, { withFileTypes: true })) {
+  if (!entry.isDirectory()) continue;
+  const dir = path.join(testsDir, entry.name);
+  const inputFile = path.join(dir, "input.acsv"),
+    expectedFile = path.join(dir, "expected.csv");
+  if (!fs.existsSync(inputFile) || !fs.existsSync(expectedFile)) continue;
+  try {
+    const expected = fs
+      .readFileSync(expectedFile, "utf8")
+      .replace(/\r?\n$/, "");
+    const actual = transpileNode({
+      input: fs.readFileSync(inputFile, "utf8"),
+      mode: "acsv",
+      baseDir: dir,
+    });
+    if (actual !== expected)
+      throw new Error(
+        `Expected ${JSON.stringify(expected)}, received ${JSON.stringify(actual)}`,
+      );
+    console.log(`PASS ${entry.name}`);
     passed++;
-  } else {
-    console.error(`FAIL  ${t.id}`);
-    console.error('--- got ---');
-    console.error(got);
-    console.error('--- want ---');
-    console.error(want);
+  } catch (error) {
+    console.error(`FAIL ${entry.name}: ${error.message}`);
     failed++;
   }
 }
-
-console.log(`\n${passed} passed, ${failed} failed`);
-process.exit(failed ? 1 : 0);
+console.log(
+  `${passed} golden fixtures passed, ${failed} failed. Full API and compatibility coverage: npm test.`,
+);
+process.exitCode = failed ? 1 : 0;

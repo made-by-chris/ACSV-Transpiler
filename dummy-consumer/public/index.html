@@ -10,8 +10,7 @@
     <p>Browser test: transpile ACSV to CSV using the library served from <code>/lib/ACSVTranspiler.js</code>.</p>
     <textarea id="acsv">id,name
 
-id++,name=Jane
-,,,
+> id++,name=Jane x3
 </textarea>
     <div><button id="run">Transpile</button></div>
     <h3>Output</h3>
@@ -22,7 +21,7 @@ id++,name=Jane
       const outEl = document.getElementById('out');
       document.getElementById('run').addEventListener('click', () => {
         try {
-          const csv = transpile({ input: inputEl.value, streaming: false, stats: false });
+          const csv = transpile({ input: inputEl.value, mode: 'acsv', streaming: false, stats: false });
           outEl.textContent = csv;
         } catch (e) {
           outEl.textContent = 'Error: ' + e;
@@ -33,7 +32,7 @@ id++,name=Jane
       const params = new URLSearchParams(window.location.search);
       if (params.get('autotest') === '1') {
         try {
-          const csv = transpile({ input: inputEl.value, streaming: false, stats: false });
+          const csv = transpile({ input: inputEl.value, mode: 'acsv', streaming: false, stats: false });
           outEl.textContent = csv;
           fetch('/report', {
             method: 'POST',

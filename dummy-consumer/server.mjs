@@ -2,8 +2,8 @@ import express from 'express';
 import transpile from 'acsv-transpiler';
 
 const app = express();
-app.use(express.text({ type: '*/*' }));
 app.use(express.json());
+app.use(express.text({ type: 'text/*' }));
 
 // In-memory latest browser test result
 let lastResult = null;
@@ -15,15 +15,15 @@ app.use('/lib', express.static('../dist'));
 app.use(express.static('public'));
 
 app.get('/node-test', (req, res) => {
-  const input = 'id,name\n\n' + 'id++,name=John Doe\n' + ',,,\n';
-  const csv = transpile({ input, streaming: false, stats: false });
+  const input = 'id,name\n> id++,name=John Doe x3';
+  const csv = transpile({ input, mode: 'acsv', streaming: false, stats: false });
   res.type('text/plain').send(csv);
 });
 
 app.post('/api/transpile', (req, res) => {
   const input = req.body || '';
   try {
-    const csv = transpile({ input, streaming: false, stats: false });
+    const csv = transpile({ input, mode: 'acsv', streaming: false, stats: false });
     res.type('text/plain').send(csv);
   } catch (e) {
     res.status(400).json({ error: String(e) });
@@ -40,7 +40,7 @@ app.post('/report', (req, res) => {
   let match = false;
   try {
     if (!error) {
-      serverCsv = transpile({ input, streaming: false, stats: false });
+      serverCsv = transpile({ input, mode: 'acsv', streaming: false, stats: false });
       match = serverCsv === browserCsv;
     }
   } catch (e) {
