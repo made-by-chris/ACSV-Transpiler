@@ -85,7 +85,7 @@ page(
 page(
   "/about/",
   "About",
-  `# About ZROW\n\nZROW generates predictable CSV and typed JSON from readable recipes. Created by [Christopher Shelley](https://x.com/househuman) at [majaku](https://majaku.com).\n\nThe implementation runs in browsers and Node.js. Python can consume its generated output. The editor processes recipes locally.\n\n[Source and issues](https://github.com/made-by-chris/zrow) · [GitHub profile](https://github.com/made-by-chris). MIT license. Version 0.2.0.\n\nReport bugs through GitHub without including private data.`,
+  `# About ZROW\n\nZROW generates predictable CSV and typed JSON from readable recipes. Created by [Christopher Shelley](https://x.com/househuman) at [majaku](https://majaku.com).\n\nThe implementation runs in browsers and Node.js. Python can consume its generated output. The editor processes recipes locally.\n\n[Source and issues](https://github.com/made-by-chris/zrow) · [GitHub profile](https://github.com/made-by-chris). MIT license. Version 0.2.1.\n\nReport bugs through GitHub without including private data.`,
 );
 page(
   "/privacy/",

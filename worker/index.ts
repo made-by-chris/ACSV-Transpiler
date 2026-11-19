@@ -1,3 +1,4 @@
+import { version } from "../package.json";
 import { compile, serializeJSON, ACSVError } from "../src/ACSVTranspiler";
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -10,7 +11,7 @@ const json = (data: unknown, status = 200) =>
 export default {
   async fetch(r: Request, env: any) {
     const p = new URL(r.url).pathname;
-    if (p === "/api/v1/health") return json({ status: "ok", version: "0.2.0" });
+    if (p === "/api/v1/health") return json({ status: "ok", version });
     if (!p.startsWith("/api/v1/")) return env.ASSETS.fetch(r);
     if (r.method === "OPTIONS")
       return new Response(null, { status: 204, headers });
@@ -70,7 +71,7 @@ export default {
         }),
       );
       return json({
-        version: "0.2.0",
+        version,
         format: b.format ?? "csv",
         data: b.format === "json" ? JSON.parse(serializeJSON(c)) : c.csv,
         rows: c.rows.length,
