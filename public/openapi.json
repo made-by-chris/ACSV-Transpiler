@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ZROW conversion API",
-    "version": "0.2.1"
+    "version": "0.4.0"
   },
   "servers": [
     {
@@ -12,7 +12,7 @@
   "paths": {
     "/api/v1/convert": {
       "post": {
-        "summary": "Compile a bounded ACSV recipe or preserve literal CSV",
+        "summary": "Compile ZROW into CSV or typed JSON",
         "requestBody": {
           "required": true,
           "content": {
@@ -42,6 +42,26 @@
                       "json"
                     ],
                     "default": "csv"
+                  },
+                  "seed": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      }
+                    ],
+                    "description": "Random seed; use either this or a document seed declaration."
+                  },
+                  "referenceTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Fixed reference timestamp with seconds and Z or a UTC offset. Use either this or a document time declaration."
                   }
                 }
               }

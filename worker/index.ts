@@ -61,7 +61,12 @@ export default {
         !["csv", "json"].includes(b.format ?? "csv")
       )
         return json({ error: "Invalid input, mode or format" }, 400);
-      const c = compile({ input: b.input, mode: b.mode ?? "zrow" });
+      const c = compile({
+        input: b.input,
+        mode: b.mode ?? "zrow",
+        seed: b.seed,
+        referenceTime: b.referenceTime,
+      });
       console.info(
         JSON.stringify({
           event: "conversion",

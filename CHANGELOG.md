@@ -1,6 +1,15 @@
 # Changelog
 
-## 0.3.0 — unreleased npm package
+## 0.4.0 — 2026-11-19
+
+- Add ZROW 0.3 named text enums and enum column validation.
+- Add explicit seeds, uniform/integer/normal generators, random and weighted selection, and bounded geographic coordinates.
+- Add captured UTC clock helpers and fixed reference-time configuration.
+- Document generator semantics and add customer, location, measurement and dated-event examples.
+- Add a language overview below the browser editor.
+- Include the parenthesized syntax introduced in the previous source release.
+
+## 0.3.0 — source release
 
 - Add ZROW 0.2 parenthesized declarations, directives and implicit default assignments.
 - Preserve explicit 0.1 parenthesized literal data and existing @ directives.

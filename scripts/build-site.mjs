@@ -1,6 +1,8 @@
 import fs from "node:fs";
+import { createHash } from "node:crypto";
 import { marked } from "marked";
 import { compile } from "../dist/ACSVTranspiler.js";
+const cssHash = createHash("sha256").update(fs.readFileSync("public/sponsor.css")).digest("hex").slice(0,12);
 const dir = "dist/web",
   host = "https://zrow.majaku.com";
 const links =
@@ -28,7 +30,7 @@ function html(title, source, path) {
   const description =
     descriptions[path] ??
     `${title}: documentation and reproducible examples for ZROW data recipes.`;
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/zrow.svg"><meta name="viewport" content="width=device-width"><title>${title} — ZROW</title><meta name="description" content="${description}"><link rel="canonical" href="${host}${path}"><meta property="og:title" content="${title} — ZROW"><meta property="og:url" content="${host}${path}"><meta property="og:type" content="website"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><link rel="stylesheet" href="/sponsor.css"><style>body{font:17px/1.65 system-ui;max-width:1000px;margin:36px auto;padding:0 24px;color:#18212c}nav{margin:24px 0}a{color:#175bc0}pre{overflow:auto;background:#f1f4f7;padding:20px}table{border-collapse:collapse;display:block;overflow:auto;max-width:100%}main{min-width:0;overflow-wrap:anywhere}td,th{border:1px solid #ddd;padding:8px}</style></head><body>${links}<main>${marked.parse(source)}</main>${path === "/privacy/" || path === "/about/" || path === "/404.html" ? "" : ad}${footer}${analytics}</body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/zrow.svg"><meta name="viewport" content="width=device-width"><title>${title} — ZROW</title><meta name="description" content="${description}"><link rel="canonical" href="${host}${path}"><meta property="og:title" content="${title} — ZROW"><meta property="og:url" content="${host}${path}"><meta property="og:type" content="website"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><link rel="stylesheet" href="/sponsor.css?v=${cssHash}"><style>body{font:17px/1.65 system-ui;max-width:1000px;margin:36px auto;padding:0 24px;color:#18212c}nav{margin:24px 0}a{color:#175bc0}pre{overflow:auto;background:#f1f4f7;padding:20px}table{border-collapse:collapse;display:block;overflow:auto;max-width:100%}main{min-width:0;overflow-wrap:anywhere}td,th{border:1px solid #ddd;padding:8px}</style></head><body>${links}<main>${marked.parse(source)}</main>${path === "/privacy/" || path === "/about/" || path === "/404.html" ? "" : ad}${footer}${analytics}</body></html>`;
 }
 const gallery = JSON.parse(fs.readFileSync("content/gallery.json", "utf8"));
 const galleryMarkdown = "# Example gallery\n\nRecipes, generated CSV previews and editable examples.\n\n" + gallery.map(item => {
@@ -53,6 +55,7 @@ const docs = [
   ["/docs/reference/", "Reference", "docs/core.md"],
   ["/docs/portable/", "Portable profile", "docs/portable-profile.md"],
   ["/docs/authoring/", "Authoring guide", "docs/authoring.md"],
+  ["/docs/generators/", "Enums and generators", "docs/generators.md"],
   ["/benchmarks/", "Recipe size measurements", "docs/size-experiment.md"],
   ["/examples/", "Examples", "examples.md"],
 ];
@@ -60,6 +63,8 @@ const map = {
   "docs/core.md": "/docs/reference/",
   "core.md": "/docs/reference/",
   "docs/authoring.md": "/docs/authoring/",
+  "docs/generators.md": "/docs/generators/",
+  "generators.md": "/docs/generators/",
   "authoring.md": "/docs/authoring/",
   "docs/portable-profile.md": "/docs/portable/",
   "portable-profile.md": "/docs/portable/",
@@ -95,7 +100,7 @@ page(
 page(
   "/api/",
   "Conversion API",
-  `# Conversion API\n\nPOST https://zrow.majaku.com/api/v1/convert with Content-Type: application/json.\n\n\`\`\`json\n{"input":"id:int,name\\n@set id=seq(),name=Player\\n@rows 3","mode":"zrow","format":"json"}\n\`\`\`\n\nResponse: version, format, data, rows, columns. JSON data is an array of typed objects; CSV data is a string. Defaults: mode zrow; xcsv and acsv remain compatibility aliases, format csv.\n\nLimits: 64 KiB body, 30 requests/minute per IP, 10,000 rows and 250,000 cells. No file includes. CORS permits public requests without credentials.\n\nErrors: 400 invalid JSON/input, 413 body limit, 415 content type, 422 compiler diagnostic, 429 rate limit. No uptime guarantee. [Reference](/docs/reference/) · [OpenAPI](/openapi.json).`,
+  `# Conversion API\n\nPOST https://zrow.majaku.com/api/v1/convert with Content-Type: application/json.\n\n\`\`\`json\n{"input":"id:int,name\\n@set id=seq(),name=Player\\n@rows 3","mode":"zrow","format":"json"}\n\`\`\`\n\nResponse: version, format, data, rows, columns. JSON data is an array of typed objects; CSV data is a string. Defaults: mode zrow; xcsv and acsv remain compatibility aliases, format csv.\n\nLimits: 64 KiB body, 30 requests/minute per IP, 10,000 rows and 250,000 cells. Optional seed and referenceTime request fields fix the random and clock context; use either request fields or document declarations, not both. No file includes. CORS permits public requests without credentials.\n\nErrors: 400 invalid JSON/input, 413 body limit, 415 content type, 422 compiler diagnostic, 429 rate limit. No uptime guarantee. [Reference](/docs/reference/) · [OpenAPI](/openapi.json).`,
 );
 page(
   "/guides/python/",
@@ -134,8 +139,9 @@ let s = fs
     "<title>ZROW</title>",
     `<title>ZROW — Expressive CSV</title><meta name="description" content="An expressive CSV extension for people and LLMs to create and store large datasets with compact recipes. Export CSV and typed JSON."><link rel="canonical" href="${host}/"><meta property="og:title" content="ZROW — Expressive CSV"><meta property="og:type" content="website"><meta property="og:url" content="${host}/"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "ZROW", url: host + "/" })}</script>`,
   );
+s = s.replace('/sponsor.css"', `/sponsor.css?v=${cssHash}"`);
 s = s.replace(
   "</body>",
-  `${footer}${analytics}<noscript><p>ZROW generates CSV and JSON from recipes. Enable JavaScript for the editor, or read the documentation.</p></noscript></body>`,
+  `${fs.readFileSync("content/language-overview.html", "utf8")}${footer}${analytics}<noscript><p>ZROW generates CSV and JSON from recipes. Enable JavaScript for the editor, or read the documentation.</p></noscript></body>`,
 );
 fs.writeFileSync(dir + "/index.html", s);

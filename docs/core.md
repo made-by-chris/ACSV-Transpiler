@@ -81,7 +81,7 @@ id,kind
 14,A
 ```
 
-Generators use no randomness, clock, external catalog or hidden global state. For arbitrary real-world records, write literal rows instead of inventing a pattern.
+The seq and cycle generators use no randomness or clock. Version 0.3 adds explicit seeded random generators and captured-clock helpers; see [enums and generators](generators.md). For arbitrary real-world records, write literal rows instead of inventing a pattern.
 
 ## Types and JSON
 
@@ -150,13 +150,13 @@ The CLI infers input mode from `.acsv` and output format from `.json`; `--mode c
 
 Literal CSV remains the default API mode. Recipe callers must pass `mode: 'zrow'`. The new `@` prefix and unquoted `:type` header suffixes are reserved in ZROW mode; quote literal fields that use them. Existing valid `>` recipes retain their behavior.
 
-Random/Faker generators, implicit/nested scopes, null generators, custom dialects and spreadsheet-safety directives remain deferred. Tests reject unsupported syntax. Temporary named overrides are now supported through `@row` and `@rows ... with` with the explicit semantics above.
+Faker catalogs, implicit/nested scopes, null generators, custom dialects and spreadsheet-safety directives remain deferred. Tests reject unsupported syntax. Temporary named overrides are now supported through `@row` and `@rows ... with` with the explicit semantics above.
 
 CSV quoting is not a spreadsheet formula-safety policy. Literal values are intentionally preserved. See [portable profile](portable-profile.md) for implementation boundaries and conformance vectors.
 
 ## Version marker
 
-Put `# ZROW 0.2` on the first line of new recipes, before the column header. This optional declaration is excluded from CSV and JSON output. Missing declarations use the current language (0.2). Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is separate from the implementation package version. Use mode zrow; acsv and xcsv are compatibility aliases. Agent entry point: https://zrow.majaku.com/llms.txt .
+Put `# ZROW 0.3` on the first line of new recipes, before the column header. This optional declaration is excluded from CSV and JSON output. Missing declarations use the current language (0.3). Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is separate from the implementation package version. Use mode zrow; acsv and xcsv are compatibility aliases. Agent entry point: https://zrow.majaku.com/llms.txt .
 
 ## Parenthesized notation (0.2)
 
@@ -190,4 +190,8 @@ Ordinary CSV rows remain useful for individual records:
 
 This emits two generated users, the literal CSV record, and a fourth user from the defaults. The literal row advances the sequence like any other emitted row. CSV data must match the header width. Quoted empty fields explicitly produce empty text; unquoted empty fields use defaults. Quote the first field when it would otherwise be recognized as a form: `"(rows 3)"` is a literal cell. Parentheses inside a quoted multiline CSV field are literal too.
 
-Documents explicitly declaring `# ZROW 0.1` retain their original parsing, including literal parenthesized cells. Missing declarations use the current language, 0.2. New documents should declare their version. Literal CSV mode remains unchanged. Parenthesized notation is available in the browser, API and repository source; npm 0.2.1 predates this syntax.
+Documents explicitly declaring `# ZROW 0.1` retain their original parsing, including literal parenthesized cells. Missing declarations use the current language, 0.3. New documents should declare their version. Literal CSV mode remains unchanged. Parenthesized notation is available in the browser, API and npm package 0.4.0. Explicit 0.2 documents retain their function set; enum, seed and time declarations require 0.3.
+
+## Enums, randomness and time (0.3)
+
+ZROW 0.3 adds named text enums, explicit random seeds, random and weighted selection, numeric and normal distributions, latitude/longitude generators and captured UTC clock helpers. Declare enums before the column header and seed/time context before emitting rows. The complete syntax, ranges, reproducibility rules and API options are specified in [enums and generators](generators.md). These features also have @enum, @seed and @time forms.

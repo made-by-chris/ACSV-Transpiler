@@ -1,12 +1,14 @@
 import { fail } from "./errors.js";
+import { randomUnit, type GeneratorContext } from "./generators.js";
 
 type Value = string | number | boolean | { days: number };
 export type Expression =
-  | { kind: "literal"; value: Value }
+  | { kind: "literal"; value: Value; verbatim?: boolean }
+  | { kind: "enum"; name: string; values: readonly string[] }
   | { kind: "ref"; name: string }
   | { kind: "unary"; op: string; value: Expression }
   | { kind: "binary"; op: string; left: Expression; right: Expression }
-  | { kind: "call"; name: string; args: Expression[] }
+  | { kind: "call"; name: string; args: Expression[]; id?: number }
   | { kind: "method"; name: string; value: Expression };
 interface Token {
   type: string;
@@ -25,16 +27,21 @@ const arities: Record<string, [number, number]> = {
   max: [1, 32],
   clamp: [3, 3],
   pow: [2, 2],
+  rand: [0, 2],
+  randFloat: [0, 2],
+  randInt: [2, 2],
+  choice: [1, 32],
+  choiceWeighted: [2, 32],
+  normal: [0, 2],
+  latitude: [0, 2],
+  longitude: [0, 2],
+  today: [0, 0],
+  now: [0, 0],
+  tomorrow: [0, 0],
+  yesterday: [0, 0],
 };
 const functions = new Set(Object.keys(arities));
-const deferred = new Set([
-  "maybe",
-  "randInt",
-  "randFloat",
-  "choice",
-  "choiceWeighted",
-  "faker",
-]);
+const deferred = new Set(["maybe", "faker"]);
 
 export function splitControls(source: string, line: number): string[] {
   const parts: string[] = [];
@@ -76,13 +83,19 @@ export function parseExpression(
   source: string,
   headers: ReadonlySet<string>,
   line: number,
+  enums: ReadonlyMap<string, readonly string[]> = new Map(),
+  extended = true,
 ): Expression {
   const text = source.trim();
   if (!text) return { kind: "literal", value: "" };
-  if (/^(?:maybe|randInt|randFloat|choice|choiceWeighted|faker)\b/.test(text))
+  if (
+    /^(?:maybe|faker)\b/.test(text) ||
+    (/^(?:randInt|randFloat|choice|choiceWeighted)\b/.test(text) &&
+      /\bseed\s*=|\[/.test(text))
+  )
     fail(
       "E_UNSUPPORTED",
-      "Random, nullable and Faker generators are deferred; use literal values in the core.",
+      "Unsupported generator syntax. Use ZROW 0.3, a document seed, and positional arguments; nullable and Faker generators are not implemented.",
       line,
     );
   if (text.length > 4000) fail("E_LIMIT", "Expression is too long.", line);
@@ -93,6 +106,7 @@ export function parseExpression(
   if (
     /^[\p{L}_][\p{L}\p{N}_ ]*$/u.test(text) &&
     !headers.has(text) &&
+    !enums.has(text) &&
     !["true", "false"].includes(text)
   ) {
     return { kind: "literal", value: text };
@@ -193,6 +207,7 @@ export function parseExpression(
       fail("E_EXPRESSION", `Expected “${type}”.`, line);
     pos++;
   }
+  let callId = 0;
   function parse(min = 0, depth = 0): Expression {
     if (depth > 40) fail("E_LIMIT", "Expression nesting is too deep.", line);
     const token = tokens[pos++];
@@ -214,8 +229,27 @@ export function parseExpression(
       if (tokens[pos].type === "(") {
         if (!functions.has(token.text))
           fail("E_EXPRESSION", `Unknown function “${token.text}”.`, line);
+        if (
+          !extended &&
+          [
+            "rand",
+            "randFloat",
+            "randInt",
+            "choice",
+            "choiceWeighted",
+            "normal",
+            "latitude",
+            "longitude",
+            "today",
+            "now",
+            "tomorrow",
+            "yesterday",
+          ].includes(token.text)
+        )
+          fail("E_UNSUPPORTED", `${token.text} requires # ZROW 0.3.`, line);
+        const id = callId++;
         pos++;
-        const args: Expression[] = [];
+        let args: Expression[] = [];
         if (tokens[pos].type !== ")") {
           do {
             args.push(parse(0, depth + 1));
@@ -224,6 +258,16 @@ export function parseExpression(
           } while (true);
         }
         expect(")");
+        if (["cycle", "choice"].includes(token.text))
+          args = args.flatMap((arg) =>
+            arg.kind === "enum"
+              ? arg.values.map((value) => ({
+                  kind: "literal" as const,
+                  value,
+                  verbatim: true,
+                }))
+              : [arg],
+          );
         const [minimum, maximum] = arities[token.text];
         if (args.length < minimum || args.length > maximum)
           fail(
@@ -231,7 +275,13 @@ export function parseExpression(
             `${token.text} expects ${minimum === maximum ? minimum : `${minimum}–${maximum}`} arguments.`,
             line,
           );
-        left = { kind: "call", name: token.text, args };
+        left = { kind: "call", name: token.text, args, id };
+      } else if (enums.has(token.text)) {
+        left = {
+          kind: "enum",
+          name: token.text,
+          values: enums.get(token.text)!,
+        };
       } else {
         if (!headers.has(token.text))
           fail(
@@ -335,6 +385,7 @@ export function evaluate(
   previous: ReadonlyMap<string, string>,
   line: number,
   index = 0,
+  context?: GeneratorContext,
 ): string {
   function visit(node: Expression): Value {
     const value = compute(node);
@@ -346,7 +397,7 @@ export function evaluate(
   }
   function compute(node: Expression): Value {
     if (node.kind === "literal") {
-      if (typeof node.value === "string") {
+      if (typeof node.value === "string" && !node.verbatim) {
         let length = node.value.length;
         return node.value.replace(
           /\{([A-Za-z_]\w*)\}/g,
@@ -365,6 +416,12 @@ export function evaluate(
       }
       return node.value;
     }
+    if (node.kind === "enum")
+      fail(
+        "E_ENUM",
+        "Use an enum list inside cycle(...) or choice(...).",
+        line,
+      );
     if (node.kind === "ref") return get(node.name);
     if (node.kind === "method") {
       const value = String(visit(node.value));
@@ -377,6 +434,155 @@ export function evaluate(
         : numeric(value, line) * (node.op === "-" ? -1 : 1);
     }
     if (node.kind === "call") {
+      if (["today", "now", "tomorrow", "yesterday"].includes(node.name)) {
+        if (!context) fail("E_TIME", "Clock context is unavailable.", line);
+        if (node.name === "now") return context.referenceTime;
+        const date = context.referenceTime.slice(0, 10);
+        return advance(
+          date,
+          node.name === "tomorrow" ? 1 : node.name === "yesterday" ? -1 : 0,
+          line,
+        );
+      }
+      if (
+        [
+          "rand",
+          "randFloat",
+          "randInt",
+          "choice",
+          "choiceWeighted",
+          "normal",
+          "latitude",
+          "longitude",
+        ].includes(node.name)
+      ) {
+        if (context?.seed === undefined)
+          fail(
+            "E_SEED",
+            "Random generators require (seed 42) or a seed configuration.",
+            line,
+          );
+        let draw = 0;
+        const unit = () =>
+          randomUnit(
+            context.seed!,
+            context.column,
+            index,
+            node.id ?? 0,
+            draw++,
+          );
+        if (node.name === "choice")
+          return visit(node.args[Math.floor(unit() * node.args.length)]);
+        if (node.name === "choiceWeighted") {
+          if (node.args.length % 2)
+            fail(
+              "E_EXPRESSION",
+              "choiceWeighted expects value,weight pairs.",
+              line,
+            );
+          const weights = node.args
+            .filter((_, i) => i % 2)
+            .map((arg) => numeric(visit(arg), line));
+          const total = weights.reduce((a, b) => a + b, 0);
+          if (
+            weights.some((w) => w < 0) ||
+            !Number.isFinite(total) ||
+            total <= 0
+          )
+            fail(
+              "E_EXPRESSION",
+              "Weights must be nonnegative and have a positive finite sum.",
+              line,
+            );
+          let target = unit() * total;
+          for (let i = 0; i < weights.length; i++) {
+            target -= weights[i];
+            if (target < 0) return visit(node.args[i * 2]);
+          }
+          return visit(
+            node.args[weights.lastIndexOf(Math.max(...weights)) * 2],
+          );
+        }
+        const values = node.args.map((arg) => numeric(visit(arg), line));
+        if (node.name === "normal") {
+          if (values.length === 1)
+            fail(
+              "E_EXPRESSION",
+              "Use normal() or normal(mean,standardDeviation).",
+              line,
+            );
+          const mean = values[0] ?? 0,
+            sd = values[1] ?? 1;
+          if (sd < 0)
+            fail(
+              "E_EXPRESSION",
+              "Standard deviation must be nonnegative.",
+              line,
+            );
+          return (
+            mean +
+            sd *
+              Math.sqrt(-2 * Math.log(1 - unit())) *
+              Math.cos(2 * Math.PI * unit())
+          );
+        }
+        if (values.length === 1)
+          fail(
+            "E_EXPRESSION",
+            "Supply both minimum and maximum, or neither.",
+            line,
+          );
+        const lat = node.name === "latitude",
+          lon = node.name === "longitude";
+        const lo = values[0] ?? (lat ? -90 : lon ? -180 : 0),
+          hi = values[1] ?? (lat ? 90 : lon ? 180 : 1);
+        if (lo > hi || !Number.isFinite(hi - lo))
+          fail(
+            "E_EXPRESSION",
+            "Minimum must not exceed maximum and the range must be finite.",
+            line,
+          );
+        if ((lat && (lo < -90 || hi > 90)) || (lon && (lo < -180 || hi > 180)))
+          fail(
+            "E_EXPRESSION",
+            "Coordinates are outside geographic bounds.",
+            line,
+          );
+        if (node.name === "randInt") {
+          const span = hi - lo + 1;
+          if (
+            !Number.isSafeInteger(lo) ||
+            !Number.isSafeInteger(hi) ||
+            span > 4294967296
+          )
+            fail(
+              "E_EXPRESSION",
+              "randInt needs safe integer bounds spanning at most 2^32 values.",
+              line,
+            );
+          const limit = Math.floor(4294967296 / span) * span;
+          for (let i = 0; i < 128; i++) {
+            const bits = Math.floor(unit() * 4294967296);
+            if (bits < limit) return lo + (bits % span);
+          }
+          fail(
+            "E_LIMIT",
+            "Random integer sampling exceeded its work limit.",
+            line,
+          );
+        }
+        const u = unit();
+        if (lat) {
+          if (lo === hi) return lo;
+          const low = Math.sin((lo * Math.PI) / 180),
+            high = Math.sin((hi * Math.PI) / 180);
+          return Math.max(
+            lo,
+            Math.min(hi, (Math.asin(low + (high - low) * u) * 180) / Math.PI),
+          );
+        }
+        return lo + (hi - lo) * u;
+      }
       if (node.name === "if")
         return visit(node.args[truth(visit(node.args[0])) ? 1 : 2]);
       if (node.name === "prev") {

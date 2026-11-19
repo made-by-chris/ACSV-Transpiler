@@ -15,7 +15,12 @@ export interface RecordLine {
 export const MAX_INPUT = 1_000_000;
 
 /** Scan records, not physical lines: quoted fields may contain any line ending. */
-export function scanRecords(input: string, directives = false, forms = true): RecordLine[] {
+export function scanRecords(
+  input: string,
+  directives = false,
+  forms = true,
+  extended = true,
+): RecordLine[] {
   if (input.length > MAX_INPUT)
     fail("E_LIMIT", `Input exceeds ${MAX_INPUT.toLocaleString()} characters.`);
   const records: RecordLine[] = [];
@@ -40,11 +45,18 @@ export function scanRecords(input: string, directives = false, forms = true): Re
     const start = i,
       recordLine = line;
     // Only recognized forms are reserved; other parenthesized CSV values stay literal.
-    const parenthesized = directives && forms && input[i] === "(" &&
-      /^\((?:(?:cols|set|row|rows|expect|unique)(?:\s|\)|$)|[A-Za-z_][A-Za-z0-9_]*\s*=)/.test(input.slice(i));
+    const parenthesized =
+      directives &&
+      forms &&
+      input[i] === "(" &&
+      ((extended && /^\((?:enum|seed|time)(?:\s|\)|$)/.test(input.slice(i))) ||
+        /^\((?:(?:cols|set|row|rows|expect|unique)(?:\s|\)|$)|[A-Za-z_][A-Za-z0-9_]*\s*=)/.test(
+          input.slice(i),
+        ));
     if (
       directives &&
-      (parenthesized || input[i] === "@" ||
+      (parenthesized ||
+        input[i] === "@" ||
         input[i] === ">" ||
         input[i] === "#" ||
         input.slice(i).startsWith("include "))
@@ -53,25 +65,41 @@ export function scanRecords(input: string, directives = false, forms = true): Re
       let raw = input.slice(start, i);
       if (parenthesized) {
         if (!raw.trimEnd().endsWith(")"))
-          fail("E_DIRECTIVE", "Close the parenthesized form with ).", recordLine);
+          fail(
+            "E_DIRECTIVE",
+            "Close the parenthesized form with ).",
+            recordLine,
+          );
         const body = raw.trimEnd().slice(1, -1).trim();
         const cols = /^cols\s+([\s\S]+)$/.exec(body);
         if (cols) {
           let parsed: RecordLine[];
-          try { parsed = scanRecords(cols[1]); }
-          catch (error) {
+          try {
+            parsed = scanRecords(cols[1]);
+          } catch (error) {
             if (error instanceof ACSVError)
-              fail(error.code, error.message, recordLine, error.column + raw.indexOf(cols[1]));
+              fail(
+                error.code,
+                error.message,
+                recordLine,
+                error.column + raw.indexOf(cols[1]),
+              );
             throw error;
           }
-          const cells = parsed[0].cells.map(cell => ({ ...cell, line: recordLine }));
+          const cells = parsed[0].cells.map((cell) => ({
+            ...cell,
+            line: recordLine,
+          }));
           records.push({ kind: "header", raw, line: recordLine, cells });
           if (i < input.length) take();
           continue;
         }
-        raw = /^[A-Za-z_][A-Za-z0-9_]*\s*=/.test(body) ? "@set " + body : "@" + body;
+        raw = /^[A-Za-z_][A-Za-z0-9_]*\s*=/.test(body)
+          ? "@set " + body
+          : "@" + body;
       }
       if (/^# (?:ZROW|XCSV) 0\.1\s*$/.test(raw)) forms = false;
+      if (/^# (?:ZROW|XCSV) 0\.[12]\s*$/.test(raw)) extended = false;
       const kind = raw.startsWith("@")
         ? "directive"
         : raw.startsWith(">")

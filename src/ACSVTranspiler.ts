@@ -20,10 +20,14 @@ export type { ColumnSchema, ColumnType, DataValue } from "./schema.js";
 export { ACSVError } from "./errors.js";
 export { parseCSV, serializeCSV } from "./csv.js";
 
+import { checkSeed, clock, type Seed } from "./generators.js";
+
 export type InputMode = "csv" | "acsv" | "xcsv" | "zrow";
 export interface ACSV_Transpilation_Config {
   input: string;
   mode?: InputMode;
+  seed?: Seed;
+  referenceTime?: string;
   streaming?: boolean;
   streaming_callback?: (output: string) => void;
   stats?: boolean;
@@ -77,12 +81,31 @@ const MAX_ROWS = 10_000,
 export function compile(config: ACSV_Transpilation_Config): Compilation {
   if (!config || typeof config.input !== "string")
     fail("E_CONFIG", "Provide text in the input property.");
-  const mode = (config.mode === "xcsv" || config.mode === "zrow") ? "acsv" : config.mode ?? "csv";
+  const mode =
+    config.mode === "xcsv" || config.mode === "zrow"
+      ? "acsv"
+      : (config.mode ?? "csv");
   if (mode !== "csv" && mode !== "acsv")
     fail("E_CONFIG", "Mode must be csv or acsv.");
   // Explicit 0.1 documents keep their original literal-parenthesis behavior.
   const records = scanRecords(config.input, mode === "acsv");
-  const forms = !records.some(record => record.kind === "comment" && /^# (?:ZROW|XCSV) 0\.1\s*$/.test(record.raw));
+  let forms = !records.some(
+    (record) =>
+      record.kind === "comment" && /^# (?:ZROW|XCSV) 0\.1\s*$/.test(record.raw),
+  );
+  const enums = new Map<string, readonly string[]>();
+  let seed = config.seed === undefined ? undefined : checkSeed(config.seed);
+  let referenceTime =
+    config.referenceTime === undefined
+      ? new Date().toISOString()
+      : clock(config.referenceTime);
+  let seedDeclared = config.seed !== undefined,
+    timeDeclared = config.referenceTime !== undefined;
+  let extended = !records.some(
+    (record) =>
+      record.kind === "comment" &&
+      /^# (?:ZROW|XCSV) 0\.[12]\s*$/.test(record.raw),
+  );
   let headers: string[] = [];
   let columns: ColumnSchema[] = [];
   let expectation: { count: number; line: number } | undefined;
@@ -162,6 +185,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
           previous,
           rule.line,
           rows.length - (rule.startRow ?? 0),
+          { seed, referenceTime, column: name },
         );
         origin = {
           line: rule.line,
@@ -236,7 +260,13 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
       column(name, line);
       rules.set(name, {
         kind: "value",
-        expression: parseExpression(assignment[2], headerSet, line),
+        expression: parseExpression(
+          assignment[2],
+          headerSet,
+          line,
+          enums,
+          extended,
+        ),
         line,
         startRow: rows.length,
       });
@@ -368,7 +398,13 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
         );
       overrides.set(name, {
         kind: "value",
-        expression: parseExpression(assignment[2], headerSet, line),
+        expression: parseExpression(
+          assignment[2],
+          headerSet,
+          line,
+          enums,
+          extended,
+        ),
         line,
         startRow: rows.length,
       });
@@ -381,13 +417,106 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
     if (!match)
       fail(
         "E_DIRECTIVE",
-        "Invalid directive. Use @set, @row, @rows, @expect or @unique.",
+        "Invalid directive. Use @set, @row, @rows, @expect, @unique, @enum, @seed or @time.",
         record.line,
       );
     const command = match[1],
       content = (match[2] ?? "").trim(),
       line = record.line;
-    if (command === "set") {
+    if (["enum", "seed", "time"].includes(command)) {
+      if (!extended) fail("E_VERSION", `${command} requires # ZROW 0.3.`, line);
+      if (included)
+        fail(
+          "E_DIRECTIVE",
+          "Declare enums, seed and time in the main document.",
+          line,
+        );
+      if (command === "enum") {
+        if (haveHeader)
+          fail("E_ENUM", "Declare enums before the column header.", line);
+        const match = /^([A-Za-z_][A-Za-z0-9_]{0,63})\s+(.+)$/.exec(content);
+        if (!match) fail("E_ENUM", 'Use (enum Name "first","second").', line);
+        const name = match[1];
+        if (
+          enums.has(name) ||
+          ["text", "int", "number", "bool", "date", "true", "false"].includes(
+            name,
+          )
+        )
+          fail(
+            "E_ENUM",
+            "Enum names must be unique and must not shadow built-in types or booleans.",
+            line,
+          );
+        if (enums.size >= 32)
+          fail("E_LIMIT", "At most 32 enums are allowed.", line);
+        const parts = splitControls(match[2], line);
+        if (parts.length > 32)
+          fail("E_LIMIT", "An enum may contain at most 32 values.", line);
+        const values = parts.map((part) => {
+          if (!part)
+            fail(
+              "E_ENUM",
+              "Enum members cannot be omitted; quote an explicit empty string.",
+              line,
+            );
+          const e = parseExpression(part, new Set(), line);
+          if (
+            e.kind !== "literal" ||
+            typeof e.value !== "string" ||
+            e.value.length > 4000
+          )
+            fail(
+              "E_ENUM",
+              "Enum members must be text constants of at most 4000 characters.",
+              line,
+            );
+          return e.value;
+        });
+        if (new Set(values).size !== values.length)
+          fail("E_ENUM", "Enum values must be distinct.", line);
+        enums.set(name, values);
+      } else {
+        if (rows.length)
+          fail(
+            "E_DIRECTIVE",
+            "Declare seed and time before emitting rows.",
+            line,
+          );
+        let value = parseExpression(content, new Set(), line);
+        if (
+          value.kind === "unary" &&
+          ["+", "-"].includes(value.op) &&
+          value.value.kind === "literal" &&
+          typeof value.value.value === "number"
+        )
+          value = {
+            kind: "literal",
+            value: value.value.value * (value.op === "-" ? -1 : 1),
+          };
+        if (value.kind !== "literal")
+          fail("E_DIRECTIVE", "Seed and time must be literal constants.", line);
+        if (command === "seed") {
+          if (seedDeclared)
+            fail(
+              "E_SEED",
+              "Declare the seed once, in the document or configuration.",
+              line,
+            );
+          seed = checkSeed(value.value, line);
+          seedDeclared = true;
+        } else {
+          if (timeDeclared)
+            fail(
+              "E_TIME",
+              "Declare reference time once, in the document or configuration.",
+              line,
+            );
+          referenceTime = clock(value.value, line);
+          timeDeclared = true;
+        }
+      }
+    } else if (command === "set") {
       const next = assignments(content, line);
       for (const [name, rule] of next) rules.set(name, rule);
     } else if (command === "row")
@@ -429,7 +558,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
     } else
       fail(
         "E_DIRECTIVE",
-        `Unknown directive “@${command}”. Use @set, @row, @rows, @expect or @unique.`,
+        `Unknown directive “@${command}”. Use @set, @row, @rows, @expect, @unique, @enum, @seed or @time.`,
         line,
       );
   }
@@ -439,17 +568,49 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
     stack: string[] = [],
     included = false,
   ) {
+    const outerForms = forms;
+    forms =
+      forms &&
+      !list.some(
+        (record) =>
+          record.kind === "comment" &&
+          /^# (?:ZROW|XCSV) 0\.1\s*$/.test(record.raw),
+      );
+    const outerExtended = extended;
+    extended =
+      extended &&
+      !list.some(
+        (record) =>
+          record.kind === "comment" &&
+          /^# (?:ZROW|XCSV) 0\.[12]\s*$/.test(record.raw),
+      );
     let includeHeader = included;
     let declaredVersion = false;
     for (const record of list) {
       if (record.kind === "comment") {
         if (/^#\s*(?:ZROW|XCSV)\b/i.test(record.raw)) {
           if (declaredVersion || (haveHeader && !includeHeader))
-            fail("E_VERSION", "Place one # ZROW declaration before the header.", record.line);
-          if (!/^# (?:ZROW 0\.[12]|XCSV 0\.1)\s*$/.test(record.raw))
-            fail("E_VERSION", "Unsupported or malformed ZROW declaration. This compiler supports # ZROW 0.1 and # ZROW 0.2.", record.line);
-          if (included && !forms && /^# ZROW 0\.2\s*$/.test(record.raw))
-            fail("E_VERSION", "A version 0.1 recipe cannot include a version 0.2 fragment.", record.line);
+            fail(
+              "E_VERSION",
+              "Place one # ZROW declaration before the header.",
+              record.line,
+            );
+          if (!/^# (?:ZROW 0\.[123]|XCSV 0\.1)\s*$/.test(record.raw))
+            fail(
+              "E_VERSION",
+              "Unsupported or malformed ZROW declaration. This compiler supports # ZROW 0.1, # ZROW 0.2 and # ZROW 0.3.",
+              record.line,
+            );
+          if (
+            included &&
+            ((!forms && /^# ZROW 0\.[23]\s*$/.test(record.raw)) ||
+              (!outerExtended && /^# ZROW 0\.3\s*$/.test(record.raw)))
+          )
+            fail(
+              "E_VERSION",
+              "An older recipe cannot include a fragment requiring a newer language version.",
+              record.line,
+            );
           declaredVersion = true;
         }
         if (/^#(?:dialect|safety)\b/.test(record.raw))
@@ -464,14 +625,31 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
       if (mode === "acsv" && record.kind === "data" && record.raw === "")
         continue;
       if (!haveHeader || includeHeader) {
+        if (
+          record.kind === "directive" &&
+          /^@(enum|seed|time)\b/.test(record.raw)
+        ) {
+          directive(record, included);
+          continue;
+        }
         if (record.kind !== "data" && record.kind !== "header")
           fail(
             "E_HEADER",
             "Place the CSV header before control lines or includes.",
             record.line,
           );
-        const parsedColumns = readColumns(record.cells, mode === "acsv");
+        const parsedColumns = readColumns(
+          record.cells,
+          mode === "acsv",
+          extended ? enums : new Map(),
+        );
         const names = parsedColumns.map((column) => column.name);
+        if (names.some((name) => enums.has(name)))
+          fail(
+            "E_ENUM",
+            "Column names must not shadow enum names.",
+            record.line,
+          );
         if (includeHeader) {
           if (JSON.stringify(parsedColumns) !== JSON.stringify(columns))
             fail(
@@ -501,7 +679,11 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
         continue;
       }
       if (record.kind === "header")
-        fail("E_HEADER", "Declare columns once, before data and directives.", record.line);
+        fail(
+          "E_HEADER",
+          "Declare columns once, before data and directives.",
+          record.line,
+        );
       if (record.kind === "directive") directive(record, included);
       else if (record.kind === "control") control(record);
       else if (record.kind === "include") {
@@ -536,7 +718,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
             record.line,
           );
         consume(
-          scanRecords(resolved.input, true, forms),
+          scanRecords(resolved.input, true, forms, extended),
           resolved.source,
           [...stack, resolved.source],
           true,
@@ -558,6 +740,8 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
       }
     }
     if (includeHeader) fail("E_HEADER", "Included file has no header.");
+    extended = outerExtended;
+    forms = outerForms;
   }
   consume(records, config.sourceName);
   if (expectation && expectation.count !== rows.length)

@@ -215,7 +215,7 @@ export default function ACSVEditor() {
   function chooseDownload(format: string) {
     if (format === "source") {
       const input = draft().input;
-      const source = draft().mode === "csv" || /^#\s*(?:ZROW|XCSV)\b/m.test(input) ? input : `# ZROW 0.2\n${input}`;
+      const source = draft().mode === "csv" || /^#\s*(?:ZROW|XCSV)\b/m.test(input) ? input : `# ZROW 0.3\n${input}`;
       void download(source, draft().mode === "csv" ? ".csv" : ".zrow");
     } else if (canExport() && (format === "csv" || format === "json")) {
       void download(format === "csv" ? result()!.csv : json().text, `.${format}`);
@@ -431,7 +431,7 @@ export default function ACSVEditor() {
                                   when={result()?.columns[index()].explicit}
                                 >
                                   <span class="column-type">
-                                    {result()?.columns[index()].type}
+                                    {result()?.columns[index()].enum ?? result()?.columns[index()].type}
                                   </span>
                                 </Show>
                               </th>

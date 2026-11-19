@@ -44,7 +44,7 @@ test("conditions are lazy and templates preserve punctuation", () => {
 test.each([
   ["a,b\n> a=b,b=a x1", "E_CYCLE"],
   ["a\n> missing++", "E_COLUMN"],
-  ["a\n> a=randInt(1,10)", "E_UNSUPPORTED"],
+  ["# ZROW 0.2\na\n> a=randInt(1,10)", "E_UNSUPPORTED"],
   ["a\n> a=globalThis.process.exit()", "E_COLUMN"],
   ["a\n> a=(()=>42)()", "E_EXPRESSION"],
   ["a\n> a=1/0 x1", "E_EXPRESSION"],

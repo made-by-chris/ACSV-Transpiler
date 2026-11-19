@@ -16,7 +16,7 @@ id:int,email,role,active:bool
 
 This recipe produces six rows. `@set` defines defaults, `@rows` generates rows, and `@row` supplies named overrides. Numeric and boolean types are preserved in JSON. CSV output contains ordinary fields and no recipe directives.
 
-[Language reference](docs/core.md) · [Authoring guide](docs/authoring.md) · [Examples](examples.md) · [Feature status](FEATURES.md) · [Portable profile](docs/portable-profile.md)
+[Language reference](docs/core.md) · [Authoring guide](docs/authoring.md) · [Examples](examples.md) · [Feature status](FEATURES.md) · [Enums and generators](docs/generators.md) · [Portable profile](docs/portable-profile.md)
 
 ## Install
 
@@ -39,13 +39,33 @@ console.log(serializeJSON(result));
 console.log(validate({ input, mode: 'zrow' }));
 ```
 
-The default input mode is literal CSV, which preserves valid input without interpreting recipe syntax. Use `mode: "zrow"` to compile recipes. The optional `# ZROW 0.1` declaration identifies the language version independently of the npm package version. Unsupported, malformed, repeated or misplaced declarations are rejected.
+The default input mode is literal CSV, which preserves valid input without interpreting recipe syntax. Use `mode: "zrow"` to compile recipes. The optional `# ZROW 0.3` declaration identifies the language version independently of the npm package version. Unsupported, malformed, repeated or misplaced declarations are rejected.
 
 The portable core has no filesystem access or dynamic JavaScript evaluation. The `zrow-js/node` adapter enables confined file includes. Existing `acsv` and `xcsv` modes, file extensions and the `# XCSV 0.1` declaration remain supported for compatibility.
 
 ## Examples
 
 The [example gallery](https://zrow.majaku.com/examples/) covers catalogues, schedules, synthetic readings, invoice lines, test matrices, collection templates, shipping bands and inventory imports. Recipes live in `content/gallery.json` and are compiled during the site build.
+
+## Parenthesized notation
+
+Language version `# ZROW 0.2` adds `(cols id:int,name)`, `(id=seq(),name="User {id}")`, `(rows 10)` and `(row name=Chris)`. Assignments without a command set persistent defaults and emit no rows. Existing `@` directives remain supported. Ordinary CSV rows can be mixed in; see the [mixed CSV example](https://zrow.majaku.com/?example=mixed-csv). Explicit `0.1` documents retain their original parsing behavior.
+
+## Enums, randomness and time
+
+```text
+# ZROW 0.3
+(enum Status "trial","active","paused")
+(seed 42)
+(time "2026-11-19T12:00:00Z")
+(cols id:int,status:Status,day:date,latitude:number,longitude:number)
+(id=seq(),status=choice(Status),day=seq(today(),1))
+(latitude=round(latitude(52.4,52.6),6),longitude=round(longitude(13.2,13.6),6))
+(rows 10)
+```
+
+Enums validate every generated or literal value. Seeded random generators include `rand`, `randInt`, `normal`, `choice` and `choiceWeighted`. Clock helpers include `today`, `now`, `tomorrow` and `yesterday`. Use a fixed time as well as a seed when the whole output must repeat. The library and API accept `seed` and `referenceTime` options instead of document declarations. See [generator semantics](docs/generators.md).
+
 
 ## Editor and API
 
@@ -71,7 +91,3 @@ Changes to language behavior should include tests and compatibility notes. See [
 ## License and maintainer
 
 [MIT](LICENSE). Maintained by [Christopher Shelley](https://x.com/househuman) at [Majaku](https://majaku.com).
-
-## Parenthesized notation
-
-Language version `# ZROW 0.2` adds `(cols id:int,name)`, `(id=seq(),name="User {id}")`, `(rows 10)` and `(row name=Chris)`. Assignments without a command set persistent defaults and emit no rows. Existing `@` directives remain supported. Ordinary CSV rows can be mixed in; see the [mixed CSV example](https://zrow.majaku.com/?example=mixed-csv). Explicit `0.1` documents retain their original parsing behavior.

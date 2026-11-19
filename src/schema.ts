@@ -8,20 +8,34 @@ export interface ColumnSchema {
   name: string;
   type: ColumnType;
   explicit: boolean;
+  enum?: string;
+  values?: readonly string[];
 }
 export type DataValue = string | number | boolean;
 const types = new Set(["text", "int", "number", "bool", "date"]);
 
-export function readColumns(cells: Cell[], typed: boolean): ColumnSchema[] {
+export function readColumns(
+  cells: Cell[],
+  typed: boolean,
+  enums: ReadonlyMap<string, readonly string[]> = new Map(),
+): ColumnSchema[] {
   return cells.map((cell) => {
     if (typed && !cell.quoted && cell.value.includes(":")) {
       const split = cell.value.lastIndexOf(":");
       const name = cell.value.slice(0, split).trim(),
         type = cell.value.slice(split + 1).trim();
+      if (enums.has(type))
+        return {
+          name,
+          type: "text",
+          explicit: true,
+          enum: type,
+          values: [...enums.get(type)!],
+        };
       if (!types.has(type))
         fail(
           "E_TYPE",
-          `Unknown type “${type}”. Use text, int, number, bool or date; quote the header to keep a literal colon.`,
+          `Unknown type “${type}”. Use text, int, number, bool, date or a declared enum; quote the header to keep a literal colon.`,
           cell.line,
           cell.column,
         );
@@ -41,6 +55,12 @@ export function convertValue(
     fail(
       "E_TYPE",
       `Row ${row}, column “${column.name}”: expected ${column.type}, received ${JSON.stringify(value.length > 80 ? value.slice(0, 80) + "…" : value)}.`,
+      line,
+    );
+  if (column.values && !column.values.includes(value))
+    fail(
+      "E_ENUM",
+      `Row ${row}, column “${column.name}”: expected a member of enum ${column.enum}.`,
       line,
     );
   switch (column.type) {

@@ -1,5 +1,45 @@
 [
   {
+    "id": "customer-segments",
+    "label": "Customer segments",
+    "title": "customer-segments",
+    "category": "Synthetic records",
+    "description": "Enum-checked customer statuses with repeatable weighted selection.",
+    "expectedRows": 12,
+    "mode": "zrow",
+    "source": "# ZROW 0.3\n(enum Status \"trial\",\"active\",\"paused\")\n(seed \"customers-v1\")\n(cols id:int,email,status:Status,orders:int)\n(expect 12)\n(unique id)\n(id=seq(),email=\"customer{id}@example.test\")\n(status=choiceWeighted(\"trial\",2,\"active\",7,\"paused\",1),orders=randInt(0,20))\n(rows 12)\n"
+  },
+  {
+    "id": "synthetic-locations",
+    "label": "Synthetic locations",
+    "title": "synthetic-locations",
+    "category": "Maps and sample data",
+    "description": "Reproducible coordinates inside a latitude/longitude box around Berlin; synthetic points may fall in buildings or water.",
+    "expectedRows": 20,
+    "mode": "zrow",
+    "source": "# ZROW 0.3\n(seed \"berlin-demo\")\n(cols id:int,latitude:number,longitude:number)\n(expect 20)\n(id=seq(),latitude=round(latitude(52.4,52.6),6),longitude=round(longitude(13.2,13.6),6))\n(rows 20)\n"
+  },
+  {
+    "id": "dated-events",
+    "label": "Dated events",
+    "title": "dated-events",
+    "category": "Schedules and imports",
+    "description": "A fixed reference instant, UTC date helpers and enum-based event kinds.",
+    "expectedRows": 5,
+    "mode": "zrow",
+    "source": "# ZROW 0.3\n(enum Kind \"created\",\"updated\",\"reviewed\")\n(time \"2026-11-19T12:00:00Z\")\n(seed 42)\n(cols id:int,kind:Kind,day:date,generated_at,review_by:date)\n(id=seq(),kind=choice(Kind),day=seq(yesterday(),1),generated_at=now(),review_by=tomorrow())\n(rows 5)\n"
+  },
+  {
+    "id": "synthetic-measurements",
+    "label": "Random measurements",
+    "title": "synthetic-measurements",
+    "category": "Analysis and charts",
+    "description": "A seeded normal distribution for a synthetic chart dataset.",
+    "expectedRows": 40,
+    "mode": "zrow",
+    "source": "# ZROW 0.3\n(seed \"readings-v1\")\n(cols sample:int,value:number,noise:number)\n(sample=seq(),value=round(normal(20,2),2),noise=round(rand(-0.5,0.5),3))\n(rows 40)\n"
+  },
+  {
     "id": "mixed-csv",
     "label": "Recipes and ordinary CSV",
     "title": "mixed-csv",
