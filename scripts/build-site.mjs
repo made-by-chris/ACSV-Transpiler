@@ -121,7 +121,7 @@ fs.writeFileSync(
 );
 fs.writeFileSync(
   dir + "/_headers",
-  "/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  X-Frame-Options: DENY\n",
+  "/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  X-Frame-Options: DENY\n/*/index.md\n  X-Robots-Tag: noindex\n",
 );
 let s = fs
   .readFileSync(dir + "/index.html", "utf8")
