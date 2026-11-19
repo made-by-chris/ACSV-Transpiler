@@ -65,3 +65,14 @@ test("CLI infers typed JSON output and supports an explicit output format", () =
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('CLI selects tables, overrides parameters and preserves files on relation errors',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'zrow-tables-'));
+ try{
+ const input=join(dir,'input.zrow'),out=join(dir,'out.csv'),json=join(dir,'out.json');
+ writeFileSync(input,'# ZROW 0.4\n(param count:int=2)\n(table users\n(cols id:int)\n(id=seq())\n(rows count)\n)');
+ execFileSync(process.execPath,[cli,'--params','{"count":3}','--table','users',input,out]);expect(readFileSync(out,'utf8')).toBe('id\n1\n2\n3');
+ execFileSync(process.execPath,[cli,input,json]);expect(JSON.parse(readFileSync(json,'utf8'))).toEqual({users:[{id:1},{id:2}]});
+ const failed=spawnSync(process.execPath,[cli,input,out],{encoding:'utf8'});expect(failed.status).toBe(1);expect(failed.stderr).toContain('E_TABLE_SELECT');expect(readFileSync(out,'utf8')).toBe('id\n1\n2\n3');
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});

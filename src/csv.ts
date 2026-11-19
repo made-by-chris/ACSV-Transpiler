@@ -7,7 +7,7 @@ export interface Cell {
   column: number;
 }
 export interface RecordLine {
-  kind: "data" | "header" | "control" | "comment" | "include" | "directive";
+  kind: "data" | "header" | "control" | "comment" | "include" | "directive" | "table" | "end";
   cells: Cell[];
   raw: string;
   line: number;
@@ -45,6 +45,7 @@ export function scanRecords(
   if (input.length > MAX_INPUT)
     fail("E_LIMIT", `Input exceeds ${MAX_INPUT.toLocaleString()} characters.`);
   const records: RecordLine[] = [];
+  let tableDepth = 0;
   let i = input.startsWith("\ufeff") ? 1 : 0;
   let line = 1,
     column = 1;
@@ -63,6 +64,9 @@ export function scanRecords(
     return ch;
   }
   while (i < input.length) {
+    if (directives && (tableDepth > 0 || /^[ \t]+(?=\((?:cols|set|row|rows|expect|unique|param|fn|ref|table|enum|seed|time|param|fn|ref|table)\b|\([A-Za-z_]\w*\s*=|\)|#)/.test(input.slice(i)))) {
+      while (input[i] === " " || input[i] === "\t") take();
+    }
     const start = i,
       recordLine = line;
     // Only recognized forms are reserved; other parenthesized CSV values stay literal.
@@ -71,12 +75,13 @@ export function scanRecords(
       forms &&
       input[i] === "(" &&
       ((extended && /^\((?:enum|seed|time)(?:\s|\)|$)/.test(input.slice(i))) ||
-        /^\((?:(?:cols|set|row|rows|expect|unique)(?:\s|\)|$)|[A-Za-z_][A-Za-z0-9_]*\s*=)/.test(
+        /^\((?:(?:cols|set|row|rows|expect|unique|param|fn|ref|table)(?:\s|\)|$)|[A-Za-z_][A-Za-z0-9_]*\s*=)/.test(
           input.slice(i),
         ));
     if (
       directives &&
       (parenthesized ||
+        input[i] === ")" ||
         input[i] === "@" ||
         input[i] === ">" ||
         input[i] === "#" ||
@@ -85,6 +90,18 @@ export function scanRecords(
       while (i < input.length && input[i] !== "\n" && input[i] !== "\r") take();
       let raw = input.slice(start, i);
       if (!raw.startsWith("#")) raw = withoutInlineComment(raw);
+      if (/^\(table\s+[A-Za-z_]\w*\s*(?:#.*)?$/.test(raw)) {
+        tableDepth++;
+        records.push({kind:"table",raw:raw.replace(/\s+#.*$/, "").trim(),line:recordLine,cells:[]});
+        if(i<input.length) take();
+        continue;
+      }
+      if (/^\)\s*(?:#.*)?$/.test(raw)) {
+        tableDepth--;
+        records.push({kind:"end",raw,line:recordLine,cells:[]});
+        if(i<input.length) take();
+        continue;
+      }
       if (parenthesized) {
         if (!raw.trimEnd().endsWith(")"))
           fail(

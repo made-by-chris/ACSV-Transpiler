@@ -1,5 +1,5 @@
 import { version } from "../package.json";
-import { compile, serializeJSON, ZROWError } from "../src/ZROWCompiler";
+import { compile, serializeJSON, selectTable, ZROWError } from "../src/ZROWCompiler";
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -66,21 +66,25 @@ export default {
         mode: b.mode ?? "zrow",
         seed: b.seed,
         referenceTime: b.referenceTime,
+        params: b.params,
       });
+      if (b.table !== undefined && typeof b.table !== "string") return json({error:"table must be a string"},400);
+      const selected = b.format === "json" && b.table === undefined ? c : selectTable(c,b.table);
       console.info(
         JSON.stringify({
           event: "conversion",
           format: b.format ?? "csv",
-          rows: c.rows.length,
-          columns: c.headers.length,
+          rows: selected.stats.output_rows,
+          columns: selected.headers.length,
         }),
       );
       return json({
         version,
         format: b.format ?? "csv",
-        data: b.format === "json" ? JSON.parse(serializeJSON(c)) : c.csv,
-        rows: c.rows.length,
-        columns: c.headers,
+        data: b.format === "json" ? JSON.parse(serializeJSON(selected)) : selected.csv,
+        rows: selected.stats.output_rows,
+        columns: selected.headers,
+        ...(c.tables ? {tables: Object.fromEntries(Object.entries(c.tables).map(([name,table]) => [name,{rows:table.rows.length,columns:table.headers}]))} : {}),
       });
     } catch (e) {
       return e instanceof ZROWError

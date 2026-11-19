@@ -1,7 +1,7 @@
 <section class="language-overview" aria-labelledby="language-heading">
-  <h1 id="language-heading">The ZROW language</h1>
-  <p><strong>ZROW</strong> is an expressive extension of CSV for creating and storing tabular data. It lets people and language models describe large datasets with a small amount of text. Rows can be written directly as CSV or generated from sequences, formulas and shared values.</p>
-  <p>A ZROW document represents a flat table. It contains two basic structures:</p>
+  <h1 id="language-heading">The CSV programming language</h1>
+  <p><strong>ZROW</strong> is the CSV programming language for creating and storing tabular data. It lets people and language models describe large datasets with a small amount of text. Rows can be written directly as CSV or generated from sequences, formulas and shared values.</p>
+  <p>A ZROW document represents a table or a collection of named tables. It contains two basic structures:</p>
   <ul>
     <li><strong>Columns</strong> give each field a name and an optional type, such as text, integer, number, boolean, date or a named enum.</li>
     <li><strong>Rows</strong> contain values in column order. A row can be an ordinary comma-separated record or the result of a generation rule.</li>
@@ -11,7 +11,7 @@
   <p>A literal row uses CSV notation. Commas separate fields; double quotes surround fields that contain commas, line endings or quotes. A quote inside a quoted field is written twice. Literal rows can appear alongside generated rows in the same document.</p>
   <h2>Defaults and generators</h2>
   <p>An assignment such as <code>(role=member)</code> sets a default for subsequent rows. <code>(rows 100)</code> generates 100 rows from the current defaults. <code>(row role=admin)</code> generates one row with an override. Overrides apply to the rows that request them.</p>
-  <pre><code># ZROW 0.3
+  <pre><code># ZROW 0.4
 (enum Status "new","active","paused")
 (seed 42)
 (cols id:int,status:Status)
@@ -21,4 +21,4 @@
   <h2>Output and implementations</h2>
   <p>ZROW compiles to ordinary CSV or typed JSON. Column types and enum values are checked during compilation. Row-count and unique-key assertions can check the resulting table. The version declaration identifies the language used by the document.</p>
   <p>The reference implementation runs in browsers and Node.js. A <a href="https://www.npmjs.com/package/zrow-js">JavaScript package and command-line tool</a>, a <a href="/api/">conversion API</a> and the <a href="https://github.com/made-by-chris/zrow">MIT-licensed source</a> are available. See the <a href="/docs/reference/">language reference</a> and <a href="/examples/">examples</a> for the full syntax.</p>
-</section>
+<h2>Parameters, functions and related tables</h2><p>Parameters provide typed inputs with defaults. Functions name reusable expressions. Table blocks can select values from earlier tables and validate foreign keys. Export a selected table as CSV or the complete dataset as JSON. <a href="/docs/programs/">See examples and the full rules</a>.</p></section>

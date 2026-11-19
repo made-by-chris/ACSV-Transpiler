@@ -1,8 +1,17 @@
 import { fail } from "./errors.js";
 import { randomUnit, type GeneratorContext } from "./generators.js";
 
-type Value = string | number | boolean | { days: number };
+export type Value = string | number | boolean | { days: number };
+export interface ExpressionScope {
+  constants: ReadonlyMap<string, string | number | boolean>;
+  functions: ReadonlyMap<string, UserFunction>;
+  lists: ReadonlyMap<string, readonly (string | number | boolean)[]>;
+}
+export interface UserFunction { args: string[]; body: Expression; }
+export const emptyScope = (): ExpressionScope => ({ constants: new Map(), functions: new Map(), lists: new Map() });
 export type Expression =
+  | { kind: "list"; values: readonly (string | number | boolean)[] }
+  | { kind: "usercall"; fn: UserFunction; args: Expression[] }
   | { kind: "literal"; value: Value; verbatim?: boolean }
   | { kind: "enum"; name: string; values: readonly string[] }
   | { kind: "ref"; name: string }
@@ -40,7 +49,8 @@ const arities: Record<string, [number, number]> = {
   tomorrow: [0, 0],
   yesterday: [0, 0],
 };
-const functions = new Set(Object.keys(arities));
+export const builtinFunctions = new Set(Object.keys(arities));
+const functions = builtinFunctions;
 const deferred = new Set(["maybe", "faker"]);
 
 export function splitControls(source: string, line: number): string[] {
@@ -85,6 +95,7 @@ export function parseExpression(
   line: number,
   enums: ReadonlyMap<string, readonly string[]> = new Map(),
   extended = true,
+  scope: ExpressionScope = emptyScope(),
 ): Expression {
   const text = source.trim();
   if (!text) return { kind: "literal", value: "" };
@@ -106,6 +117,7 @@ export function parseExpression(
   if (
     /^[\p{L}_][\p{L}\p{N}_ ]*$/u.test(text) &&
     !headers.has(text) &&
+    !scope.constants.has(text) &&
     !enums.has(text) &&
     !["true", "false"].includes(text)
   ) {
@@ -227,7 +239,7 @@ export function parseExpression(
           line,
         );
       if (tokens[pos].type === "(") {
-        if (!functions.has(token.text))
+        if (!functions.has(token.text) && !scope.functions.has(token.text))
           fail("E_EXPRESSION", `Unknown function “${token.text}”.`, line);
         if (
           !extended &&
@@ -268,14 +280,23 @@ export function parseExpression(
                 }))
               : [arg],
           );
-        const [minimum, maximum] = arities[token.text];
+        const custom = scope.functions.get(token.text);
+        const [minimum, maximum] = custom ? [custom.args.length, custom.args.length] : arities[token.text];
         if (args.length < minimum || args.length > maximum)
           fail(
             "E_EXPRESSION",
             `${token.text} expects ${minimum === maximum ? minimum : `${minimum}–${maximum}`} arguments.`,
             line,
           );
-        left = { kind: "call", name: token.text, args, id };
+        left = custom ? { kind: "usercall", fn: custom, args } : { kind: "call", name: token.text, args, id };
+      } else if (tokens[pos].type === "." && tokens[pos + 2]?.type !== "(") {
+        pos++;
+        const field = tokens[pos++].text;
+        const key = token.text + "." + field;
+        if (!scope.lists.has(key)) fail(scope.lists.size ? "E_RELATION" : "E_COLUMN", `Unknown earlier table column “${key}”.`, line);
+        left = { kind: "list", values: scope.lists.get(key)! };
+      } else if (scope.constants.has(token.text)) {
+        left = { kind: "literal", value: scope.constants.get(token.text)!, verbatim: true };
       } else if (enums.has(token.text)) {
         left = {
           kind: "enum",
@@ -386,8 +407,11 @@ export function evaluate(
   line: number,
   index = 0,
   context?: GeneratorContext,
+  scope: ExpressionScope = emptyScope(),
+  budget = { remaining: 10000, depth: 0 },
 ): string {
   function visit(node: Expression): Value {
+    if (--budget.remaining < 0) fail("E_LIMIT", "Expression evaluation budget exceeded.", line);
     const value = compute(node);
     if (typeof value === "string" && value.length > 100_000)
       fail("E_LIMIT", "A generated cell exceeds 100,000 characters.", line);
@@ -402,7 +426,7 @@ export function evaluate(
         return node.value.replace(
           /\{([A-Za-z_]\w*)\}/g,
           (match, name: string) => {
-            const value = get(name);
+            const value = scope.constants.has(name) ? String(scope.constants.get(name)) : get(name);
             length += value.length - match.length;
             if (length > 100_000)
               fail(
@@ -416,6 +440,16 @@ export function evaluate(
       }
       return node.value;
     }
+    if (node.kind === "usercall") {
+      if (++budget.depth > 32) fail("E_LIMIT", "Function call depth exceeds 32.", line);
+      const values = node.args.map(visit);
+      const bindings = new Map(node.fn.args.map((name, i) => [name, String(values[i])]));
+      try { return evaluate(node.fn.body, name => {
+        if (!bindings.has(name)) fail("E_FUNCTION", `Unknown function argument “${name}”.`, line);
+        return bindings.get(name)!;
+      }, new Map(), line, 0, undefined, scope, budget); } finally { budget.depth--; }
+    }
+    if (node.kind === "list") fail("E_RELATION", "Use table columns inside choice(...) or cycle(...).", line);
     if (node.kind === "enum")
       fail(
         "E_ENUM",
@@ -434,6 +468,13 @@ export function evaluate(
         : numeric(value, line) * (node.op === "-" ? -1 : 1);
     }
     if (node.kind === "call") {
+      if ((node.name === "choice" || node.name === "cycle") && node.args.length === 1 && node.args[0].kind === "list") {
+        const values = node.args[0].values;
+        if (!values.length) fail("E_RELATION", "Cannot select from an empty table column.", line);
+        if (node.name === "cycle") return values[index % values.length];
+        if (!context || context.seed === undefined) fail("E_SEED", "Random generators require a seed.", line);
+        return values[Math.floor(randomUnit(context.seed, context.column, index, node.id ?? 0, 0) * values.length)];
+      }
       if (["today", "now", "tomorrow", "yesterday"].includes(node.name)) {
         if (!context) fail("E_TIME", "Clock context is unavailable.", line);
         if (node.name === "now") return context.referenceTime;

@@ -10,6 +10,7 @@ import {
 import {
   compile,
   serializeJSON,
+  selectTable,
   ZROWError,
   type Compilation,
   type InputMode,
@@ -88,11 +89,15 @@ export default function ZROWEditor() {
       }
     },
   );
-  const result = () => compilation().result;
+  const [tableName, setTableName] = createSignal("");
+  const dataset = () => compilation().result;
+  const tableNames = () => Object.keys(dataset()?.tables ?? {});
+  const activeTable = () => tableNames().includes(tableName()) ? tableName() : tableNames()[0];
+  const result = () => { const data = dataset(); return data?.tables ? selectTable(data, activeTable()) : data; };
   const json = createMemo<{ text: string; error?: ZROWError }>(() => {
     if (!result()) return { text: "" };
     try {
-      return { text: serializeJSON(result()!) };
+      return { text: serializeJSON(dataset()!) };
     } catch (error) {
       return { text: "", error: error as ZROWError };
     }
@@ -203,7 +208,7 @@ export default function ZROWEditor() {
       const source =
         draft().mode === "csv" || /^#\s*ZROW\b/m.test(input)
           ? input
-          : `# ZROW 0.3\n${input}`;
+          : `# ZROW 0.4\n${input}`;
       void download(source, draft().mode === "csv" ? ".csv" : ".zrow");
     } else if (canExport() && (format === "csv" || format === "json")) {
       void download(
@@ -341,7 +346,7 @@ export default function ZROWEditor() {
                 }}
                 placeholder={
                   draft().mode !== "csv"
-                    ? "# ZROW 0.3\n(cols id:int,name)\n(id=seq(),name=\"User {id}\")\n(rows 5)"
+                    ? "# ZROW 0.4\n(cols id:int,name)\n(id=seq(),name=\"User {id}\")\n(rows 5)"
                     : "id,name\n1,Player"
                 }
               />
@@ -358,6 +363,11 @@ export default function ZROWEditor() {
                 <span classList={{ "status-dot": true, invalid: !!error() }} />
               </div>
               <div class="output-actions">
+                <Show when={tableNames().length}>
+                  <select aria-label="Output table" value={activeTable()} onChange={e => { setTableName(e.currentTarget.value); setSelection(undefined); }}>
+                    <For each={tableNames()}>{name => <option value={name}>{name}</option>}</For>
+                  </select>
+                </Show>
                 <select
                   class="download-select"
                   aria-label="Download"
@@ -377,7 +387,7 @@ export default function ZROWEditor() {
                     CSV
                   </option>
                   <option value="json" disabled={!canExport()}>
-                    JSON
+                    {tableNames().length ? "JSON (all tables)" : "JSON"}
                   </option>
                 </select>
                 <div class="segmented" role="group" aria-label="Output view">
@@ -409,6 +419,7 @@ export default function ZROWEditor() {
               </div>
             </div>
             <div class="output-summary">
+              <Show when={tableNames().length}><span>{view() === "json" ? "JSON includes all tables" : activeTable()}</span></Show>
               <span>
                 <strong>{result()?.rows.length.toLocaleString() ?? "—"}</strong>{" "}
                 rows <span class="separator">/</span>{" "}

@@ -7,7 +7,7 @@ export const examples = [
     title: "app-fixtures",
     mode: "zrow" as const,
     kind: "use-case",
-    source: `# ZROW 0.3
+    source: `# ZROW 0.4
 (cols id:int,email,role,active:bool)
 (expect 25)
 (unique id)

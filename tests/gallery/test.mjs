@@ -4,8 +4,8 @@ import {compile,toRecords} from '../../dist/ZROWCompiler.js';
 const examples=JSON.parse(readFileSync(new URL('../../content/gallery.json',import.meta.url),'utf8'));
 for(const example of examples)test(example.label,()=>{
  const result=compile({input:example.source,mode:'zrow'});
- expect(result.rows).toHaveLength(example.expectedRows);
- expect(toRecords(result)).toHaveLength(example.expectedRows);
+ expect(result.stats.output_rows).toBe(example.expectedRows);
+ if(!result.tables) expect(toRecords(result)).toHaveLength(example.expectedRows);
 });
 test('browser matrix covers each combination once',()=>{
  const e=examples.find(x=>x.id==='browser-matrix');

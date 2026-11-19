@@ -5,7 +5,7 @@ The [example gallery](https://zrow.majaku.com/examples/) and editor dropdown gro
 ## Enums
 
 ```zrow
-# ZROW 0.3
+# ZROW 0.4
 (enum Role "member","admin","guest")
 (cols id:int,role:Role)
 (id=seq(),role=cycle(Role))
@@ -22,7 +22,7 @@ id,role
 ## Generated and literal rows
 
 ```zrow
-# ZROW 0.3
+# ZROW 0.4
 (cols id:int,name,role)
 (id=seq(),name="User {id}",role=member)
 (rows 2)
@@ -41,7 +41,7 @@ id,name,role
 ## Seeded data and fixed time
 
 ```zrow
-# ZROW 0.3
+# ZROW 0.4
 (enum Status "trial","active","paused")
 (seed "customers-v1")
 (time "2026-11-19T12:00:00Z")

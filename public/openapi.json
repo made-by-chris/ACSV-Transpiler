@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ZROW conversion API",
-    "version": "0.5.0"
+    "version": "0.6.0"
   },
   "servers": [
     {
@@ -60,6 +60,21 @@
                     "type": "string",
                     "format": "date-time",
                     "description": "Fixed reference timestamp with seconds and Z or a UTC offset. Use either this or a document time declaration."
+                  },
+                  "params": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "description": "Overrides for explicitly declared parameters; unknown names are rejected."
+                  },
+                  "table": {
+                    "type": "string",
+                    "description": "Named table to export. Required for CSV datasets; omit for JSON to export all tables."
                   }
                 }
               }

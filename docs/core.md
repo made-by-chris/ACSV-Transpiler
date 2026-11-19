@@ -1,11 +1,11 @@
 # ZROW language reference
 
-ZROW describes a flat table using column declarations, literal CSV records and generation rules. It compiles to CSV or typed JSON. New recipes use `# ZROW 0.3`.
+ZROW describes a flat table using column declarations, literal CSV records and generation rules. It compiles to CSV or typed JSON. New recipes use `# ZROW 0.4`.
 
 ## A document
 
 ```zrow
-# ZROW 0.3
+# ZROW 0.4
 (cols id:int,name,role)
 (expect 3)
 (unique id)
@@ -21,7 +21,7 @@ id,name,role
 3,"Shelley, Chris",admin
 ```
 
-The version declaration is optional; an omitted declaration uses the current language, 0.3. Declare it before the header. Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is independent of the npm package version. Earlier ZROW versions remain readable for existing files.
+The version declaration is optional; an omitted declaration uses the current language, 0.4. Declare it before the header. Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is independent of the npm package version. Earlier ZROW versions remain readable for existing files.
 
 Forms begin in column 1 and occupy one physical line. Parenthesized forms use comma-separated expressions. Blank lines and full-line comments beginning with `#` do not emit rows. A trailing `#` comment can follow a complete form, for example `(rows 6) # generate six rows`. Comments on other instruction lines need a space before `#`. Hashes inside quoted strings and literal CSV fields remain data. A document contains one column header. Metadata declarations can precede it.
 
@@ -64,7 +64,7 @@ Count and unique checks include all output rows. Unique checks compare typed val
 A CSV record emits one row. Nonempty fields override defaults for that row. Unquoted empty fields use defaults; quoted empty fields explicitly produce empty text. Every data record must match the header width. Commas separate fields; double quotes surround fields containing commas, quotes or line endings. Double an embedded quote. Spaces inside fields are significant.
 
 ```zrow
-# ZROW 0.3
+# ZROW 0.4
 (cols id:int,name,role)
 (id=seq(),name="User {id}",role=member)
 (row)
@@ -134,3 +134,7 @@ The CLI infers recipe mode from `.zrow`, literal mode from other extensions, and
 Bounds: 1,000,000 input UTF-16 code units including includes; 10,000 output rows; 128 columns; 250,000 cells; 10,000,000 expanded value code units; 100,000 code units per generated value; 4,000 code units / 256 tokens / 40 nesting levels per expression; 10 include levels; 32 unique checks. Bounds apply before callbacks and output writes.
 
 The optional streaming callback runs only after the full document succeeds; it buffers output. Stats count physical input lines and emitted output rows. The alternate `@` directive spelling and earlier versioned controls remain parseable for existing documents. Current examples use the parenthesized syntax.
+
+## Parameters, functions and named tables
+
+Language 0.4 adds typed parameters, reusable pure expression functions, named tables and checked foreign keys. See [the program reference](programs.md) for syntax, exports and limits. Existing single-table recipes and their API return shape are unchanged.

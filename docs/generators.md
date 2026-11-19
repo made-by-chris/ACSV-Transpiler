@@ -1,11 +1,11 @@
 # Enums, randomness and time
 
-These features require language version `# ZROW 0.3`, available in `zrow-js` 0.4.0. New documents should declare their version. Missing declarations use 0.3.
+Enums, randomness and time were introduced in language 0.3. New documents should use `# ZROW 0.4`; missing declarations use the current language.
 
 ## Named text enums
 
 ```text
-# ZROW 0.3
+# ZROW 0.4
 (enum Status "trial","active","paused")
 (seed 42)
 (cols id:int,status:Status)
@@ -65,7 +65,7 @@ Reference timestamps require seconds and an explicit `Z` or numeric UTC offset, 
 ```js
 import { compile } from 'zrow-js';
 const result = compile({
-  input: '# ZROW 0.3\n(cols n:int,day:date)\n(n=randInt(1,100),day=today())\n(rows 3)',
+  input: '# ZROW 0.4\n(cols n:int,day:date)\n(n=randInt(1,100),day=today())\n(rows 3)',
   mode: 'zrow',
   seed: 42,
   referenceTime: '2026-11-19T12:00:00Z'

@@ -1,3 +1,5 @@
+import { compileProgram } from "./program.js";
+import { emptyScope, type ExpressionScope } from "./expression.js";
 import { ZROWError, fail, type Diagnostic } from "./errors.js";
 import {
   scanRecords,
@@ -25,6 +27,7 @@ import { checkSeed, clock, type Seed } from "./generators.js";
 export type InputMode = "csv" | "zrow";
 export interface CompileConfig {
   input: string;
+  params?: Record<string, string | number | boolean>;
   mode?: InputMode;
   seed?: Seed;
   referenceTime?: string;
@@ -57,6 +60,7 @@ export interface CellOrigin {
     | "generator";
 }
 export interface Compilation {
+  tables?: Record<string, Compilation>;
   csv: string;
   headers: string[];
   columns: ColumnSchema[];
@@ -79,6 +83,16 @@ const MAX_ROWS = 10_000,
 
 /** Literal CSV is the default. ZROW execution is always an explicit choice. */
 export function compile(config: CompileConfig): Compilation {
+  return compileProgram(config, compileSingle);
+}
+
+export function selectTable(result: Compilation, name?: string): Compilation {
+  if (!result.tables) { if (name) fail("E_TABLE_SELECT", "This document has no named tables."); return result; }
+  if (!name || !Object.prototype.hasOwnProperty.call(result.tables, name)) fail("E_TABLE_SELECT", "Choose one of: " + Object.keys(result.tables).join(", "));
+  return result.tables[name];
+}
+
+function compileSingle(config: CompileConfig, scope: ExpressionScope = emptyScope()): Compilation {
   if (!config || typeof config.input !== "string")
     fail("E_CONFIG", "Provide text in the input property.");
   const mode = config.mode ?? "csv";
@@ -157,6 +171,7 @@ export function compile(config: CompileConfig): Compilation {
       }
     });
     function get(name: string): string {
+      if (scope.constants.has(name)) return String(scope.constants.get(name));
       column(name, line);
       if (values.has(name)) return values.get(name)!;
       const rule = overrides.get(name) ?? rules.get(name);
@@ -182,6 +197,7 @@ export function compile(config: CompileConfig): Compilation {
           rule.line,
           rows.length - (rule.startRow ?? 0),
           { seed, referenceTime, column: name },
+          scope,
         );
         origin = {
           line: rule.line,
@@ -262,6 +278,7 @@ export function compile(config: CompileConfig): Compilation {
           line,
           enums,
           extended,
+          scope,
         ),
         line,
         startRow: rows.length,
@@ -400,12 +417,18 @@ export function compile(config: CompileConfig): Compilation {
           line,
           enums,
           extended,
+          scope,
         ),
         line,
         startRow: rows.length,
       });
     }
     return overrides;
+  }
+  function countValue(text: string, line: number): number {
+    const value = Number(evaluate(parseExpression(text, new Set(), line, new Map(), true, scope), () => fail("E_PARAM", "Row counts cannot read columns.", line), new Map(), line, 0, undefined, scope));
+    if(!Number.isSafeInteger(value)||value<0||text.trim()==="") fail("E_DIRECTIVE", "Row count must be a non-negative safe integer.", line);
+    return value;
   }
   function directive(record: RecordLine, included: boolean) {
     stats.control_lines++;
@@ -479,7 +502,7 @@ export function compile(config: CompileConfig): Compilation {
             "Declare seed and time before emitting rows.",
             line,
           );
-        let value = parseExpression(content, new Set(), line);
+        let value = parseExpression(content, new Set(), line, new Map(), true, scope);
         if (
           value.kind === "unary" &&
           ["+", "-"].includes(value.op) &&
@@ -518,10 +541,10 @@ export function compile(config: CompileConfig): Compilation {
     } else if (command === "row")
       emit([], line, content ? assignments(content, line) : undefined);
     else if (command === "rows") {
-      const repeat = /^(\d+)(?:\s+with\s+(.+))?$/.exec(content);
-      if (!repeat)
+      const repeat = /^(.+?)(?:\s+with\s+(.+))?$/.exec(content);
+      if (!repeat || /\bwith\s*$/.test(content))
         fail("E_DIRECTIVE", "Use @rows N or @rows N with column=value.", line);
-      const count = Number(repeat[1]);
+      const count = countValue(repeat[1], line);
       capacity(count, line);
       const overrides = repeat[2] ? assignments(repeat[2], line) : undefined;
       for (let i = 0; i < count; i++) emit([], line, overrides);
@@ -534,15 +557,14 @@ export function compile(config: CompileConfig): Compilation {
         );
       if (expectation)
         fail("E_ASSERT", "Declare @expect only once per document.", line);
-      if (!/^\d+$/.test(content) || !Number.isSafeInteger(Number(content)))
-        fail("E_ASSERT", "Use @expect N with a non-negative integer.", line);
-      if (Number(content) > MAX_ROWS)
+      const expected = countValue(content, line);
+      if (expected > MAX_ROWS)
         fail(
           "E_LIMIT",
           `Expected rows exceed the ${MAX_ROWS} row limit.`,
           line,
         );
-      expectation = { count: Number(content), line };
+      expectation = { count: expected, line };
     } else if (command === "unique") {
       const names = content.split(",").map((name) => name.trim());
       names.forEach((name) => column(name, line));
@@ -589,16 +611,16 @@ export function compile(config: CompileConfig): Compilation {
               "Place one # ZROW declaration before the header.",
               record.line,
             );
-          if (!/^# ZROW 0\.[123]\s*$/.test(record.raw))
+          if (!/^# ZROW 0\.[1234]\s*$/.test(record.raw))
             fail(
               "E_VERSION",
-              "Unsupported or malformed ZROW declaration. This compiler supports # ZROW 0.1, # ZROW 0.2 and # ZROW 0.3.",
+              "Unsupported or malformed ZROW declaration. This compiler supports # ZROW 0.1, # ZROW 0.2 # ZROW 0.3 and # ZROW 0.4.",
               record.line,
             );
           if (
             included &&
-            ((!forms && /^# ZROW 0\.[23]\s*$/.test(record.raw)) ||
-              (!outerExtended && /^# ZROW 0\.3\s*$/.test(record.raw)))
+            ((!forms && /^# ZROW 0\.[234]\s*$/.test(record.raw)) ||
+              (!outerExtended && /^# ZROW 0\.[34]\s*$/.test(record.raw)))
           )
             fail(
               "E_VERSION",
@@ -638,6 +660,7 @@ export function compile(config: CompileConfig): Compilation {
           extended ? enums : new Map(),
         );
         const names = parsedColumns.map((column) => column.name);
+        if(names.some(name=>scope.constants.has(name)||scope.functions.has(name))) fail("E_NAME", "Columns must not shadow parameters or functions.",record.line);
         if (names.some((name) => enums.has(name)))
           fail(
             "E_ENUM",

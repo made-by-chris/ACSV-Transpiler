@@ -14,10 +14,10 @@ const snippets = JSON.parse(
 );
 test("all onboarding recipes use the current language and notation", () => {
   for (const example of examples.filter((e) => e.mode === "zrow")) {
-    expect(example.source, example.id).toMatch(/^# ZROW 0\.3\n/);
+    expect(example.source, example.id).toMatch(/^# ZROW 0\.4\n/);
     expect(example.source, example.id).not.toMatch(/^@/m);
     expect(
-      compile({ input: example.source, mode: "zrow" }).rows.length,
+      compile({ input: example.source, mode: "zrow" }).stats.output_rows,
     ).toBeGreaterThan(0);
   }
 });

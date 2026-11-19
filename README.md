@@ -1,9 +1,9 @@
 # ZROW
 
-ZROW is an expressive extension of CSV for creating and storing data. People and LLMs can describe large datasets with compact recipes, then compile them into CSV and typed JSON. It includes a JavaScript library, a command-line tool, a browser editor and a conversion API.
+ZROW is the CSV programming language. Create data with parameters, reusable functions and linked tables, then export ordinary CSV or typed JSON. People and LLMs can describe large datasets with compact recipes, then compile them into CSV and typed JSON. It includes a JavaScript library, a command-line tool, a browser editor and a conversion API.
 
 ```text
-# ZROW 0.3
+# ZROW 0.4
 (cols id:int,email,role,active:bool)
 (expect 6)
 (unique id)
@@ -16,7 +16,7 @@ ZROW is an expressive extension of CSV for creating and storing data. People and
 
 This recipe produces six rows. Assignments define defaults, `(rows N)` generates rows, and `(row ...)` supplies named overrides. Numeric and boolean types are preserved in JSON. CSV output contains ordinary fields and no recipe directives.
 
-[Language reference](docs/core.md) · [Authoring guide](docs/authoring.md) · [Examples](examples.md) · [Feature status](FEATURES.md) · [Enums and generators](docs/generators.md) · [Portable profile](docs/portable-profile.md)
+[Language reference](docs/core.md) · [Authoring guide](docs/authoring.md) · [Examples](examples.md) · [Feature status](FEATURES.md) · [Enums and generators](docs/generators.md) · [Portable profile](docs/portable-profile.md) · [Parameters, functions and tables](docs/programs.md)
 
 ## Install
 
@@ -31,7 +31,7 @@ npx zrow users.zrow users.json
 ```js
 import { compile, toRecords, serializeJSON, validate } from 'zrow-js';
 
-const input = '# ZROW 0.3\n(cols id:int,active:bool)\n(id=seq(),active=true)\n(rows 3)';
+const input = '# ZROW 0.4\n(cols id:int,active:bool)\n(id=seq(),active=true)\n(rows 3)';
 const result = compile({ input, mode: 'zrow' });
 console.log(result.csv);
 console.log(toRecords(result));
@@ -39,7 +39,7 @@ console.log(serializeJSON(result));
 console.log(validate({ input, mode: 'zrow' }));
 ```
 
-The default input mode is literal CSV, which preserves valid input without interpreting recipe syntax. Use `mode: "zrow"` to compile recipes. The optional `# ZROW 0.3` declaration identifies the language version independently of the npm package version. Unsupported, malformed, repeated or misplaced declarations are rejected.
+The default input mode is literal CSV, which preserves valid input without interpreting recipe syntax. Use `mode: "zrow"` to compile recipes. The optional `# ZROW 0.4` declaration identifies the language version independently of the npm package version. Unsupported, malformed, repeated or misplaced declarations are rejected.
 
 The portable core has no filesystem access or dynamic JavaScript evaluation. The `zrow-js/node` adapter enables confined file includes.
 
@@ -50,7 +50,7 @@ The [example gallery](https://zrow.majaku.com/examples/) groups small keyword/fu
 ## Enums, randomness and time
 
 ```text
-# ZROW 0.3
+# ZROW 0.4
 (enum Status "trial","active","paused")
 (seed 42)
 (time "2026-11-19T12:00:00Z")
@@ -93,7 +93,7 @@ Changes to language behavior should include tests and compatibility notes. See [
 Explain a recipe next to the instructions:
 
 ```text
-# ZROW 0.3
+# ZROW 0.4
 (cols id:int,name)          # two columns
 (id=seq(),name="User {id}") # number each name
 (rows 6)                   # generate six rows

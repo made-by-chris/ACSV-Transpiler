@@ -2,11 +2,23 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { randomUUID } from "node:crypto";
-import { ZROWError, serializeJSON, type InputMode } from "./ZROWCompiler.js";
+import { ZROWError, serializeJSON, selectTable, type InputMode } from "./ZROWCompiler.js";
 import { compileNode } from "./node.js";
 
 const args = process.argv.slice(2);
 let mode: InputMode | undefined;
+let table: string | undefined;
+let params: Record<string,string|number|boolean> | undefined;
+for (const flag of ["--table", "--params"]) {
+  const index = args.indexOf(flag);
+  if (index >= 0) {
+    const value = args[index+1];
+    if (!value) { console.error(`${flag} requires a value`); process.exit(1); }
+    if (flag === "--table") table = value;
+    else { try { params = JSON.parse(value); } catch { console.error("--params requires a JSON object"); process.exit(1); } }
+    args.splice(index,2);
+  }
+}
 let format: "csv" | "json" | undefined;
 const formatIndex = args.indexOf("--format");
 if (formatIndex >= 0) {
@@ -30,11 +42,11 @@ if (modeIndex >= 0) {
 }
 if (args.includes("--help")) {
   console.log(
-    "Usage: zrow [--mode csv|zrow] [--format csv|json] <input.csv|input.zrow> <output.csv|output.json>\nMode defaults to the input extension; format defaults to the output extension. CSV input is literal.",
+    "Usage: zrow [--mode csv|zrow] [--format csv|json] [--table name] [--params JSON] <input.csv|input.zrow> <output.csv|output.json>\nMode defaults to the input extension; format defaults to the output extension. CSV input is literal.",
   );
 } else if (args.length !== 2) {
   console.error(
-    "Usage: zrow [--mode csv|zrow] [--format csv|json] <input.csv|input.zrow> <output.csv|output.json>",
+    "Usage: zrow [--mode csv|zrow] [--format csv|json] [--table name] [--params JSON] <input.csv|input.zrow> <output.csv|output.json>",
   );
   process.exitCode = 1;
 } else {
@@ -48,9 +60,11 @@ if (args.includes("--help")) {
       mode,
       baseDir: path.dirname(sourceName),
       sourceName,
+      params,
     });
     format ??= path.extname(dest).toLowerCase() === ".json" ? "json" : "csv";
-    const output = format === "json" ? serializeJSON(result) : result.csv;
+    const selected = format === "json" && table === undefined ? result : selectTable(result,table);
+    const output = format === "json" ? serializeJSON(selected) : selected.csv;
     temporary = path.join(path.dirname(dest), `.zrow-${randomUUID()}.tmp`);
     fs.writeFileSync(temporary, output, { flag: "wx" });
     fs.renameSync(temporary, dest);

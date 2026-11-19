@@ -83,3 +83,13 @@ it("accepts fixed seed/time context and returns reproducible generated data", as
     422,
   );
 });
+
+it('API exports named tables and validates caller parameters', async()=>{
+ const input='# ZROW 0.4\n(param count:int=2)\n(table users\n(cols id:int)\n(id=seq())\n(rows count)\n)';
+ const env={LIMITER:{limit:async()=>({success:true})}};
+ const invoke=body=>worker.fetch(new Request('https://zrow.majaku.com/api/v1/convert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input,...body})}),env);
+ const all=await invoke({format:'json',params:{count:3}});expect(all.status).toBe(200);expect((await all.json()).data).toEqual({users:[{id:1},{id:2},{id:3}]});
+ const csv=await invoke({format:'csv',table:'users'});expect((await csv.json()).data).toBe('id\n1\n2');
+ expect((await invoke({format:'csv'})).status).toBe(422);
+ expect((await invoke({format:'json',params:{count:'3'}})).status).toBe(422);
+});

@@ -8,7 +8,7 @@ The language contract is [core.md](core.md). Machine-readable, independently spe
 
 ```ebnf
 recipe      = version, { declaration }, header, { comment | blank | csv_record | form | include } ;
-version     = "# ZROW 0.3" ;
+version     = "# ZROW 0.4" ;
 header      = "(cols ", columns, ")" ;
 form        = "(", assignments, ")"
             | "(row", [ " ", assignments ], ")"
@@ -44,3 +44,7 @@ Diagnostics use stable codes and one-based source locations; column offsets and 
 ## Version 0.3 context and randomness
 
 Named enums are text membership constraints checked for every emitted row and JSON conversion. Lists are expanded into literal arguments for cycle/choice. The seeded hash, draw indexing, rejection sampling and time rules are specified in [enums and generators](generators.md). Seeded draws depend on the column name, rule-relative row index, expression call ID and local draw index, not mutable evaluation order. Normal and geographic functions use binary64 transcendental math and can differ in their last digits across independent runtimes.
+
+## Language 0.4 programs
+
+A document can declare typed parameters and pure single-expression functions before its table header. Alternatively it can contain named `(table name` blocks closed by standalone `)`. Blocks compile in declaration order. Foreign keys and table-column selection refer only to earlier tables. See [programs.md](programs.md) for the complete scope, validation, export and resource-limit contract. Parameter override values are data; implementations must not interpolate them into executable source.

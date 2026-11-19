@@ -5,7 +5,10 @@ The executable contract is [docs/core.md](docs/core.md). Historical feature IDs 
 | Area | Supported |
 | --- | --- |
 | CSV | Literal default mode, exact byte preservation, quotes/multiline fields, BOM/newlines, strict row width |
-| Named recipes | `@set`, `@row`, `@rows N`, scoped `@rows N with ...`; no empty placeholder rows required |
+| Parameters | Typed defaults, validated caller overrides and expressions in row counts |
+| Functions | Pure named expressions, explicit arguments, earlier function calls and bounded evaluation |
+| Relationships | Named tables, choice/cycle over earlier columns, typed foreign-key validation |
+| Named recipes | `(column=value)`, `(row ...)`, `(rows N)`, scoped `(rows N with ...)`; no empty placeholder rows required |
 | Generators | `seq(start,step)` for numbers/dates; deterministic `cycle(...)`; explicit restart/index semantics |
 | Randomness and geography | Explicit document/config seeds; rand/randFloat, inclusive randInt, normal, choice/choiceWeighted, bounded area-uniform latitude and longitude |
 | Clock | One captured UTC instant; today/now/tomorrow/yesterday; explicit time/referenceTime override |
@@ -21,4 +24,4 @@ The executable contract is [docs/core.md](docs/core.md). Historical feature IDs 
 
 ## Still deferred
 
-Faker catalogs, nullable generators, nested scopes/tables, custom dialects, spreadsheet-safety transformations, and asynchronous constant-memory streaming. Historical implicit group syntax remains unsupported; explicit row/block overrides now provide a small, well-defined scope mechanism.
+Faker catalogs, nullable generators, nested table blocks, custom dialects, spreadsheet-safety transformations, and asynchronous constant-memory streaming. Historical implicit group syntax remains unsupported; explicit row/block overrides now provide a small, well-defined scope mechanism.

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { createHash } from "node:crypto";
 import { marked } from "marked";
-import { compile } from "../dist/ZROWCompiler.js";
+import { compile, serializeJSON } from "../dist/ZROWCompiler.js";
 const cssHash = createHash("sha256").update(fs.readFileSync("public/sponsor.css")).digest("hex").slice(0,12);
 const dir = "dist/web",
   host = "https://zrow.majaku.com";
@@ -35,8 +35,8 @@ function html(title, source, path) {
 const gallery = JSON.parse(fs.readFileSync("content/gallery.json", "utf8"));
 const galleryEntry = item => {
   const result = compile({ input: item.source, mode: "zrow" });
-  if (result.rows.length !== item.expectedRows) throw Error(`Invalid gallery example: ${item.id}`);
-  const body = `${item.description}\n\n\`\`\`zrow\n${item.source}\`\`\`\n\nProduces ${result.rows.length} rows. First rows:\n\n\`\`\`csv\n${result.csv.split("\n").slice(0, 5).join("\n")}\n\`\`\`\n\n[Open in editor](/?example=${item.id}).\n\n`;
+  if (result.stats.output_rows !== item.expectedRows) throw Error(`Invalid gallery example: ${item.id}`);
+  const body = `${item.description}\n\n\`\`\`zrow\n${item.source}\`\`\`\n\nProduces ${result.stats.output_rows} rows. ${result.tables ? "Named tables as JSON:" : "First rows:"}\n\n\`\`\`${result.tables ? "json" : "csv"}\n${result.tables ? serializeJSON(result) : result.csv.split("\n").slice(0, 5).join("\n")}\n\`\`\`\n\n[Open in editor](/?example=${item.id}).\n\n`;
   return item.kind === 'feature' ? `<details class="example-details"><summary>${item.label}</summary>\n\n${body}</details>\n\n` : `## ${item.label}\n\n${body}`;
 };
 const galleryMarkdown = "# Examples\n\n## Features\n\n" + gallery.filter(item => item.kind === 'feature').map(galleryEntry).join("") + "## Use cases\n\n" + gallery.filter(item => item.kind !== 'feature').map(galleryEntry).join("");
@@ -61,11 +61,14 @@ const docs = [
   ["/docs/reference/", "Reference", "docs/core.md"],
   ["/docs/portable/", "Portable profile", "docs/portable-profile.md"],
   ["/docs/authoring/", "Authoring guide", "docs/authoring.md"],
+  ["/docs/programs/", "Parameters, functions and tables", "docs/programs.md"],
   ["/docs/generators/", "Enums and generators", "docs/generators.md"],
   ["/benchmarks/", "Recipe size measurements", "docs/size-experiment.md"],
   ["/examples/", "Examples", "examples.md"],
 ];
 const map = {
+  "docs/programs.md": "/docs/programs/",
+  "programs.md": "/docs/programs/",
   "docs/core.md": "/docs/reference/",
   "core.md": "/docs/reference/",
   "docs/authoring.md": "/docs/authoring/",
@@ -96,7 +99,7 @@ page(
 page(
   "/about/",
   "About",
-  `# About ZROW\n\nZROW generates predictable CSV and typed JSON from readable recipes. Created by [Christopher Shelley](https://x.com/househuman) at [majaku](https://majaku.com).\n\nThe implementation runs in browsers and Node.js. Python can consume its generated output. The editor processes recipes locally.\n\n[Source and issues](https://github.com/made-by-chris/zrow) · [GitHub profile](https://github.com/made-by-chris). MIT license. Version 0.5.0.\n\nReport bugs through GitHub without including private data.`,
+  `# About ZROW\n\nZROW generates predictable CSV and typed JSON from readable recipes. Created by [Christopher Shelley](https://x.com/househuman) at [majaku](https://majaku.com).\n\nThe implementation runs in browsers and Node.js. Python can consume its generated output. The editor processes recipes locally.\n\n[Source and issues](https://github.com/made-by-chris/zrow) · [GitHub profile](https://github.com/made-by-chris). MIT license. Version 0.6.0.\n\nReport bugs through GitHub without including private data.`,
 );
 page(
   "/privacy/",
@@ -106,7 +109,7 @@ page(
 page(
   "/api/",
   "Conversion API",
-  `# Conversion API\n\nPOST https://zrow.majaku.com/api/v1/convert with Content-Type: application/json.\n\n\`\`\`json\n{"input":"# ZROW 0.3\\n(cols id:int,name)\\n(id=seq(),name=Player)\\n(rows 3)","mode":"zrow","format":"json"}\n\`\`\`\n\nResponse: version, format, data, rows, columns. JSON data is an array of typed objects; CSV data is a string. Defaults: mode zrow, format csv.\n\nLimits: 64 KiB body, 30 requests/minute per IP, 10,000 rows and 250,000 cells. Optional seed and referenceTime request fields fix the random and clock context; use either request fields or document declarations, not both. No file includes. CORS permits public requests without credentials.\n\nErrors: 400 invalid JSON/input, 413 body limit, 415 content type, 422 compiler diagnostic, 429 rate limit. No uptime guarantee. [Reference](/docs/reference/) · [OpenAPI](/openapi.json).`,
+  `# Conversion API\n\nPOST https://zrow.majaku.com/api/v1/convert with Content-Type: application/json.\n\n\`\`\`json\n{"input":"# ZROW 0.4\\n(cols id:int,name)\\n(id=seq(),name=Player)\\n(rows 3)","mode":"zrow","format":"json"}\n\`\`\`\n\nResponse: version, format, data, rows, columns; named datasets also include table metadata. Optional params supplies a JSON object of declared parameter overrides. CSV from named tables requires table: the exact table name. JSON without table exports all tables as an object; with table it exports that table as an array. JSON data is an array of typed objects; CSV data is a string. Defaults: mode zrow, format csv.\n\nLimits: 64 KiB body, 30 requests/minute per IP, 10,000 rows and 250,000 cells. Optional seed and referenceTime request fields fix the random and clock context; use either request fields or document declarations, not both. No file includes. CORS permits public requests without credentials.\n\nErrors: 400 invalid JSON/input, 413 body limit, 415 content type, 422 compiler diagnostic, 429 rate limit. No uptime guarantee. [Reference](/docs/reference/) · [OpenAPI](/openapi.json).`,
 );
 page(
   "/guides/python/",
@@ -116,7 +119,7 @@ page(
 page(
   "/guides/game-data/",
   "Game data",
-  `# Generate game progression data\n\n\`\`\`zrow\n# ZROW 0.3\n(cols level:int,xp:int,reward:int)\n(level=seq(),xp=level*level*100,reward=min(level*10,500))\n(rows 100)\n\`\`\`\n\nLevel 1 requires 100 XP and grants 10 reward units. Level 10 requires 10,000 XP and grants 100. Rewards cap at level 50. XP is per-level, not cumulative.\n\n[Open the editor](/), paste the recipe and download CSV or JSON. Commit the recipe with your game and regenerate it when balancing changes. [Reference](/docs/reference/).`,
+  `# Generate game progression data\n\n\`\`\`zrow\n# ZROW 0.4\n(cols level:int,xp:int,reward:int)\n(level=seq(),xp=level*level*100,reward=min(level*10,500))\n(rows 100)\n\`\`\`\n\nLevel 1 requires 100 XP and grants 10 reward units. Level 10 requires 10,000 XP and grants 100. Rewards cap at level 50. XP is per-level, not cumulative.\n\n[Open the editor](/), paste the recipe and download CSV or JSON. Commit the recipe with your game and regenerate it when balancing changes. [Reference](/docs/reference/).`,
 );
 fs.writeFileSync(
   dir + "/robots.txt",
@@ -143,7 +146,7 @@ let s = fs
   .readFileSync(dir + "/index.html", "utf8")
   .replace(
     "<title>ZROW</title>",
-    `<title>ZROW — Expressive CSV</title><meta name="description" content="An expressive CSV extension for people and LLMs to create and store large datasets with compact recipes. Export CSV and typed JSON."><link rel="canonical" href="${host}/"><meta property="og:title" content="ZROW — Expressive CSV"><meta property="og:type" content="website"><meta property="og:url" content="${host}/"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "ZROW", url: host + "/" })}</script>`,
+    `<title>ZROW — The CSV programming language</title><meta name="description" content="The CSV programming language. Generate data with parameters, functions and related tables. Export CSV and typed JSON."><link rel="canonical" href="${host}/"><meta property="og:title" content="ZROW — The CSV programming language"><meta property="og:type" content="website"><meta property="og:url" content="${host}/"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "ZROW", url: host + "/" })}</script>`,
   );
 s = s.replace('/sponsor.css"', `/sponsor.css?v=${cssHash}"`);
 s = s.replace(

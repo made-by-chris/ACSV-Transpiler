@@ -5,7 +5,7 @@
     "icon": "JS",
     "install": "npm install zrow-js",
     "language": "javascript",
-    "code": "import { compile, serializeJSON } from 'zrow-js';\n\nconst input = `# ZROW 0.3\n(cols id:int,name)\n(id=seq(),name=\"User {id}\")\n(rows 3)`;\n\nconst result = compile({ input, mode: 'zrow' });\nconsole.log(result.csv);\nconsole.log(serializeJSON(result));"
+    "code": "import { compile, serializeJSON } from 'zrow-js';\n\nconst input = `# ZROW 0.4\n(cols id:int,name)\n(id=seq(),name=\"User {id}\")\n(rows 3)`;\n\nconst result = compile({ input, mode: 'zrow' });\nconsole.log(result.csv);\nconsole.log(serializeJSON(result));"
   },
   {
     "id": "node",
@@ -27,6 +27,6 @@
     "label": "HTTP API",
     "icon": "{}",
     "language": "shell",
-    "code": "curl https://zrow.majaku.com/api/v1/convert \\\n  -H 'Content-Type: application/json' \\\n  --data '{\"input\":\"# ZROW 0.3\\n(cols id:int,name)\\n(id=seq(),name=\\\"User {id}\\\")\\n(rows 3)\",\"mode\":\"zrow\",\"format\":\"json\"}'"
+    "code": "curl https://zrow.majaku.com/api/v1/convert \\\n  -H 'Content-Type: application/json' \\\n  --data '{\"input\":\"# ZROW 0.4\\n(cols id:int,name)\\n(id=seq(),name=\\\"User {id}\\\")\\n(rows 3)\",\"mode\":\"zrow\",\"format\":\"json\"}'"
   }
 ]

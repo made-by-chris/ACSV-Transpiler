@@ -98,6 +98,7 @@ export function convertValue(
 
 /** JSON conversion is explicit: CSV may legally contain duplicate header cells. */
 export function toRecords(result: Compilation): Record<string, DataValue>[] {
+  if(result.tables) fail("E_TABLE_SELECT", "Select a table before calling toRecords; serializeJSON exports the whole dataset.");
   if (
     result.headers.some((name) => !name) ||
     new Set(result.headers).size !== result.headers.length
@@ -122,5 +123,6 @@ export function toRecords(result: Compilation): Record<string, DataValue>[] {
   );
 }
 export function serializeJSON(result: Compilation, pretty = true): string {
-  return JSON.stringify(toRecords(result), null, pretty ? 2 : undefined);
+  const data = result.tables ? Object.fromEntries(Object.entries(result.tables).map(([name, table]) => [name, toRecords(table)])) : toRecords(result);
+  return JSON.stringify(data, null, pretty ? 2 : undefined);
 }
