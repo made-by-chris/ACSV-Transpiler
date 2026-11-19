@@ -1,9 +1,9 @@
-# ACSV authoring guide for LLMs
+# XCSV authoring guide for LLMs
 
 This reference can be copied into a prompt. It teaches the supported syntax; it does not guarantee that a model follows it. Validate generated recipes before exporting.
 
 ```text
-Generate ACSV for a flat table. Return raw ACSV only, without Markdown fences.
+Generate XCSV for a flat table. Return raw XCSV only, without Markdown fences.
 
 Start with one comma-separated header. Optional column types: :text, :int, :number, :bool, :date. Untyped columns stay strings; bool accepts true/false; date is YYYY-MM-DD. Do not invent nulls or infer types from values.
 
@@ -30,7 +30,11 @@ id:int,name,active:bool
 
 Ordinary CSV data rows may be mixed in; they must match header width. # starts a full-line comment. Directives start at the beginning of a line. Literal CSV mode interprets none of this syntax.
 
-Keep recipes deterministic and readable. Maximum 10,000 rows / 250,000 cells. No JavaScript, randomness, Faker, nested tables or network/file access in the browser. Use explicit literal cases for irregular real data rather than inventing a pattern. Validate with the ACSV compiler before claiming a recipe is executable.
+Keep recipes deterministic and readable. Maximum 10,000 rows / 250,000 cells. No JavaScript, randomness, Faker, nested tables or network/file access in the browser. Use explicit literal cases for irregular real data rather than inventing a pattern. Validate with the XCSV compiler before claiming a recipe is executable.
 ```
 
 For very small or irregular tables, plain CSV can be shorter and easier. Use recipes for repeated structure and explicit literals for irregular facts. Do not infer that fewer output tokens imply better accuracy.
+
+## Version marker
+
+Put `# XCSV 0.1` on the first line of new recipes, before the column header. This optional declaration is excluded from CSV and JSON output. Missing declarations use the current language. Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is separate from the implementation package version. Use mode xcsv; acsv is a compatibility alias. Agent entry point: https://acsv.majaku.com/llms.txt .

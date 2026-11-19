@@ -21,8 +21,8 @@ if (formatIndex >= 0) {
 const modeIndex = args.indexOf("--mode");
 if (modeIndex >= 0) {
   const value = args[modeIndex + 1];
-  if (value !== "csv" && value !== "acsv") {
-    console.error("--mode must be csv or acsv");
+  if (value !== "csv" && value !== "acsv" && value !== "xcsv") {
+    console.error("--mode must be csv, xcsv or acsv");
     process.exit(1);
   }
   mode = value;
@@ -30,18 +30,18 @@ if (modeIndex >= 0) {
 }
 if (args.includes("--help")) {
   console.log(
-    "Usage: node cli/ACSV.js [--mode csv|acsv] [--format csv|json] <input.csv|input.acsv> <output.csv|output.json>\nMode defaults to the input extension; format defaults to the output extension. CSV input is literal.",
+    "Usage: node cli/ACSV.js [--mode csv|xcsv|acsv] [--format csv|json] <input.csv|input.acsv> <output.csv|output.json>\nMode defaults to the input extension; format defaults to the output extension. CSV input is literal.",
   );
 } else if (args.length !== 2) {
   console.error(
-    "Usage: node cli/ACSV.js [--mode csv|acsv] [--format csv|json] <input.csv|input.acsv> <output.csv|output.json>",
+    "Usage: node cli/ACSV.js [--mode csv|xcsv|acsv] [--format csv|json] <input.csv|input.acsv> <output.csv|output.json>",
   );
   process.exitCode = 1;
 } else {
   let temporary: string | undefined;
   try {
     const [src, dest] = args;
-    mode ??= path.extname(src).toLowerCase() === ".acsv" ? "acsv" : "csv";
+    mode ??= path.extname(src).toLowerCase() === ".acsv" || path.extname(src).toLowerCase() === ".xcsv" ? "acsv" : "csv";
     const sourceName = fs.realpathSync(src);
     const result = compileNode({
       input: fs.readFileSync(src, "utf8"),

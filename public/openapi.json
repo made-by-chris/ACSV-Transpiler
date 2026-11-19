@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "ACSV conversion API",
-    "version": "0.1.0"
+    "title": "XCSV conversion API",
+    "version": "0.2.0"
   },
   "servers": [
     {
@@ -19,18 +19,27 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["input"],
+                "required": [
+                  "input"
+                ],
                 "properties": {
                   "input": {
                     "type": "string",
                     "maxLength": 65536
                   },
                   "mode": {
-                    "enum": ["csv", "acsv"],
-                    "default": "acsv"
+                    "enum": [
+                      "csv",
+                      "xcsv",
+                      "acsv"
+                    ],
+                    "default": "xcsv"
                   },
                   "format": {
-                    "enum": ["csv", "json"],
+                    "enum": [
+                      "csv",
+                      "json"
+                    ],
                     "default": "csv"
                   }
                 }

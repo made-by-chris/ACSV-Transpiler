@@ -184,7 +184,9 @@ export default function ACSVEditor() {
 
   function chooseDownload(format: string) {
     if (format === "source") {
-      void download(draft().input, draft().mode === "csv" ? ".csv" : ".acsv");
+      const input = draft().input;
+      const source = draft().mode === "csv" || /^#\s*XCSV\b/m.test(input) ? input : `# XCSV 0.1\n${input}`;
+      void download(source, draft().mode === "csv" ? ".csv" : ".xcsv");
     } else if (canExport() && (format === "csv" || format === "json")) {
       void download(format === "csv" ? result()!.csv : json().text, `.${format}`);
     }
@@ -231,7 +233,7 @@ export default function ACSVEditor() {
                   update({ mode: e.currentTarget.value as InputMode })
                 }
               >
-                <option value="acsv">ACSV recipe</option>
+                <option value="acsv">XCSV recipe</option>
                 <option value="csv">Literal CSV</option>
               </select>
               <select

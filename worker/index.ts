@@ -10,7 +10,7 @@ const json = (data: unknown, status = 200) =>
 export default {
   async fetch(r: Request, env: any) {
     const p = new URL(r.url).pathname;
-    if (p === "/api/v1/health") return json({ status: "ok", version: "0.1.0" });
+    if (p === "/api/v1/health") return json({ status: "ok", version: "0.2.0" });
     if (!p.startsWith("/api/v1/")) return env.ASSETS.fetch(r);
     if (r.method === "OPTIONS")
       return new Response(null, { status: 204, headers });
@@ -56,11 +56,11 @@ export default {
       if (
         !b ||
         typeof b.input !== "string" ||
-        !["csv", "acsv"].includes(b.mode ?? "acsv") ||
+        !["csv", "acsv", "xcsv"].includes(b.mode ?? "xcsv") ||
         !["csv", "json"].includes(b.format ?? "csv")
       )
         return json({ error: "Invalid input, mode or format" }, 400);
-      const c = compile({ input: b.input, mode: b.mode ?? "acsv" });
+      const c = compile({ input: b.input, mode: b.mode ?? "xcsv" });
       console.info(
         JSON.stringify({
           event: "conversion",
@@ -70,7 +70,7 @@ export default {
         }),
       );
       return json({
-        version: "0.1.0",
+        version: "0.2.0",
         format: b.format ?? "csv",
         data: b.format === "json" ? JSON.parse(serializeJSON(c)) : c.csv,
         rows: c.rows.length,

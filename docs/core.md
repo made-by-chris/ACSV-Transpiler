@@ -1,6 +1,6 @@
-# ACSV language contract
+# XCSV language contract
 
-ACSV describes a flat table through ordinary CSV values and deterministic recipes. It runs locally in the browser or in Node. The same recipe can produce CSV strings or JSON objects with explicitly declared primitive types.
+XCSV describes a flat table through ordinary CSV values and deterministic recipes. It runs locally in the browser or in Node. The same recipe can produce CSV strings or JSON objects with explicitly declared primitive types.
 
 ## A readable recipe
 
@@ -34,9 +34,9 @@ No placeholder commas are required. Naming an override makes its meaning indepen
 
 Both modes support comma-separated fields, doubled quotes and quoted multiline fields. Quotes surround the whole CSV field. Spaces inside CSV fields are significant. Data records must match the header width exactly; malformed quotes or ragged rows fail. Empty input is valid; a final newline does not create a row.
 
-Quote the first field when literal ACSV data begins with a reserved prefix. Prefixes inside quoted multiline data are never directives. Directives begin at column 1 and occupy one physical line. Use multiple `@set` lines to organize a recipe.
+Quote the first field when literal XCSV data begins with a reserved prefix. Prefixes inside quoted multiline data are never directives. Directives begin at column 1 and occupy one physical line. Use multiple `@set` lines to organize a recipe.
 
-ACSV output uses LF record endings and no final newline; typed annotations are removed from output headers. Literal CSV mode returns the original input instead of reserializing it. Browser text areas may normalize pasted line endings; use the CLI or library when byte preservation matters.
+XCSV output uses LF record endings and no final newline; typed annotations are removed from output headers. Literal CSV mode returns the original input instead of reserializing it. Browser text areas may normalize pasted line endings; use the CLI or library when byte preservation matters.
 
 ## Directives
 
@@ -119,7 +119,7 @@ Expression strings use single or double quotes, doubled matching quotes, and esc
 
 ## Ordinary rows and legacy notation
 
-Existing `>` recipes continue working. Data records emit one row; nonempty literal values override defaults for that row. Unquoted empty fields use defaults; quoted empty fields (`""`) override them with an empty string. A blank physical line is cosmetic in ACSV mode.
+Existing `>` recipes continue working. Data records emit one row; nonempty literal values override defaults for that row. Unquoted empty fields use defaults; quoted empty fields (`""`) override them with an empty string. A blank physical line is cosmetic in XCSV mode.
 
 | Legacy control | Meaning |
 | --- | --- |
@@ -148,8 +148,12 @@ The CLI infers input mode from `.acsv` and output format from `.json`; `--mode c
 
 ## Compatibility and deferred work
 
-Literal CSV remains the default API mode. Recipe callers must pass `mode: 'acsv'`. The new `@` prefix and unquoted `:type` header suffixes are reserved in ACSV mode; quote literal fields that use them. Existing valid `>` recipes retain their behavior.
+Literal CSV remains the default API mode. Recipe callers must pass `mode: 'acsv'`. The new `@` prefix and unquoted `:type` header suffixes are reserved in XCSV mode; quote literal fields that use them. Existing valid `>` recipes retain their behavior.
 
 Random/Faker generators, implicit/nested scopes, null generators, custom dialects and spreadsheet-safety directives remain deferred. The old proposal vectors are preserved in `docs/roadmap-fixtures/`; active tests reject their unsupported syntax. Temporary named overrides are now supported through `@row` and `@rows ... with` with the explicit semantics above.
 
 CSV quoting is not a spreadsheet formula-safety policy. Literal values are intentionally preserved. See [portable profile](portable-profile.md) for implementation boundaries and conformance vectors.
+
+## Version marker
+
+Put `# XCSV 0.1` on the first line of new recipes, before the column header. This optional declaration is excluded from CSV and JSON output. Missing declarations use the current language. Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is separate from the implementation package version. Use mode xcsv; acsv is a compatibility alias. Agent entry point: https://acsv.majaku.com/llms.txt .

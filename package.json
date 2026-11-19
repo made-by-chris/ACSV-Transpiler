@@ -1,5 +1,5 @@
 {
-  "name": "acsv",
+  "name": "xcsv",
   "main": "dist/ACSVTranspiler.js",
   "module": "dist/ACSVTranspiler.js",
   "types": "dist/ACSVTranspiler.d.ts",
@@ -13,7 +13,7 @@
       "import": "./dist/node.js"
     }
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -54,7 +54,8 @@
     "LICENSE"
   ],
   "bin": {
-    "acsv": "cli/ACSV.js"
+    "acsv": "cli/ACSV.js",
+    "xcsv": "cli/ACSV.js"
   },
   "description": "Readable, deterministic recipes for CSV and typed JSON fixtures.",
   "keywords": [

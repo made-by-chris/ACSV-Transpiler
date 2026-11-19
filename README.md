@@ -1,4 +1,4 @@
-# ACSV — readable data recipes
+# XCSV — readable data recipes
 
 Generate predictable app fixtures and game tables without repeating every value or counting empty comma cells. Name the pattern, then name the exceptions.
 
@@ -40,15 +40,12 @@ Library files live in `dist/`, CLI files in `cli/`, and the website in `dist/web
 
 ## Install the released package
 
-The short npm name `acsv` was rejected by npm because it is too similar to `a-csv`. A replacement registry name is being selected. For now, use the [GitHub release package](https://github.com/made-by-chris/ACSV-Transpiler/releases/tag/v0.1.0):
+The npm package is `xcsv`. The 0.2.0 release is being submitted to npm; until accepted, the existing [0.1.0 package](https://www.npmjs.com/package/acsv-transpiler) remains available.
 
 ```sh
-npm install acsv@https://github.com/made-by-chris/ACSV-Transpiler/releases/download/v0.1.0/acsv-transpiler-0.1.0.tgz
+npm install xcsv
+npx xcsv users.xcsv users.csv
 ```
-
-Run the installed CLI with `npx acsv users.acsv users.csv`.
-
-The installed library exports `compile`, `validate`, `serializeJSON` and `toRecords` from `acsv`. The release package is versioned and the website API reports its version in responses.
 
 ## CLI
 
@@ -63,10 +60,10 @@ node cli/ACSV.js existing.csv unchanged.csv
 
 ## Library
 
-The GitHub installation above exposes the portable core as `acsv`:
+The GitHub installation above exposes the portable core as `xcsv`:
 
 ```js
-import { compile, toRecords, serializeJSON, validate } from 'acsv';
+import { compile, toRecords, serializeJSON, validate } from 'xcsv';
 const input = 'id:int,active:bool\n@set id=seq(),active=true\n@rows 3';
 const result = compile({ input, mode: 'acsv' });
 console.log(result.csv);
@@ -75,11 +72,11 @@ console.log(serializeJSON(result));
 console.log(validate({ input, mode: 'acsv' }));
 ```
 
-The default export still returns CSV text. The default **input** mode is literal CSV: it never interprets formulas or directives and returns valid input unchanged. File includes require the explicit `./dist/node.js` adapter (package export `acsv/node`); the portable core has no filesystem access or dynamic JavaScript evaluation.
+The default export still returns CSV text. The default **input** mode is literal CSV: it never interprets formulas or directives and returns valid input unchanged. File includes require the explicit `./dist/node.js` adapter (package export `xcsv/node`); the portable core has no filesystem access or dynamic JavaScript evaluation.
 
 ## Compatibility
 
-Existing `>` controls and ordinary CSV rows continue working. New recipes can use named directives throughout. `@` lines and unquoted `:type` header annotations are now reserved in ACSV mode; quote literal fields that resemble them. See the [contract](docs/core.md) for complete behavior and limits.
+Existing `>` controls and ordinary CSV rows continue working. New recipes can use named directives throughout. `@` lines and unquoted `:type` header annotations are now reserved in XCSV mode; quote literal fields that resemble them. See the [contract](docs/core.md) for complete behavior and limits.
 
 Created by Christopher Shelley. [MIT license](LICENSE).
 
@@ -93,3 +90,7 @@ Created by Christopher Shelley. [MIT license](LICENSE).
 - [Game progression tables](https://acsv.majaku.com/guides/game-data/)
 - [Reading generated CSV in Python](https://acsv.majaku.com/guides/python/)
 - [Conversion API and limits](https://acsv.majaku.com/api/)
+
+## Language declaration
+
+Start new recipes with `# XCSV 0.1` on its own line before the column header. It is optional for existing recipes, emits no output row, and declares the language version rather than the package version. Unsupported, malformed, duplicate or misplaced declarations are rejected. Literal CSV mode never interprets it. `mode: "xcsv"` selects recipes; `mode: "acsv"` remains a compatibility alias. The current website stays at https://acsv.majaku.com.

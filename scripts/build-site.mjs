@@ -11,24 +11,24 @@ const ad = `<aside aria-label="Advertisements" class="ad-placement"><small>Adver
 function html(title, source, path) {
   const descriptions = {
     "/docs/":
-      "Install and use ACSV to generate deterministic CSV and typed JSON fixtures in the browser, JavaScript or CLI.",
+      "Install and use XCSV to generate deterministic CSV and typed JSON fixtures in the browser, JavaScript or CLI.",
     "/docs/reference/":
-      "ACSV language reference: named defaults, row overrides, sequences, types, CSV quoting, diagnostics and resource limits.",
+      "XCSV language reference: named defaults, row overrides, sequences, types, CSV quoting, diagnostics and resource limits.",
     "/guides/game-data/":
       "Generate a 100-level game progression table with XP formulas and capped rewards, then export CSV or JSON.",
     "/guides/app-fixtures/":
       "Create predictable user fixtures with named admin and inactive account exceptions, explicit types and validation.",
     "/api/":
-      "Convert ACSV to CSV or typed JSON using the public Cloudflare API. Request examples, limits and error responses.",
+      "Convert XCSV to CSV or typed JSON using the public Cloudflare API. Request examples, limits and error responses.",
     "/about/":
-      "ACSV is maintained by Christopher Shelley at majaku. Source code, licensing, implementation and contact information.",
+      "XCSV is maintained by Christopher Shelley at majaku. Source code, licensing, implementation and contact information.",
     "/privacy/":
-      "How ACSV handles local browser drafts, conversion API requests, advertising and traffic measurement.",
+      "How XCSV handles local browser drafts, conversion API requests, advertising and traffic measurement.",
   };
   const description =
     descriptions[path] ??
-    `${title}: documentation and reproducible examples for ACSV data recipes.`;
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${title} — ACSV</title><meta name="description" content="${description}"><link rel="canonical" href="${host}${path}"><meta property="og:title" content="${title} — ACSV"><meta property="og:url" content="${host}${path}"><meta property="og:type" content="website"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><link rel="stylesheet" href="/sponsor.css"><style>body{font:17px/1.65 system-ui;max-width:1000px;margin:36px auto;padding:0 24px;color:#18212c}nav,footer{margin:24px 0}footer{text-align:center}a{color:#175bc0}pre{overflow:auto;background:#f1f4f7;padding:20px}table{border-collapse:collapse;display:block;overflow:auto;max-width:100%}main{min-width:0;overflow-wrap:anywhere}td,th{border:1px solid #ddd;padding:8px}</style></head><body>${links}<main>${marked.parse(source)}</main>${path === "/privacy/" || path === "/about/" || path === "/404.html" ? "" : ad}${footer}${analytics}</body></html>`;
+    `${title}: documentation and reproducible examples for XCSV data recipes.`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${title} — XCSV</title><meta name="description" content="${description}"><link rel="canonical" href="${host}${path}"><meta property="og:title" content="${title} — XCSV"><meta property="og:url" content="${host}${path}"><meta property="og:type" content="website"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><link rel="stylesheet" href="/sponsor.css"><style>body{font:17px/1.65 system-ui;max-width:1000px;margin:36px auto;padding:0 24px;color:#18212c}nav,footer{margin:24px 0}footer{text-align:center}a{color:#175bc0}pre{overflow:auto;background:#f1f4f7;padding:20px}table{border-collapse:collapse;display:block;overflow:auto;max-width:100%}main{min-width:0;overflow-wrap:anywhere}td,th{border:1px solid #ddd;padding:8px}</style></head><body>${links}<main>${marked.parse(source)}</main>${path === "/privacy/" || path === "/about/" || path === "/404.html" ? "" : ad}${footer}${analytics}</body></html>`;
 }
 const pages = [];
 function page(path, title, source) {
@@ -80,7 +80,7 @@ page(
 page(
   "/about/",
   "About",
-  `# About ACSV\n\nACSV generates predictable CSV and typed JSON from readable recipes. Created by [Christopher Shelley](https://x.com/househuman) at [majaku](https://majaku.com).\n\nThe implementation runs in browsers and Node.js. Python can consume its generated output. The editor processes recipes locally.\n\n[Source and issues](https://github.com/made-by-chris/ACSV-Transpiler) · [GitHub profile](https://github.com/made-by-chris). MIT license. Version 0.1.0.\n\nReport bugs through GitHub without including private data.`,
+  `# About XCSV\n\nXCSV generates predictable CSV and typed JSON from readable recipes. Created by [Christopher Shelley](https://x.com/househuman) at [majaku](https://majaku.com).\n\nThe implementation runs in browsers and Node.js. Python can consume its generated output. The editor processes recipes locally.\n\n[Source and issues](https://github.com/made-by-chris/ACSV-Transpiler) · [GitHub profile](https://github.com/made-by-chris). MIT license. Version 0.2.0.\n\nReport bugs through GitHub without including private data.`,
 );
 page(
   "/privacy/",
@@ -90,12 +90,12 @@ page(
 page(
   "/api/",
   "Conversion API",
-  `# Conversion API\n\nPOST https://acsv.majaku.com/api/v1/convert with Content-Type: application/json.\n\n\`\`\`json\n{"input":"id:int,name\\n@set id=seq(),name=Player\\n@rows 3","mode":"acsv","format":"json"}\n\`\`\`\n\nResponse: version, format, data, rows, columns. JSON data is an array of typed objects; CSV data is a string. Defaults: mode acsv, format csv.\n\nLimits: 64 KiB body, 30 requests/minute per IP, 10,000 rows and 250,000 cells. No file includes. CORS permits public requests without credentials.\n\nErrors: 400 invalid JSON/input, 413 body limit, 415 content type, 422 compiler diagnostic, 429 rate limit. No uptime guarantee. [Reference](/docs/reference/) · [OpenAPI](/openapi.json).`,
+  `# Conversion API\n\nPOST https://acsv.majaku.com/api/v1/convert with Content-Type: application/json.\n\n\`\`\`json\n{"input":"id:int,name\\n@set id=seq(),name=Player\\n@rows 3","mode":"acsv","format":"json"}\n\`\`\`\n\nResponse: version, format, data, rows, columns. JSON data is an array of typed objects; CSV data is a string. Defaults: mode xcsv; acsv remains a compatibility alias, format csv.\n\nLimits: 64 KiB body, 30 requests/minute per IP, 10,000 rows and 250,000 cells. No file includes. CORS permits public requests without credentials.\n\nErrors: 400 invalid JSON/input, 413 body limit, 415 content type, 422 compiler diagnostic, 429 rate limit. No uptime guarantee. [Reference](/docs/reference/) · [OpenAPI](/openapi.json).`,
 );
 page(
   "/guides/python/",
   "Python integration",
-  `# Read generated CSV in Python\n\nExport CSV, then read it with the standard library. This consumes output; ACSV compilation runs in JavaScript.\n\n\`\`\`python\nimport csv\nwith open("users.csv", newline="", encoding="utf-8") as source:\n    users = list(csv.DictReader(source))\nprint(users[0])\n\`\`\`\n\nCSV fields are strings. Convert them explicitly, or export typed JSON and use json.load. [Python csv](https://docs.python.org/3/library/csv.html).`,
+  `# Read generated CSV in Python\n\nExport CSV, then read it with the standard library. This consumes output; XCSV compilation runs in JavaScript.\n\n\`\`\`python\nimport csv\nwith open("users.csv", newline="", encoding="utf-8") as source:\n    users = list(csv.DictReader(source))\nprint(users[0])\n\`\`\`\n\nCSV fields are strings. Convert them explicitly, or export typed JSON and use json.load. [Python csv](https://docs.python.org/3/library/csv.html).`,
 );
 page(
   "/guides/game-data/",
@@ -112,7 +112,7 @@ fs.writeFileSync(
 );
 fs.writeFileSync(
   dir + "/llms.txt",
-  "# ACSV\n\nReadable recipes for CSV and typed JSON.\n\n" +
+  "# XCSV\n\nReadable recipes for CSV and typed JSON.\n\n" +
     docs.map(([p, t]) => `- [${t}](${host}${p}index.md)`).join("\n"),
 );
 fs.writeFileSync(
@@ -126,11 +126,11 @@ fs.writeFileSync(
 let s = fs
   .readFileSync(dir + "/index.html", "utf8")
   .replace(
-    "<title>ACSV</title>",
-    `<title>ACSV — CSV and JSON fixture generator</title><meta name="description" content="Generate app fixtures and game data from readable recipes. Edit locally and export CSV or typed JSON."><link rel="canonical" href="${host}/"><meta property="og:title" content="ACSV — CSV and JSON fixture generator"><meta property="og:type" content="website"><meta property="og:url" content="${host}/"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "ACSV", url: host + "/" })}</script>`,
+    "<title>XCSV</title>",
+    `<title>XCSV — CSV and JSON fixture generator</title><meta name="description" content="Generate app fixtures and game data from readable recipes. Edit locally and export CSV or typed JSON."><link rel="canonical" href="${host}/"><meta property="og:title" content="XCSV — CSV and JSON fixture generator"><meta property="og:type" content="website"><meta property="og:url" content="${host}/"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "XCSV", url: host + "/" })}</script>`,
   );
 s = s.replace(
   "</body>",
-  `<div class="site-footer" style="padding:12px 24px;text-align:center">${links}${footer}${analytics}</div><noscript><p>ACSV generates CSV and JSON from recipes. Enable JavaScript for the editor, or read the documentation.</p></noscript></body>`,
+  `<div class="site-footer" style="padding:12px 24px;text-align:center">${links}${footer}${analytics}</div><noscript><p>XCSV generates CSV and JSON from recipes. Enable JavaScript for the editor, or read the documentation.</p></noscript></body>`,
 );
 fs.writeFileSync(dir + "/index.html", s);
