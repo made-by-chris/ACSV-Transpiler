@@ -1,6 +1,6 @@
 # Enums, randomness and time
 
-These features require language version `# ZROW 0.3`, available in `zrow-js` 0.4.0. Explicit 0.1 and 0.2 documents retain their existing syntax and reject these functions. New documents should declare their version. Missing declarations use 0.3.
+These features require language version `# ZROW 0.3`, available in `zrow-js` 0.4.0. New documents should declare their version. Missing declarations use 0.3.
 
 ## Named text enums
 
@@ -13,7 +13,7 @@ These features require language version `# ZROW 0.3`, available in `zrow-js` 0.4
 (rows 10)
 ```
 
-Declare enums before the column header. `(enum Name "first","second")` or `@enum Name "first","second"` defines a named list of distinct text values. Use the name as a column type, as in `status:Status`, and inside `cycle(Status)` or `choice(Status)`. Ordinary columns and formulas remain available.
+Declare enums before the column header. `(enum Name "first","second")` defines a named list of distinct text values. Use the name as a column type, as in `status:Status`, and inside `cycle(Status)` or `choice(Status)`. Ordinary columns and formulas remain available.
 
 Every emitted value must belong to its column's enum, including literal CSV cells and named overrides. Values remain strings in JSON: an enum member `"001"` stays `"001"`. Enum names and values are case-sensitive. Enum names use ASCII identifiers of at most 64 characters and cannot shadow column names, primitive types or booleans. Declare each enum once in the main document; includes can use its types. An enum declaration emits no rows.
 
@@ -21,7 +21,7 @@ At most 32 enums with 32 members each are allowed. Members must be text constant
 
 ## Seeds
 
-Use `(seed 42)` or `(seed "customers-v1")`. `@seed` is equivalent. A seed is a safe integer or a nonempty string of at most 256 UTF-16 code units. Numeric `42` and text `"42"` are different seeds. Set it once in the main document before emitting rows. The library and conversion API also accept a `seed` option; supplying both an option and a declaration is an error.
+Use `(seed 42)` or `(seed "customers-v1")`. A seed is a safe integer or a nonempty string of at most 256 UTF-16 code units. Numeric `42` and text `"42"` are different seeds. Set it once in the main document before emitting rows. The library and conversion API also accept a `seed` option; supplying both an option and a declaration is an error.
 
 Random functions require a seed when evaluated. They have no hidden global random state. For the same seed, column, expression structure and row index, the same random draws are produced. Referencing a random column twice in a row returns its cached value. Adding another column or changing evaluation order does not shift other columns' streams. Changing the structure of a column's expression can change its random stream.
 
@@ -58,7 +58,7 @@ Latitude samples uniformly in sine of latitude; longitude samples uniformly in d
 | `yesterday()` | One UTC calendar day before `today()`. |
 | `tomorrow()` | One UTC calendar day after `today()`. |
 
-Each compilation captures one instant, shared by every row and helper. The host clock supplies it by default. To reproduce dates and timestamps, use `(time "2026-11-19T12:00:00Z")` or `@time` in the main document before emitting rows. Alternatively provide `referenceTime` to the library/API. Supplying both is an error. Fixing a random seed alone does not fix the time.
+Each compilation captures one instant, shared by every row and helper. The host clock supplies it by default. To reproduce dates and timestamps, use `(time "2026-11-19T12:00:00Z")` in the main document before emitting rows. Alternatively provide `referenceTime` to the library/API. Supplying both is an error. Fixing a random seed alone does not fix the time.
 
 Reference timestamps require seconds and an explicit `Z` or numeric UTC offset, with at most three fractional digits. Invalid dates and out-of-range years fail. Results use UTC even when the input uses another offset. `now()` returns text; use a text/untyped column for timestamps. `today`, `yesterday` and `tomorrow` fit `:date` columns. Existing date arithmetic and sequences work with these helpers: `seq(today(),1)` generates consecutive dates, and `today()+3d` adds three days.
 

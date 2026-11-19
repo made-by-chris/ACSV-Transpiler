@@ -30,5 +30,5 @@ test("fallback accepts a custom filename, adds its extension and releases its UR
 });
 test("cancelling the fallback creates no download",async()=>{
   vi.stubGlobal("window",{prompt:()=>null});const create=vi.spyOn(URL,"createObjectURL");
-  expect(await saveFile("x", ".acsv",date)).toBeUndefined();expect(create).not.toHaveBeenCalled();
+  expect(await saveFile("x", ".zrow",date)).toBeUndefined();expect(create).not.toHaveBeenCalled();
 });

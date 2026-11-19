@@ -1,7 +1,7 @@
 import { fail } from "./errors.js";
 import { checkDate } from "./expression.js";
 import type { Cell } from "./csv.js";
-import type { Compilation } from "./ACSVTranspiler.js";
+import type { Compilation } from "./ZROWCompiler.js";
 
 export type ColumnType = "text" | "int" | "number" | "bool" | "date";
 export interface ColumnSchema {

@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { compile, validate } from "../../dist/ACSVTranspiler.js";
-const run = (input) => compile({ input, mode: "acsv" });
+import { compile, validate } from "../../dist/ZROWCompiler.js";
+const run = (input) => compile({ input, mode: "zrow" });
 
 test("named rows remove placeholders and never leak overrides", () => {
   const result = run(
@@ -132,7 +132,7 @@ test.each([
   ["a\n@unique missing", "E_COLUMN"],
   ["a\n@expect 1\n@expect 2", "E_ASSERT"],
 ])("invalid recipe gives a source diagnostic: %s", (input, code) => {
-  expect(validate({ input, mode: "acsv" })).toMatchObject({
+  expect(validate({ input, mode: "zrow" })).toMatchObject({
     valid: false,
     diagnostics: [{ code }],
   });

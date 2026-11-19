@@ -4,12 +4,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-const cli = fileURLToPath(new URL("../../cli/ACSV.js", import.meta.url));
+const cli = fileURLToPath(new URL("../../cli/zrow.js", import.meta.url));
 
-test("CLI executes ACSV, preserves CSV, and never overwrites output after an error", () => {
-  const dir = mkdtempSync(join(tmpdir(), "acsv-cli-"));
+test("CLI executes ZROW, preserves CSV, and never overwrites output after an error", () => {
+  const dir = mkdtempSync(join(tmpdir(), "zrow-cli-"));
   try {
-    const input = join(dir, "input.acsv"),
+    const input = join(dir, "input.zrow"),
       output = join(dir, "output.csv"),
       csv = join(dir, "literal.csv");
     writeFileSync(input, "id,name\n> id++,name=Jane x3");
@@ -34,9 +34,9 @@ test("CLI executes ACSV, preserves CSV, and never overwrites output after an err
 });
 
 test("CLI infers typed JSON output and supports an explicit output format", () => {
-  const dir = mkdtempSync(join(tmpdir(), "acsv-json-"));
+  const dir = mkdtempSync(join(tmpdir(), "zrow-json-"));
   try {
-    const input = join(dir, "users.acsv"),
+    const input = join(dir, "users.zrow"),
       output = join(dir, "users.json"),
       named = join(dir, "output.txt");
     writeFileSync(

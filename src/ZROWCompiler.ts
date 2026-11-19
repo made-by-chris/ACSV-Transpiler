@@ -1,4 +1,4 @@
-import { ACSVError, fail, type Diagnostic } from "./errors.js";
+import { ZROWError, fail, type Diagnostic } from "./errors.js";
 import {
   scanRecords,
   serializeCSV,
@@ -17,13 +17,13 @@ import {
 import { readColumns, convertValue, type ColumnSchema } from "./schema.js";
 export { toRecords, serializeJSON } from "./schema.js";
 export type { ColumnSchema, ColumnType, DataValue } from "./schema.js";
-export { ACSVError } from "./errors.js";
+export { ZROWError } from "./errors.js";
 export { parseCSV, serializeCSV } from "./csv.js";
 
 import { checkSeed, clock, type Seed } from "./generators.js";
 
-export type InputMode = "csv" | "acsv" | "xcsv" | "zrow";
-export interface ACSV_Transpilation_Config {
+export type InputMode = "csv" | "zrow";
+export interface CompileConfig {
   input: string;
   mode?: InputMode;
   seed?: Seed;
@@ -77,21 +77,18 @@ const MAX_ROWS = 10_000,
   MAX_CELLS = 250_000,
   MAX_OUTPUT = 10_000_000;
 
-/** Literal CSV is the default. ACSV execution is always an explicit choice. */
-export function compile(config: ACSV_Transpilation_Config): Compilation {
+/** Literal CSV is the default. ZROW execution is always an explicit choice. */
+export function compile(config: CompileConfig): Compilation {
   if (!config || typeof config.input !== "string")
     fail("E_CONFIG", "Provide text in the input property.");
-  const mode =
-    config.mode === "xcsv" || config.mode === "zrow"
-      ? "acsv"
-      : (config.mode ?? "csv");
-  if (mode !== "csv" && mode !== "acsv")
-    fail("E_CONFIG", "Mode must be csv or acsv.");
+  const mode = config.mode ?? "csv";
+  if (mode !== "csv" && mode !== "zrow")
+    fail("E_CONFIG", "Mode must be csv or zrow.");
   // Explicit 0.1 documents keep their original literal-parenthesis behavior.
-  const records = scanRecords(config.input, mode === "acsv");
+  const records = scanRecords(config.input, mode === "zrow");
   let forms = !records.some(
     (record) =>
-      record.kind === "comment" && /^# (?:ZROW|XCSV) 0\.1\s*$/.test(record.raw),
+      record.kind === "comment" && /^# ZROW 0\.1\s*$/.test(record.raw),
   );
   const enums = new Map<string, readonly string[]>();
   let seed = config.seed === undefined ? undefined : checkSeed(config.seed);
@@ -103,8 +100,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
     timeDeclared = config.referenceTime !== undefined;
   let extended = !records.some(
     (record) =>
-      record.kind === "comment" &&
-      /^# (?:ZROW|XCSV) 0\.[12]\s*$/.test(record.raw),
+      record.kind === "comment" && /^# ZROW 0\.[12]\s*$/.test(record.raw),
   );
   let headers: string[] = [];
   let columns: ColumnSchema[] = [];
@@ -573,29 +569,27 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
       forms &&
       !list.some(
         (record) =>
-          record.kind === "comment" &&
-          /^# (?:ZROW|XCSV) 0\.1\s*$/.test(record.raw),
+          record.kind === "comment" && /^# ZROW 0\.1\s*$/.test(record.raw),
       );
     const outerExtended = extended;
     extended =
       extended &&
       !list.some(
         (record) =>
-          record.kind === "comment" &&
-          /^# (?:ZROW|XCSV) 0\.[12]\s*$/.test(record.raw),
+          record.kind === "comment" && /^# ZROW 0\.[12]\s*$/.test(record.raw),
       );
     let includeHeader = included;
     let declaredVersion = false;
     for (const record of list) {
       if (record.kind === "comment") {
-        if (/^#\s*(?:ZROW|XCSV)\b/i.test(record.raw)) {
+        if (/^#\s*ZROW\b/i.test(record.raw)) {
           if (declaredVersion || (haveHeader && !includeHeader))
             fail(
               "E_VERSION",
               "Place one # ZROW declaration before the header.",
               record.line,
             );
-          if (!/^# (?:ZROW 0\.[123]|XCSV 0\.1)\s*$/.test(record.raw))
+          if (!/^# ZROW 0\.[123]\s*$/.test(record.raw))
             fail(
               "E_VERSION",
               "Unsupported or malformed ZROW declaration. This compiler supports # ZROW 0.1, # ZROW 0.2 and # ZROW 0.3.",
@@ -622,7 +616,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
         stats.comments++;
         continue;
       }
-      if (mode === "acsv" && record.kind === "data" && record.raw === "")
+      if (mode === "zrow" && record.kind === "data" && record.raw === "")
         continue;
       if (!haveHeader || includeHeader) {
         if (
@@ -640,7 +634,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
           );
         const parsedColumns = readColumns(
           record.cells,
-          mode === "acsv",
+          mode === "zrow",
           extended ? enums : new Map(),
         );
         const names = parsedColumns.map((column) => column.name);
@@ -665,13 +659,13 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
         if (headers.length > 128)
           fail("E_LIMIT", "A table may have at most 128 columns.", record.line);
         if (
-          mode === "acsv" &&
+          mode === "zrow" &&
           (headers.some((n) => n === "") ||
             new Set(headers).size !== headers.length)
         )
           fail(
             "E_HEADER",
-            "ACSV headers must be non-empty and unique.",
+            "ZROW headers must be non-empty and unique.",
             record.line,
           );
         headers.forEach((n) => headerSet.add(n));
@@ -695,7 +689,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
           );
         const match = /^include\s+"([^"]+)"\s*$/.exec(record.raw);
         if (!match)
-          fail("E_INCLUDE", 'Use include "relative-file.acsv".', record.line);
+          fail("E_INCLUDE", 'Use include "relative-file.zrow".', record.line);
         if (stack.length >= 10)
           fail("E_LIMIT", "Includes are limited to 10 levels.", record.line);
         let resolved: { input: string; source: string };
@@ -787,7 +781,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
   return { csv, headers, columns, rows, origins, stats };
 }
 
-export function validate(config: ACSV_Transpilation_Config): {
+export function validate(config: CompileConfig): {
   valid: boolean;
   diagnostics: Diagnostic[];
 } {
@@ -796,9 +790,9 @@ export function validate(config: ACSV_Transpilation_Config): {
     return { valid: true, diagnostics: [] };
   } catch (error) {
     const diagnostic =
-      error instanceof ACSVError
+      error instanceof ZROWError
         ? error
-        : new ACSVError(
+        : new ZROWError(
             "E_INTERNAL",
             error instanceof Error ? error.message : "Compilation failed.",
           );
@@ -815,9 +809,9 @@ export function validate(config: ACSV_Transpilation_Config): {
     };
   }
 }
-export function isValid(config: ACSV_Transpilation_Config): boolean {
+export function isValid(config: CompileConfig): boolean {
   return validate(config).valid;
 }
-export default function transpile(config: ACSV_Transpilation_Config): string {
+export default function transpile(config: CompileConfig): string {
   return compile(config).csv;
 }

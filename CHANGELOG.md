@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0 — 2026-11-19
+
+- Add keyword/function examples and separate feature and use-case groups.
+- Update user-facing recipes to ZROW 0.3 parenthesized syntax.
+- Add JavaScript, Node.js, CLI and HTTP integration tabs.
+- Use canonical compiler, CLI, error and editor identifiers and storage names.
+- Accept only csv/zrow input modes and .zrow recipe files. Remove obsolete aliases and draft bridges.
+
 ## 0.4.0 — 2026-11-19
 
 - Add ZROW 0.3 named text enums and enum column validation.

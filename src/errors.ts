@@ -5,7 +5,7 @@ export interface Diagnostic {
   column: number;
 }
 
-export class ACSVError extends Error implements Diagnostic {
+export class ZROWError extends Error implements Diagnostic {
   constructor(
     public code: string,
     message: string,
@@ -13,7 +13,7 @@ export class ACSVError extends Error implements Diagnostic {
     public column = 1,
   ) {
     super(message);
-    this.name = "ACSVError";
+    this.name = "ZROWError";
   }
 }
 
@@ -23,5 +23,5 @@ export function fail(
   line = 1,
   column = 1,
 ): never {
-  throw new ACSVError(code, message, line, column);
+  throw new ZROWError(code, message, line, column);
 }

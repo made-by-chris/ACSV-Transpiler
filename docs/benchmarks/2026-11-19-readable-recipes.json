@@ -1,12 +1,12 @@
 {
-  "method": "Hand-authored examples expanded by the compiler; CSV rows checked and equivalent legacy recipe compared. JSON is compact, not pretty-printed. Counts exclude task prompts, Markdown fences, reasoning, retries and execution. The complete copyable LLM guide is counted separately, not hidden in recipe savings. No LLM accuracy or human usability experiment was performed. Small or irregular datasets may not benefit; new keywords may cost more tokens than legacy notation.",
+  "method": "Hand-authored examples expanded by the compiler; CSV row counts checked. Recipes use ZROW 0.3 parenthesized notation. JSON is compact, not pretty-printed. Counts exclude task prompts, Markdown fences, reasoning, retries and execution. The complete copyable LLM guide is counted separately, not hidden in recipe savings. No LLM accuracy or human usability experiment was performed. Small or irregular datasets may not benefit.",
   "tokenizer_version": "0.14.0",
   "llm_guide_overhead": {
-    "characters": 2112,
-    "utf8_bytes": 2112,
+    "characters": 2996,
+    "utf8_bytes": 2996,
     "tokens": {
-      "o200k_base": 489,
-      "cl100k_base": 487
+      "o200k_base": 690,
+      "cl100k_base": 690
     }
   },
   "cases": [
@@ -15,19 +15,11 @@
       "rows": 3,
       "formats": {
         "recipe": {
-          "characters": 60,
-          "utf8_bytes": 60,
+          "characters": 76,
+          "utf8_bytes": 76,
           "tokens": {
-            "o200k_base": 23,
-            "cl100k_base": 23
-          }
-        },
-        "legacy_recipe": {
-          "characters": 48,
-          "utf8_bytes": 48,
-          "tokens": {
-            "o200k_base": 17,
-            "cl100k_base": 17
+            "o200k_base": 30,
+            "cl100k_base": 30
           }
         },
         "csv": {
@@ -47,26 +39,18 @@
           }
         }
       },
-      "source": "id,role,active\n@set id=seq(),role=member,active=true\n@rows 3"
+      "source": "# ZROW 0.3\n(cols id,role,active)\n(id=seq(),role=member,active=true)\n(rows 3)"
     },
     {
       "case": "25 regular app rows",
       "rows": 25,
       "formats": {
         "recipe": {
-          "characters": 61,
-          "utf8_bytes": 61,
+          "characters": 77,
+          "utf8_bytes": 77,
           "tokens": {
-            "o200k_base": 23,
-            "cl100k_base": 23
-          }
-        },
-        "legacy_recipe": {
-          "characters": 49,
-          "utf8_bytes": 49,
-          "tokens": {
-            "o200k_base": 17,
-            "cl100k_base": 17
+            "o200k_base": 30,
+            "cl100k_base": 30
           }
         },
         "csv": {
@@ -86,26 +70,18 @@
           }
         }
       },
-      "source": "id,role,active\n@set id=seq(),role=member,active=true\n@rows 25"
+      "source": "# ZROW 0.3\n(cols id,role,active)\n(id=seq(),role=member,active=true)\n(rows 25)"
     },
     {
       "case": "250 regular app rows",
       "rows": 250,
       "formats": {
         "recipe": {
-          "characters": 62,
-          "utf8_bytes": 62,
+          "characters": 78,
+          "utf8_bytes": 78,
           "tokens": {
-            "o200k_base": 23,
-            "cl100k_base": 23
-          }
-        },
-        "legacy_recipe": {
-          "characters": 50,
-          "utf8_bytes": 50,
-          "tokens": {
-            "o200k_base": 17,
-            "cl100k_base": 17
+            "o200k_base": 30,
+            "cl100k_base": 30
           }
         },
         "csv": {
@@ -125,18 +101,18 @@
           }
         }
       },
-      "source": "id,role,active\n@set id=seq(),role=member,active=true\n@rows 250"
+      "source": "# ZROW 0.3\n(cols id,role,active)\n(id=seq(),role=member,active=true)\n(rows 250)"
     },
     {
       "case": "100 game levels",
       "rows": 100,
       "formats": {
         "recipe": {
-          "characters": 110,
-          "utf8_bytes": 110,
+          "characters": 126,
+          "utf8_bytes": 126,
           "tokens": {
-            "o200k_base": 46,
-            "cl100k_base": 45
+            "o200k_base": 53,
+            "cl100k_base": 52
           }
         },
         "csv": {
@@ -156,7 +132,7 @@
           }
         }
       },
-      "source": "level:int,hp:int,damage:int\n@set level=seq(),hp=round(80*pow(1.12,level-1)),damage=min(99,5+level*3)\n@rows 100"
+      "source": "# ZROW 0.3\n(cols level:int,hp:int,damage:int)\n(level=seq(),hp=round(80*pow(1.12,level-1)),damage=min(99,5+level*3))\n(rows 100)"
     },
     {
       "case": "5 irregular literal records",

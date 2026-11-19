@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { compile, validate } from "../../dist/ACSVTranspiler.js";
-const run = (input) => compile({ input, mode: "acsv" });
+import { compile, validate } from "../../dist/ZROWCompiler.js";
+const run = (input) => compile({ input, mode: "zrow" });
 
 test("formulas recalculate per row using literal overrides and forward references", () => {
   expect(
@@ -51,7 +51,7 @@ test.each([
   ["a\n> a++ x10001", "E_LIMIT"],
   ["a,b\n> a=1..3,b=1..2", "E_RANGE"],
 ])("invalid recipe fails explicitly: %s", (input, code) => {
-  expect(validate({ input, mode: "acsv" })).toMatchObject({
+  expect(validate({ input, mode: "zrow" })).toMatchObject({
     valid: false,
     diagnostics: [{ code }],
   });
@@ -70,7 +70,7 @@ test("streaming and stats reflect exactly the generated data rows", () => {
     stats = [];
   const result = compile({
     input: "id,name\n> id++,name=Alice x3",
-    mode: "acsv",
+    mode: "zrow",
     streaming: true,
     streaming_callback: (r) => output.push(r),
     stats: true,
@@ -98,10 +98,10 @@ test("derived text and numeric literals are bounded before runaway expansion", (
   expect(
     validate({
       input: `${names.join(",")}\n> ${controls.join(",")} x1`,
-      mode: "acsv",
+      mode: "zrow",
     }),
   ).toMatchObject({ valid: false, diagnostics: [{ code: "E_LIMIT" }] });
-  expect(validate({ input: "n\n> n=1e309 x1", mode: "acsv" })).toMatchObject({
+  expect(validate({ input: "n\n> n=1e309 x1", mode: "zrow" })).toMatchObject({
     valid: false,
     diagnostics: [{ code: "E_EXPRESSION" }],
   });

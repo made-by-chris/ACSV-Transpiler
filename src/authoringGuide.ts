@@ -1,37 +1,31 @@
-export const authoringGuide = `Generate ZROW for a flat table. Return raw ZROW only, without Markdown fences.
+export const authoringGuide = `Generate a ZROW document for a flat table. Return raw ZROW without Markdown fences.
 
-Start with # ZROW 0.3 on its own line, then one comma-separated header. Optional column types: :text, :int, :number, :bool, :date. Untyped columns stay strings; bool accepts true/false; date is YYYY-MM-DD. Do not invent nulls or infer types from values.
+Start with # ZROW 0.3. Use parenthesized syntax. Declare named enums before (cols ...). A header lists comma-separated names, optionally annotated with :text, :int, :number, :bool, :date or a declared enum. Untyped columns remain strings. Do not invent null values or infer types.
 
-Parenthesized notation is supported in version 0.2: (cols id:int,name) declares columns; (id=seq(),name="User {id}") sets defaults without emitting a row; (rows 10) emits ten rows; (row name=Chris) emits one row with named overrides. (expect N) and (unique id) assert constraints. Existing @ directives can be mixed with these forms.
+(column=expression,other=expression) sets persistent defaults/formulas and emits no rows.
+(row column=value) emits one row with named overrides; omitted fields use defaults.
+(rows N) emits N rows; (rows N with column=value) temporarily overrides defaults for that block.
+(expect N) checks the final output row count; (unique id) checks a key, (unique a,b) checks a composite key.
+Literal CSV rows can appear between forms and must match the header width. Quoted empty fields explicitly produce empty text. Unquoted empty fields use defaults.
 
-After the header:
-@expect N checks the total output row count. Declare it near the top.
-@unique id checks one key; @unique a,b checks a composite key.
-@set column=expression,other=expression sets persistent defaults/formulas.
-@rows N generates N rows from the current defaults. No empty comma rows are needed.
-@row column=value,other=value generates one row with named overrides.
-@rows N with column=value repeats a temporary override. Overrides do not change defaults.
+seq() counts from 1; seq(start,step) also supports quoted ISO dates with whole UTC-day steps. cycle("A","B") repeats a list. Generators advance with every emitted row, including overrides. Reassignment restarts their index.
 
-seq() counts from 1. seq(start,step) supports numeric or quoted ISO-date starts (date steps are whole UTC days).
-cycle("A","B") repeats values. Both start at their rule's declaration and advance once per emitted row, including overrides. Reassigning restarts them.
+(enum Role "member","admin") defines a named text enum. Use role:Role as the column type and cycle(Role) or choice(Role) as a generator. All emitted values are checked against the enum.
 
-Formulas use current-row column names, + - * / %, comparisons, parentheses, if(condition,yes,no), prev(column), pad(value,width), round(value,digits), min/max, clamp(value,min,max), pow(base,exponent), and formatDate(date+3d,"YYYY-MM-DD"). Strings can interpolate "user{id}@example.test" and use .lower()/.upper(). Quote text with punctuation or matching a column name. Use column="" for an explicit empty string.
+Random generators require a main-document seed before emitting rows: (seed 42) or (seed "sample"). Use rand() or rand(min,max), randInt(min,max) with inclusive integer endpoints, normal() or normal(mean,sd), choice("A","B"), choiceWeighted("A",9,"B",1). Latitude/longitude accept zero or two bounds. Coordinates are synthetic. Lists contain at most 32 values. Weights must be nonnegative with a positive finite sum.
 
-Version 0.3: (enum Role "member","admin") before the header defines allowed text values; use role:Role as the column type. cycle(Role) repeats the list and choice(Role) randomly selects a member. Enum values are validated for ordinary CSV rows and named overrides too.
+Clock helpers today(), tomorrow(), yesterday() return UTC dates; now() returns an ISO UTC timestamp. All rows share one captured instant. Use (time "2026-11-19T12:00:00Z") to fix it, or the host clock is used. Fix time as well as seed for complete reproducibility. Library/API seed and referenceTime options can replace document declarations; do not supply both.
 
-Random functions require (seed 42) or (seed "sample") in the main document before emitting rows. Use rand() or rand(min,max), randInt(min,max) including both integer endpoints, normal() or normal(mean,sd), choice("A","B"), choiceWeighted("A",9,"B",1). Latitude/longitude generators accept zero or two bounds: latitude(-90,90), longitude(-180,180). Coordinates are synthetic. Lists have at most 32 entries; weights are nonnegative with positive finite sum.
-
-Clock helpers today(), tomorrow(), yesterday() return UTC dates; now() returns an ISO UTC timestamp. One captured instant is shared by all rows. Use (time "2026-11-19T12:00:00Z") before emitting rows to fix it; otherwise the host clock is used. A seed alone does not fix time. Library/API options seed and referenceTime can replace declarations; do not supply both forms.
+Expressions support current-row column references, arithmetic, comparisons, if(condition,yes,no), prev(column), pad(value,width), round(value,digits), min/max, clamp, pow, date+3d and formatDate(date,"YYYY-MM-DD"). Strings interpolate values: "user{id}@example.test". Use .lower()/.upper() for text case. Quote punctuation and literal words matching column/enum names.
 
 Example:
 # ZROW 0.3
-id:int,name,active:bool
-@expect 3
-@unique id
-@set id=seq(),active=true
-@rows 2 with name=cycle("Ada","Bo")
-@row name=Cy,active=false
+(enum Role "member","admin")
+(cols id:int,name,role:Role)
+(expect 3)
+(unique id)
+(id=seq(),name="User {id}",role=member)
+(rows 2)
+3,"Shelley, Chris",admin
 
-Ordinary CSV data rows may be mixed in; they must match header width. # starts a full-line comment. Directives start at the beginning of a line. Literal CSV mode interprets none of this syntax.
-
-Keep recipes deterministic and readable. Maximum 10,000 rows / 250,000 cells. No JavaScript, Faker, nested tables or network/file access in the browser. Use explicit literal cases for irregular real data rather than inventing a pattern. Validate with the ZROW compiler before claiming a recipe is executable.`;
+Forms start in column 1 and occupy one physical line. Full-line # comments and blank lines emit no rows. Limits: 10,000 rows, 250,000 cells. No arbitrary JavaScript evaluation, Faker, nested tables or browser file/network access. Use literal records for irregular cases. Validate with the ZROW compiler before claiming that a recipe is executable.`;

@@ -1,5 +1,412 @@
 [
   {
+    "id": "feature-cols",
+    "label": "cols \u2014 Columns and types",
+    "title": "feature-cols",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Declare column names and primitive types.",
+    "mode": "zrow",
+    "expectedRows": 1,
+    "source": "# ZROW 0.3\n(cols id:int,name,price:number,active:bool,date:date)\n1,Ada,12.5,true,2026-11-19\n"
+  },
+  {
+    "id": "feature-defaults",
+    "label": "Defaults \u2014 Assignments",
+    "title": "feature-defaults",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Set values once and reuse them for subsequent rows.",
+    "mode": "zrow",
+    "expectedRows": 3,
+    "source": "# ZROW 0.3\n(cols id:int,role,active:bool)\n(id=seq(),role=member,active=true)\n(rows 3)\n"
+  },
+  {
+    "id": "feature-row",
+    "label": "row \u2014 One row",
+    "title": "feature-row",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Emit one row with named overrides, then resume the defaults.",
+    "mode": "zrow",
+    "expectedRows": 2,
+    "source": "# ZROW 0.3\n(cols id:int,name,role)\n(id=seq(),name=\"User {id}\",role=member)\n(row name=Ada,role=admin)\n(row)\n"
+  },
+  {
+    "id": "feature-rows",
+    "label": "rows \u2014 Repeated rows",
+    "title": "feature-rows",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Generate a chosen number of rows from the current defaults.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(cols id:int,label)\n(id=seq(),label=\"Item {id}\")\n(rows 5)\n"
+  },
+  {
+    "id": "feature-with",
+    "label": "with \u2014 Block overrides",
+    "title": "feature-with",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Apply temporary defaults to a group of rows.",
+    "mode": "zrow",
+    "expectedRows": 3,
+    "source": "# ZROW 0.3\n(cols id:int,role)\n(id=seq(),role=member)\n(rows 2 with role=guest)\n(row)\n"
+  },
+  {
+    "id": "feature-enum",
+    "label": "enum \u2014 Enums",
+    "title": "feature-enum",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Define allowed text values and validate every row against them.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(enum Role \"member\",\"admin\",\"guest\")\n(cols id:int,role:Role)\n(id=seq(),role=cycle(Role))\n(rows 3)\n4,admin\n"
+  },
+  {
+    "id": "feature-expect",
+    "label": "expect \u2014 Row counts",
+    "title": "feature-expect",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Assert the total number of generated and literal rows.",
+    "mode": "zrow",
+    "expectedRows": 3,
+    "source": "# ZROW 0.3\n(cols id:int)\n(expect 3)\n(id=seq())\n(rows 2)\n3\n"
+  },
+  {
+    "id": "feature-unique",
+    "label": "unique \u2014 Unique keys",
+    "title": "feature-unique",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Check a key across all emitted rows.",
+    "mode": "zrow",
+    "expectedRows": 3,
+    "source": "# ZROW 0.3\n(cols id:int,email)\n(unique id)\n(unique email)\n(id=seq(),email=\"user{id}@example.test\")\n(rows 3)\n"
+  },
+  {
+    "id": "feature-seed",
+    "label": "seed \u2014 Repeatable randomness",
+    "title": "feature-seed",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Fix the seed to reproduce random values on every compilation.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(seed \"repeat-this\")\n(cols id:int,value:int)\n(id=seq(),value=randInt(1,100))\n(rows 5)\n"
+  },
+  {
+    "id": "feature-time",
+    "label": "time \u2014 Fixed reference time",
+    "title": "feature-time",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Pin the reference instant used by all clock helpers.",
+    "mode": "zrow",
+    "expectedRows": 2,
+    "source": "# ZROW 0.3\n(time \"2026-11-19T12:00:00Z\")\n(cols day:date,timestamp)\n(day=today(),timestamp=now())\n(rows 2)\n"
+  },
+  {
+    "id": "feature-seq",
+    "label": "seq \u2014 Sequences",
+    "title": "feature-seq",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Generate numbers from a chosen start and step.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(cols id:int,code:int)\n(id=seq(),code=seq(100,5))\n(rows 4)\n"
+  },
+  {
+    "id": "feature-cycle",
+    "label": "cycle \u2014 Repeated lists",
+    "title": "feature-cycle",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Repeat values in their declared order.",
+    "mode": "zrow",
+    "expectedRows": 6,
+    "source": "# ZROW 0.3\n(cols id:int,size)\n(id=seq(),size=cycle(\"S\",\"M\",\"L\"))\n(rows 6)\n"
+  },
+  {
+    "id": "feature-rand",
+    "label": "rand \u2014 Uniform decimals",
+    "title": "feature-rand",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Generate seeded uniform values between two bounds.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(seed 42)\n(cols id:int,value:number)\n(id=seq(),value=round(rand(10,20),3))\n(rows 5)\n"
+  },
+  {
+    "id": "feature-randFloat",
+    "label": "randFloat \u2014 Uniform decimals alias",
+    "title": "feature-randFloat",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Use randFloat as an alias for uniform random values.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(seed 42)\n(cols id:int,value:number)\n(id=seq(),value=round(randFloat(),3))\n(rows 5)\n"
+  },
+  {
+    "id": "feature-randInt",
+    "label": "randInt \u2014 Random integers",
+    "title": "feature-randInt",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Generate integers including both endpoints.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(seed 42)\n(cols id:int,value:int)\n(id=seq(),value=randInt(1,6))\n(rows 5)\n"
+  },
+  {
+    "id": "feature-normal",
+    "label": "normal \u2014 Normal distribution",
+    "title": "feature-normal",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Generate synthetic measurements around a mean.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(seed 42)\n(cols id:int,value:number)\n(id=seq(),value=round(normal(20,2),2))\n(rows 5)\n"
+  },
+  {
+    "id": "feature-choice",
+    "label": "choice \u2014 Random choices",
+    "title": "feature-choice",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Select values from a named enum.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(enum Status \"active\",\"paused\")\n(seed 42)\n(cols id:int,value:Status)\n(id=seq(),value=choice(Status))\n(rows 5)\n"
+  },
+  {
+    "id": "feature-choiceWeighted",
+    "label": "choiceWeighted \u2014 Weighted choices",
+    "title": "feature-choiceWeighted",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Make some values more likely than others.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(seed 42)\n(cols id:int,value:text)\n(id=seq(),value=choiceWeighted(\"active\",9,\"paused\",1))\n(rows 5)\n"
+  },
+  {
+    "id": "feature-latitude",
+    "label": "latitude \u2014 Latitude",
+    "title": "feature-latitude",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Sample latitude within a chosen geographic band.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(seed 42)\n(cols id:int,value:number)\n(id=seq(),value=round(latitude(52.4,52.6),6))\n(rows 5)\n"
+  },
+  {
+    "id": "feature-longitude",
+    "label": "longitude \u2014 Longitude",
+    "title": "feature-longitude",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Sample longitude within a chosen range.",
+    "mode": "zrow",
+    "expectedRows": 5,
+    "source": "# ZROW 0.3\n(seed 42)\n(cols id:int,value:number)\n(id=seq(),value=round(longitude(13.2,13.6),6))\n(rows 5)\n"
+  },
+  {
+    "id": "feature-today",
+    "label": "today \u2014 UTC date",
+    "title": "feature-today",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Read the UTC calendar date of the reference instant.",
+    "mode": "zrow",
+    "expectedRows": 1,
+    "source": "# ZROW 0.3\n(time \"2024-02-29T12:00:00Z\")\n(cols value:date)\n(value=today())\n(row)\n"
+  },
+  {
+    "id": "feature-now",
+    "label": "now \u2014 UTC timestamp",
+    "title": "feature-now",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Read the reference instant as an ISO UTC timestamp.",
+    "mode": "zrow",
+    "expectedRows": 1,
+    "source": "# ZROW 0.3\n(time \"2024-02-29T12:00:00Z\")\n(cols value:text)\n(value=now())\n(row)\n"
+  },
+  {
+    "id": "feature-tomorrow",
+    "label": "tomorrow \u2014 UTC date",
+    "title": "feature-tomorrow",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Read the next UTC calendar date.",
+    "mode": "zrow",
+    "expectedRows": 1,
+    "source": "# ZROW 0.3\n(time \"2024-02-29T12:00:00Z\")\n(cols value:date)\n(value=tomorrow())\n(row)\n"
+  },
+  {
+    "id": "feature-yesterday",
+    "label": "yesterday \u2014 UTC date",
+    "title": "feature-yesterday",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Read the previous UTC calendar date.",
+    "mode": "zrow",
+    "expectedRows": 1,
+    "source": "# ZROW 0.3\n(time \"2024-02-29T12:00:00Z\")\n(cols value:date)\n(value=yesterday())\n(row)\n"
+  },
+  {
+    "id": "feature-round",
+    "label": "round \u2014 Rounding",
+    "title": "feature-round",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Evaluate round for each row.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(cols id:int,value:number)\n(id=seq(),value=round(12.3456,2))\n(rows 4)\n"
+  },
+  {
+    "id": "feature-min",
+    "label": "min \u2014 Minimum",
+    "title": "feature-min",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Evaluate min for each row.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(cols id:int,value:number)\n(id=seq(),value=min(id,3))\n(rows 4)\n"
+  },
+  {
+    "id": "feature-max",
+    "label": "max \u2014 Maximum",
+    "title": "feature-max",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Evaluate max for each row.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(cols id:int,value:number)\n(id=seq(),value=max(id,3))\n(rows 4)\n"
+  },
+  {
+    "id": "feature-clamp",
+    "label": "clamp \u2014 Bounds",
+    "title": "feature-clamp",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Evaluate clamp for each row.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(cols id:int,value:number)\n(id=seq(),value=clamp(id,2,3))\n(rows 4)\n"
+  },
+  {
+    "id": "feature-pow",
+    "label": "pow \u2014 Powers",
+    "title": "feature-pow",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Evaluate pow for each row.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(cols id:int,value:number)\n(id=seq(),value=pow(2,id))\n(rows 4)\n"
+  },
+  {
+    "id": "feature-if",
+    "label": "if \u2014 Conditions",
+    "title": "feature-if",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Evaluate if for each row.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(cols id:int,value:number)\n(id=seq(),value=if(id<=2,10,20))\n(rows 4)\n"
+  },
+  {
+    "id": "feature-prev",
+    "label": "prev \u2014 Previous row",
+    "title": "feature-prev",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Evaluate prev for each row.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(cols id:int,value:number)\n(id=seq(),value=prev(value)+5)\n(rows 4)\n"
+  },
+  {
+    "id": "feature-pad",
+    "label": "pad \u2014 Padding",
+    "title": "feature-pad",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Evaluate pad for each row.",
+    "mode": "zrow",
+    "expectedRows": 4,
+    "source": "# ZROW 0.3\n(cols id:int,value)\n(id=seq(),value=pad(id,4))\n(rows 4)\n"
+  },
+  {
+    "id": "feature-formatDate",
+    "label": "formatDate \u2014 Dates",
+    "title": "feature-formatDate",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Format a date after UTC day arithmetic.",
+    "mode": "zrow",
+    "expectedRows": 3,
+    "source": "# ZROW 0.3\n(cols day:date,following:date)\n(day=seq(\"2024-02-28\",1),following=formatDate(day+1d,\"YYYY-MM-DD\"))\n(rows 3)\n"
+  },
+  {
+    "id": "feature-date-sequence",
+    "label": "Date sequences",
+    "title": "feature-date-sequence",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Generate consecutive dates across month and leap-day boundaries.",
+    "mode": "zrow",
+    "expectedRows": 3,
+    "source": "# ZROW 0.3\n(cols day:date)\n(day=seq(\"2024-02-28\",1))\n(rows 3)\n"
+  },
+  {
+    "id": "feature-templates",
+    "label": "Templates \u2014 Interpolation",
+    "title": "feature-templates",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Insert current-row values into text.",
+    "mode": "zrow",
+    "expectedRows": 3,
+    "source": "# ZROW 0.3\n(cols id:int,email)\n(id=seq(),email=\"user{id}@example.test\")\n(rows 3)\n"
+  },
+  {
+    "id": "feature-lower",
+    "label": ".lower \u2014 Text case",
+    "title": "feature-lower",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Convert generated text to lowercase.",
+    "mode": "zrow",
+    "expectedRows": 3,
+    "source": "# ZROW 0.3\n(cols id:int,label)\n(id=seq(),label=\"Item {id}\".lower())\n(rows 3)\n"
+  },
+  {
+    "id": "feature-upper",
+    "label": ".upper \u2014 Text case",
+    "title": "feature-upper",
+    "category": "Language features",
+    "kind": "feature",
+    "description": "Convert generated text to uppercase.",
+    "mode": "zrow",
+    "expectedRows": 3,
+    "source": "# ZROW 0.3\n(cols id:int,label)\n(id=seq(),label=\"Item {id}\".upper())\n(rows 3)\n"
+  },
+  {
     "id": "customer-segments",
     "label": "Customer segments",
     "title": "customer-segments",
@@ -7,7 +414,8 @@
     "description": "Enum-checked customer statuses with repeatable weighted selection.",
     "expectedRows": 12,
     "mode": "zrow",
-    "source": "# ZROW 0.3\n(enum Status \"trial\",\"active\",\"paused\")\n(seed \"customers-v1\")\n(cols id:int,email,status:Status,orders:int)\n(expect 12)\n(unique id)\n(id=seq(),email=\"customer{id}@example.test\")\n(status=choiceWeighted(\"trial\",2,\"active\",7,\"paused\",1),orders=randInt(0,20))\n(rows 12)\n"
+    "source": "# ZROW 0.3\n(enum Status \"trial\",\"active\",\"paused\")\n(seed \"customers-v1\")\n(cols id:int,email,status:Status,orders:int)\n(expect 12)\n(unique id)\n(id=seq(),email=\"customer{id}@example.test\")\n(status=choiceWeighted(\"trial\",2,\"active\",7,\"paused\",1),orders=randInt(0,20))\n(rows 12)\n",
+    "kind": "use-case"
   },
   {
     "id": "synthetic-locations",
@@ -17,7 +425,8 @@
     "description": "Reproducible coordinates inside a latitude/longitude box around Berlin; synthetic points may fall in buildings or water.",
     "expectedRows": 20,
     "mode": "zrow",
-    "source": "# ZROW 0.3\n(seed \"berlin-demo\")\n(cols id:int,latitude:number,longitude:number)\n(expect 20)\n(id=seq(),latitude=round(latitude(52.4,52.6),6),longitude=round(longitude(13.2,13.6),6))\n(rows 20)\n"
+    "source": "# ZROW 0.3\n(seed \"berlin-demo\")\n(cols id:int,latitude:number,longitude:number)\n(expect 20)\n(id=seq(),latitude=round(latitude(52.4,52.6),6),longitude=round(longitude(13.2,13.6),6))\n(rows 20)\n",
+    "kind": "use-case"
   },
   {
     "id": "dated-events",
@@ -27,7 +436,8 @@
     "description": "A fixed reference instant, UTC date helpers and enum-based event kinds.",
     "expectedRows": 5,
     "mode": "zrow",
-    "source": "# ZROW 0.3\n(enum Kind \"created\",\"updated\",\"reviewed\")\n(time \"2026-11-19T12:00:00Z\")\n(seed 42)\n(cols id:int,kind:Kind,day:date,generated_at,review_by:date)\n(id=seq(),kind=choice(Kind),day=seq(yesterday(),1),generated_at=now(),review_by=tomorrow())\n(rows 5)\n"
+    "source": "# ZROW 0.3\n(enum Kind \"created\",\"updated\",\"reviewed\")\n(time \"2026-11-19T12:00:00Z\")\n(seed 42)\n(cols id:int,kind:Kind,day:date,generated_at,review_by:date)\n(id=seq(),kind=choice(Kind),day=seq(yesterday(),1),generated_at=now(),review_by=tomorrow())\n(rows 5)\n",
+    "kind": "use-case"
   },
   {
     "id": "synthetic-measurements",
@@ -37,7 +447,8 @@
     "description": "A seeded normal distribution for a synthetic chart dataset.",
     "expectedRows": 40,
     "mode": "zrow",
-    "source": "# ZROW 0.3\n(seed \"readings-v1\")\n(cols sample:int,value:number,noise:number)\n(sample=seq(),value=round(normal(20,2),2),noise=round(rand(-0.5,0.5),3))\n(rows 40)\n"
+    "source": "# ZROW 0.3\n(seed \"readings-v1\")\n(cols sample:int,value:number,noise:number)\n(sample=seq(),value=round(normal(20,2),2),noise=round(rand(-0.5,0.5),3))\n(rows 40)\n",
+    "kind": "use-case"
   },
   {
     "id": "mixed-csv",
@@ -47,7 +458,8 @@
     "description": "Generate regular rows, insert a literal CSV record, then resume the defaults.",
     "expectedRows": 4,
     "mode": "zrow",
-    "source": "# ZROW 0.2\n(cols id:int,name,role)\n(expect 4)\n(unique id)\n(id=seq(),name=\"User {id}\",role=member)\n(rows 2)\n3,\"Shelley, Chris\",admin\n(row)\n"
+    "source": "# ZROW 0.3\n(cols id:int,name,role)\n(expect 4)\n(unique id)\n(id=seq(),name=\"User {id}\",role=member)\n(rows 2)\n3,\"Shelley, Chris\",admin\n(row)\n",
+    "kind": "use-case"
   },
   {
     "id": "product-catalogue",
@@ -57,7 +469,8 @@
     "description": "Ten product rows: nine size variants and a premium-item override.",
     "expectedRows": 10,
     "mode": "zrow",
-    "source": "# ZROW 0.1\nid:int,sku,size,price:number\n@unique sku\n@set id=seq(),sku=\"SKU-{id}\"\n@set size=cycle(\"S\",\"M\",\"L\"),price=19.95\n@rows 9\n@row sku=\"PREMIUM\",size=\"one-size\",price=29.95\n"
+    "source": "# ZROW 0.3\n(cols id:int,sku,size,price:number)\n(unique sku)\n(id=seq(),sku=\"SKU-{id}\")\n(size=cycle(\"S\",\"M\",\"L\"),price=19.95)\n(rows 9)\n(row sku=\"PREMIUM\",size=\"one-size\",price=29.95)\n",
+    "kind": "use-case"
   },
   {
     "id": "work-schedule",
@@ -67,7 +480,8 @@
     "description": "Five dated work slots with explicit local times and timezone.",
     "expectedRows": 5,
     "mode": "zrow",
-    "source": "# ZROW 0.1\ndate:date,start,end,timezone,team\n@set date=seq(\"2026-11-23\",1)\n@set start=\"09:00\",end=\"17:00\",timezone=\"Europe/Berlin\",team=\"support\"\n@rows 5\n"
+    "source": "# ZROW 0.3\n(cols date:date,start,end,timezone,team)\n(date=seq(\"2026-11-23\",1))\n(start=\"09:00\",end=\"17:00\",timezone=\"Europe/Berlin\",team=\"support\")\n(rows 5)\n",
+    "kind": "use-case"
   },
   {
     "id": "daily-readings",
@@ -77,7 +491,8 @@
     "description": "A synthetic daily temperature series for chart fixtures.",
     "expectedRows": 14,
     "mode": "zrow",
-    "source": "# ZROW 0.1\nday:int,date:date,temperature:number\n@set day=seq(),date=seq(\"2026-01-01\",1)\n@set temperature=round(20+day*0.5,1)\n@rows 14\n"
+    "source": "# ZROW 0.3\n(cols day:int,date:date,temperature:number)\n(day=seq(),date=seq(\"2026-01-01\",1))\n(temperature=round(20+day*0.5,1))\n(rows 14)\n",
+    "kind": "use-case"
   },
   {
     "id": "invoice-lines",
@@ -87,7 +502,8 @@
     "description": "Line totals computed from quantities and unit prices.",
     "expectedRows": 6,
     "mode": "zrow",
-    "source": "# ZROW 0.1\nline:int,description,quantity:int,unit_price:number,total:number\n@set line=seq(),description=\"Item {line}\"\n@set quantity=cycle(1,2,5),unit_price=12.5\n@set total=round(quantity*unit_price,2)\n@rows 6\n"
+    "source": "# ZROW 0.3\n(cols line:int,description,quantity:int,unit_price:number,total:number)\n(line=seq(),description=\"Item {line}\")\n(quantity=cycle(1,2,5),unit_price=12.5)\n(total=round(quantity*unit_price,2))\n(rows 6)\n",
+    "kind": "use-case"
   },
   {
     "id": "browser-matrix",
@@ -97,7 +513,8 @@
     "description": "Two browsers across desktop and mobile layouts.",
     "expectedRows": 4,
     "mode": "zrow",
-    "source": "# ZROW 0.1\ncase_id:int,browser,layout\n@set case_id=seq(),browser=cycle(\"chrome\",\"firefox\")\n@set layout=if(case_id<=2,\"desktop\",\"mobile\")\n@rows 4\n"
+    "source": "# ZROW 0.3\n(cols case_id:int,browser,layout)\n(case_id=seq(),browser=cycle(\"chrome\",\"firefox\"))\n(layout=if(case_id<=2,\"desktop\",\"mobile\"))\n(rows 4)\n",
+    "kind": "use-case"
   },
   {
     "id": "survey-template",
@@ -107,7 +524,8 @@
     "description": "Numbered collection rows with assigned cohorts and empty response fields.",
     "expectedRows": 12,
     "mode": "zrow",
-    "source": "# ZROW 0.1\nparticipant_id:int,cohort,rating,comment\n@unique participant_id\n@set participant_id=seq(),cohort=cycle(\"A\",\"B\")\n@set rating=\"\",comment=\"\"\n@rows 12\n"
+    "source": "# ZROW 0.3\n(cols participant_id:int,cohort,rating,comment)\n(unique participant_id)\n(participant_id=seq(),cohort=cycle(\"A\",\"B\"))\n(rating=\"\",comment=\"\")\n(rows 12)\n",
+    "kind": "use-case"
   },
   {
     "id": "shipping-grid",
@@ -117,7 +535,8 @@
     "description": "Example weight bands use inclusive lower limits and exclusive upper limits.",
     "expectedRows": 5,
     "mode": "zrow",
-    "source": "# ZROW 0.1\nband:int,min_kg:number,max_kg:number,price:number\n@set band=seq(),min_kg=(band-1)*2,max_kg=band*2\n@set price=round(3.5+band*1.25,2)\n@rows 5\n"
+    "source": "# ZROW 0.3\n(cols band:int,min_kg:number,max_kg:number,price:number)\n(band=seq(),min_kg=(band-1)*2,max_kg=band*2)\n(price=round(3.5+band*1.25,2))\n(rows 5)\n",
+    "kind": "use-case"
   },
   {
     "id": "inventory-import",
@@ -127,6 +546,18 @@
     "description": "Generated item IDs, alternating locations and a zero-stock exception.",
     "expectedRows": 11,
     "mode": "zrow",
-    "source": "# ZROW 0.1\nitem_id:int,location,stock:int\n@unique item_id\n@set item_id=seq(1001),location=cycle(\"A-01\",\"B-02\"),stock=50\n@rows 10\n@row location=\"QUARANTINE\",stock=0\n"
+    "source": "# ZROW 0.3\n(cols item_id:int,location,stock:int)\n(unique item_id)\n(item_id=seq(1001),location=cycle(\"A-01\",\"B-02\"),stock=50)\n(rows 10)\n(row location=\"QUARANTINE\",stock=0)\n",
+    "kind": "use-case"
+  },
+  {
+    "id": "game-progression",
+    "label": "Game progression",
+    "title": "game-progression",
+    "category": "Progression tables",
+    "kind": "use-case",
+    "description": "A progression curve with one guardian and three elite overrides.",
+    "expectedRows": 24,
+    "mode": "zrow",
+    "source": "# ZROW 0.3\n(cols level:int,enemy,hp:int,damage:int,reward:int)\n(expect 24)\n(unique level)\n\n(level=seq(),enemy=cycle(\"slime\",\"golem\"))\n(hp=round(80*pow(1.12,level-1)))\n(damage=min(99,5+level*3),reward=level*25)\n(rows 20)\n\n(row enemy=guardian,hp=1500,damage=80)\n(rows 3 with enemy=elite)\n"
   }
 ]

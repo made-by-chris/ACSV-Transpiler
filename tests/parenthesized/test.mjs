@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { compile, validate } from '../../dist/ACSVTranspiler.js';
+import { compile, validate } from '../../dist/ZROWCompiler.js';
 const run=input=>compile({input,mode:'zrow'});
 test('parenthesized forms share existing directive semantics and source lines',()=>{
  const result=run('# ZROW 0.2\n(cols id:int,label,active:bool)\n(expect 4)\n(unique id)\n(id=seq(),label=cycle("A","B"),active=true)\n(rows 2)\n(row label="manual, value",active=false)\n(rows 1 with label=end)');

@@ -7,15 +7,17 @@ The language contract is [core.md](core.md). Machine-readable, independently spe
 ## Grammar outline
 
 ```ebnf
-recipe      = { context_declaration }, header, { comment | blank | csv_record | directive | legacy_control | include } ;
-directive   = "@set ", assignments
-            | "@row", [ " ", assignments ]
-            | "@rows ", count, [ " with ", assignments ]
-            | "@expect ", count
-            | "@unique ", column, { ",", column } ;
+recipe      = version, { declaration }, header, { comment | blank | csv_record | form | include } ;
+version     = "# ZROW 0.3" ;
+header      = "(cols ", columns, ")" ;
+form        = "(", assignments, ")"
+            | "(row", [ " ", assignments ], ")"
+            | "(rows ", count, [ " with ", assignments ], ")"
+            | "(expect ", count, ")"
+            | "(unique ", column, { ",", column }, ")" ;
 assignments = column, "=", expression, { ",", column, "=", expression } ;
 annotation  = ":text" | ":int" | ":number" | ":bool" | ":date" | ":", enum_name ;
-context_declaration = enum_declaration | seed_declaration | time_declaration ;
+declaration = enum_declaration | seed_declaration | time_declaration ;
 count       = digit, { digit } ;
 ```
 

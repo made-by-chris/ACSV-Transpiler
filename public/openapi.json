@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ZROW conversion API",
-    "version": "0.4.0"
+    "version": "0.5.0"
   },
   "servers": [
     {
@@ -30,8 +30,6 @@
                   "mode": {
                     "enum": [
                       "csv",
-                      "xcsv",
-                      "acsv",
                       "zrow"
                     ],
                     "default": "zrow"

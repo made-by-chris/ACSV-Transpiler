@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { compile, toRecords, validate } from "../../dist/ACSVTranspiler.js";
+import { compile, toRecords, validate } from "../../dist/ZROWCompiler.js";
 const run = (body, config = {}) =>
   compile({ input: "# ZROW 0.3\n" + body, mode: "zrow", ...config });
 test("named enums validate generated, literal and overridden values and preserve text", () => {

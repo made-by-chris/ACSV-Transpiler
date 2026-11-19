@@ -4,8 +4,8 @@ import {
   toRecords,
   serializeJSON,
   validate,
-} from "../../dist/ACSVTranspiler.js";
-const run = (input) => compile({ input, mode: "acsv" });
+} from "../../dist/ZROWCompiler.js";
+const run = (input) => compile({ input, mode: "zrow" });
 
 test("typed headers validate data and export native JSON primitives", () => {
   const result = run(
@@ -59,7 +59,7 @@ test.each([
   ["id:integer\n1", "E_TYPE"],
   ["id:int,id\n1,2", "E_HEADER"],
 ])("types reject invalid data without coercing it: %s", (input, code) => {
-  expect(validate({ input, mode: "acsv" })).toMatchObject({
+  expect(validate({ input, mode: "zrow" })).toMatchObject({
     valid: false,
     diagnostics: [{ code }],
   });

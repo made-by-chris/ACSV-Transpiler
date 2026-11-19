@@ -3,7 +3,7 @@ import transpile, {
   compile,
   parseCSV,
   serializeCSV,
-} from "../../dist/ACSVTranspiler.js";
+} from "../../dist/ZROWCompiler.js";
 
 const examples = [
   "value\n1+2\na=b\n#urgent\n> urgent\ninclude data.csv",
@@ -66,9 +66,9 @@ test.each([
   }
 });
 
-test("ACSV data cells stay literal, quoted empties override defaults", () => {
+test("ZROW data cells stay literal, quoted empties override defaults", () => {
   const result = compile({
-    mode: "acsv",
+    mode: "zrow",
     input:
       'note,status\n> status=active\n1+2,\na=b,""\n"#urgent",\n"> urgent",',
   });

@@ -1,4 +1,4 @@
-import { ACSVError, fail } from "./errors.js";
+import { ZROWError, fail } from "./errors.js";
 
 export interface Cell {
   value: string;
@@ -77,7 +77,7 @@ export function scanRecords(
           try {
             parsed = scanRecords(cols[1]);
           } catch (error) {
-            if (error instanceof ACSVError)
+            if (error instanceof ZROWError)
               fail(
                 error.code,
                 error.message,
@@ -98,8 +98,8 @@ export function scanRecords(
           ? "@set " + body
           : "@" + body;
       }
-      if (/^# (?:ZROW|XCSV) 0\.1\s*$/.test(raw)) forms = false;
-      if (/^# (?:ZROW|XCSV) 0\.[12]\s*$/.test(raw)) extended = false;
+      if (/^# ZROW 0\.1\s*$/.test(raw)) forms = false;
+      if (/^# ZROW 0\.[12]\s*$/.test(raw)) extended = false;
       const kind = raw.startsWith("@")
         ? "directive"
         : raw.startsWith(">")

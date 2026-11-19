@@ -1,9 +1,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { compile, type ACSV_Transpilation_Config } from "./ACSVTranspiler.js";
+import { compile, type CompileConfig } from "./ZROWCompiler.js";
 
 /** The core never opens files. This explicit adapter confines includes to baseDir. */
-export function compileNode(config: ACSV_Transpilation_Config) {
+export function compileNode(config: CompileConfig) {
   const base = fs.realpathSync(config.baseDir ?? process.cwd());
   return compile({
     ...config,
@@ -24,8 +24,6 @@ export function compileNode(config: ACSV_Transpilation_Config) {
     },
   });
 }
-export default function transpileNode(
-  config: ACSV_Transpilation_Config,
-): string {
+export default function transpileNode(config: CompileConfig): string {
   return compileNode(config).csv;
 }

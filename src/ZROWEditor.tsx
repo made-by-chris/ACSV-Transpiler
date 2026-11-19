@@ -10,11 +10,11 @@ import {
 import {
   compile,
   serializeJSON,
-  ACSVError,
+  ZROWError,
   type Compilation,
   type InputMode,
-} from "./ACSVTranspiler";
-import { examples } from "./exampleACSV";
+} from "./ZROWCompiler";
+import { examples } from "./examples";
 import UtilityBar from "./UtilityBar";
 import { saveFile } from "./saveFile";
 
@@ -24,12 +24,12 @@ interface Draft {
   title: string;
   format: "csv" | "json";
 }
-const STORAGE_KEY = "acsv.workbench.v1";
+const STORAGE_KEY = "zrow.workbench.v1";
 const PREVIEW_ROWS = 100;
 function readDraft(): Draft {
   const fallback: Draft = {
     input: examples[0].source,
-    mode: "acsv",
+    mode: "zrow",
     title: examples[0].title,
     format: "csv",
   };
@@ -40,27 +40,20 @@ function readDraft(): Draft {
       if (
         typeof draft.input === "string" &&
         typeof draft.title === "string" &&
-        ["csv", "acsv", "xcsv", "zrow"].includes(draft.mode)
+        ["csv", "zrow"].includes(draft.mode)
       )
         return {
           ...draft,
           format: ["csv", "json"].includes(draft.format) ? draft.format : "csv",
         };
     }
-    // Keep drafts from the original editor, including intentionally empty ones.
-    return {
-      ...fallback,
-      input: localStorage.getItem("ACSVEditor_input") ?? fallback.input,
-      title: localStorage.getItem("ACSVEditor_title") ?? fallback.title,
-    };
+    return fallback;
   } catch {
     return fallback;
   }
 }
 
-export default function ACSVEditor() {
-  let migrateLegacyDraft = false;
-  try { migrateLegacyDraft = localStorage.getItem(STORAGE_KEY) === null; } catch {}
+export default function ZROWEditor() {
   const [draft, setDraft] = createSignal(readDraft());
   const [undo, setUndo] = createSignal<Draft>();
   const [view, setView] = createSignal<"table" | "csv" | "json">("table");
@@ -74,7 +67,7 @@ export default function ACSVEditor() {
   let noticeTimer: ReturnType<typeof setTimeout> | undefined;
   onCleanup(() => clearTimeout(noticeTimer));
 
-  const compilation = createMemo<{ result?: Compilation; error?: ACSVError }>(
+  const compilation = createMemo<{ result?: Compilation; error?: ZROWError }>(
     () => {
       try {
         return {
@@ -83,9 +76,9 @@ export default function ACSVEditor() {
       } catch (error) {
         return {
           error:
-            error instanceof ACSVError
+            error instanceof ZROWError
               ? error
-              : new ACSVError(
+              : new ZROWError(
                   "E_INTERNAL",
                   error instanceof Error
                     ? error.message
@@ -96,12 +89,12 @@ export default function ACSVEditor() {
     },
   );
   const result = () => compilation().result;
-  const json = createMemo<{ text: string; error?: ACSVError }>(() => {
+  const json = createMemo<{ text: string; error?: ZROWError }>(() => {
     if (!result()) return { text: "" };
     try {
       return { text: serializeJSON(result()!) };
     } catch (error) {
-      return { text: "", error: error as ACSVError };
+      return { text: "", error: error as ZROWError };
     }
   });
   const error = () =>
@@ -181,44 +174,42 @@ export default function ACSVEditor() {
       if (name) announce(`Saved ${name}.`);
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
-      announce(error instanceof Error ? `Save failed: ${error.message}` : "Save failed. Try again.");
+      announce(
+        error instanceof Error
+          ? `Save failed: ${error.message}`
+          : "Save failed. Try again.",
+      );
     }
   }
 
   onMount(() => {
     const id = new URLSearchParams(location.search).get("example");
-    const example = examples.find(item => item.id === id);
+    const example = examples.find((item) => item.id === id);
     if (example) {
-      replace({ input: example.source, title: example.title, mode: example.mode, format: draft().format });
+      replace({
+        input: example.source,
+        title: example.title,
+        mode: example.mode,
+        format: draft().format,
+      });
       history.replaceState(null, "", location.pathname);
       return;
     }
-    if (!migrateLegacyDraft) return;
-    const frame = document.createElement("iframe");
-    frame.hidden = true;
-    frame.src = "https://acsv.majaku.com/_draft-migration";
-    const cleanup = () => { frame.remove(); window.removeEventListener("message", receive); clearTimeout(timer); };
-    const receive = (event: MessageEvent) => {
-      if (event.origin !== "https://acsv.majaku.com" || event.source !== frame.contentWindow || event.data?.type !== "zrow-draft-migration") return;
-      const legacy = event.data.draft;
-      if (legacy && typeof legacy.input === "string" && legacy.input.length <= 65536 && ["csv", "acsv", "xcsv", "zrow"].includes(legacy.mode)) {
-        replace({input:legacy.input, title:typeof legacy.title === "string" ? legacy.title : "Imported draft", mode:legacy.mode, format:legacy.format === "json" ? "json" : "csv"});
-      }
-      cleanup();
-    };
-    window.addEventListener("message", receive);
-    const timer = setTimeout(cleanup, 5000);
-    document.body.append(frame);
-    onCleanup(cleanup);
   });
 
   function chooseDownload(format: string) {
     if (format === "source") {
       const input = draft().input;
-      const source = draft().mode === "csv" || /^#\s*(?:ZROW|XCSV)\b/m.test(input) ? input : `# ZROW 0.3\n${input}`;
+      const source =
+        draft().mode === "csv" || /^#\s*ZROW\b/m.test(input)
+          ? input
+          : `# ZROW 0.3\n${input}`;
       void download(source, draft().mode === "csv" ? ".csv" : ".zrow");
     } else if (canExport() && (format === "csv" || format === "json")) {
-      void download(format === "csv" ? result()!.csv : json().text, `.${format}`);
+      void download(
+        format === "csv" ? result()!.csv : json().text,
+        `.${format}`,
+      );
     }
   }
 
@@ -228,7 +219,19 @@ export default function ACSVEditor() {
       <main>
         <aside class="sponsor-card" aria-label="Advertisement">
           <span class="sponsor-label">Advertisement</span>
-          <a href="https://paperboy.now" target="_blank" rel="sponsored noopener noreferrer"><strong>paperboy<span>.now</span></strong><span>A printer in your pocket</span><span class="sponsor-arrow" aria-hidden="true">↗</span></a>
+          <a
+            href="https://paperboy.now"
+            target="_blank"
+            rel="sponsored noopener noreferrer"
+          >
+            <strong>
+              paperboy<span>.now</span>
+            </strong>
+            <span>A printer in your pocket</span>
+            <span class="sponsor-arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
         </aside>
         <div class="editor-grid">
           <section class="panel source-panel" aria-labelledby="source-heading">
@@ -258,17 +261,23 @@ export default function ACSVEditor() {
               <label for="input-mode">Input</label>
               <select
                 id="input-mode"
-                value={draft().mode === "csv" ? "csv" : "acsv"}
+                value={draft().mode === "csv" ? "csv" : "zrow"}
                 onChange={(e) =>
                   update({ mode: e.currentTarget.value as InputMode })
                 }
               >
-                <option value="acsv">ZROW recipe</option>
+                <option value="zrow">ZROW recipe</option>
                 <option value="csv">Literal CSV</option>
               </select>
               <select
                 aria-label="Load example"
-                value={examples.find(example => example.source === draft().input && (example.mode === "csv") === (draft().mode === "csv"))?.id ?? ""}
+                value={
+                  examples.find(
+                    (example) =>
+                      example.source === draft().input &&
+                      (example.mode === "csv") === (draft().mode === "csv"),
+                  )?.id ?? ""
+                }
                 onChange={(e) => {
                   const example = examples.find(
                     (item) => item.id === e.currentTarget.value,
@@ -285,11 +294,28 @@ export default function ACSVEditor() {
                 <option value="" disabled>
                   Examples
                 </option>
-                <For each={examples}>
-                  {(example) => (
-                    <option value={example.id}>{example.label}</option>
-                  )}
-                </For>
+                <optgroup label="Features">
+                  <For
+                    each={examples.filter(
+                      (example) => example.kind === "feature",
+                    )}
+                  >
+                    {(example) => (
+                      <option value={example.id}>{example.label}</option>
+                    )}
+                  </For>
+                </optgroup>
+                <optgroup label="Use cases">
+                  <For
+                    each={examples.filter(
+                      (example) => example.kind !== "feature",
+                    )}
+                  >
+                    {(example) => (
+                      <option value={example.id}>{example.label}</option>
+                    )}
+                  </For>
+                </optgroup>
               </select>
             </div>
             <div class="source-area">
@@ -332,41 +358,54 @@ export default function ACSVEditor() {
                 <span classList={{ "status-dot": true, invalid: !!error() }} />
               </div>
               <div class="output-actions">
-                <select class="download-select" aria-label="Download" value="" onChange={(e) => {
-                  const format = e.currentTarget.value;
-                  chooseDownload(format);
-                }}>
-                  <option value="" disabled selected>Download</option>
-                  <option value="source" disabled={!draft().input}>Source</option>
-                  <option value="csv" disabled={!canExport()}>CSV</option>
-                  <option value="json" disabled={!canExport()}>JSON</option>
+                <select
+                  class="download-select"
+                  aria-label="Download"
+                  value=""
+                  onChange={(e) => {
+                    const format = e.currentTarget.value;
+                    chooseDownload(format);
+                  }}
+                >
+                  <option value="" disabled selected>
+                    Download
+                  </option>
+                  <option value="source" disabled={!draft().input}>
+                    Source
+                  </option>
+                  <option value="csv" disabled={!canExport()}>
+                    CSV
+                  </option>
+                  <option value="json" disabled={!canExport()}>
+                    JSON
+                  </option>
                 </select>
-              <div class="segmented" role="group" aria-label="Output view">
-                <button
-                  disabled={!canExport()}
-                  onClick={() => void copy(output(), "Output")}
-                >
-                  Copy {draft().format.toUpperCase()}
-                </button>
-                <button
-                  aria-pressed={view() === "table"}
-                  onClick={() => chooseView("table")}
-                >
-                  Table
-                </button>
-                <button
-                  aria-pressed={view() === "csv"}
-                  onClick={() => chooseView("csv")}
-                >
-                  CSV
-                </button>
-                <button
-                  aria-pressed={view() === "json"}
-                  onClick={() => chooseView("json")}
-                >
-                  JSON
-                </button>
-              </div>
+                <div class="segmented" role="group" aria-label="Output view">
+                  <button
+                    disabled={!canExport()}
+                    onClick={() => void copy(output(), "Output")}
+                  >
+                    Copy {draft().format.toUpperCase()}
+                  </button>
+                  <button
+                    aria-pressed={view() === "table"}
+                    onClick={() => chooseView("table")}
+                  >
+                    Table
+                  </button>
+                  <button
+                    aria-pressed={view() === "csv"}
+                    onClick={() => chooseView("csv")}
+                  >
+                    CSV
+                  </button>
+                  <button
+                    aria-pressed={view() === "json"}
+                    onClick={() => chooseView("json")}
+                  >
+                    JSON
+                  </button>
+                </div>
               </div>
             </div>
             <div class="output-summary">
@@ -431,7 +470,8 @@ export default function ACSVEditor() {
                                   when={result()?.columns[index()].explicit}
                                 >
                                   <span class="column-type">
-                                    {result()?.columns[index()].enum ?? result()?.columns[index()].type}
+                                    {result()?.columns[index()].enum ??
+                                      result()?.columns[index()].type}
                                   </span>
                                 </Show>
                               </th>

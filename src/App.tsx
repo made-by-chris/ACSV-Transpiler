@@ -1,6 +1,6 @@
 import "./App.css";
-import ACSVEditor from "./ACSVEditor";
+import ZROWEditor from "./ZROWEditor";
 
 export default function App() {
-  return <ACSVEditor />;
+  return <ZROWEditor />;
 }

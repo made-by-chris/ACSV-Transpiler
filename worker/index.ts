@@ -1,5 +1,5 @@
 import { version } from "../package.json";
-import { compile, serializeJSON, ACSVError } from "../src/ACSVTranspiler";
+import { compile, serializeJSON, ZROWError } from "../src/ZROWCompiler";
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -57,7 +57,7 @@ export default {
       if (
         !b ||
         typeof b.input !== "string" ||
-        !["csv", "acsv", "xcsv", "zrow"].includes(b.mode ?? "zrow") ||
+        !["csv", "zrow"].includes(b.mode ?? "zrow") ||
         !["csv", "json"].includes(b.format ?? "csv")
       )
         return json({ error: "Invalid input, mode or format" }, 400);
@@ -83,7 +83,7 @@ export default {
         columns: c.headers,
       });
     } catch (e) {
-      return e instanceof ACSVError
+      return e instanceof ZROWError
         ? json(
             {
               error: {

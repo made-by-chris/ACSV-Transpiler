@@ -4,17 +4,17 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
 import transpileNode from "../../dist/node.js";
-import example, { examples } from "../../src/exampleACSV.ts";
-import { compile } from "../../dist/ACSVTranspiler.js";
+import example, { examples } from "../../src/examples.ts";
+import { compile } from "../../dist/ZROWCompiler.js";
 
 // Native ESM avoids the __dirname wrapper injected by the test runner.
 function withoutProcess(input) {
   const script = `
-    import transpile from ${JSON.stringify(new URL("../../dist/ACSVTranspiler.js", import.meta.url).href)};
+    import transpile from ${JSON.stringify(new URL("../../dist/ZROWCompiler.js", import.meta.url).href)};
     const input = process.argv[1];
     globalThis.process = undefined;
     try {
-      console.log(JSON.stringify({ output: transpile({ input, mode:'acsv', streaming: false, stats: false }) }));
+      console.log(JSON.stringify({ output: transpile({ input, mode:'zrow', streaming: false, stats: false }) }));
     } catch (error) {
       console.log(JSON.stringify({ error: error.message }));
     }
@@ -36,24 +36,24 @@ test("plain CSV works without Node globals", () => {
   expect(output.trim()).toBe(input);
 });
 
-test("explicit ACSV controls work without Node globals", () => {
+test("explicit ZROW controls work without Node globals", () => {
   const output = withoutProcess("id,name\n> id++,name=Alice\n,\n,");
   expect(output.trim()).toBe("id,name\n1,Alice\n2,Alice");
 });
 
 test("file includes explain the browser limitation", () => {
-  expect(() => withoutProcess('id,name\ninclude "common.acsv"')).toThrow(
+  expect(() => withoutProcess('id,name\ninclude "common.zrow"')).toThrow(
     "File includes require the Node.js adapter",
   );
 });
 
 test("Node file includes still resolve relative to baseDir", () => {
-  const dir = mkdtempSync(join(tmpdir(), "acsv-include-"));
+  const dir = mkdtempSync(join(tmpdir(), "zrow-include-"));
   try {
-    writeFileSync(join(dir, "common.acsv"), "id,name\n1,Alice\n2,Bob");
+    writeFileSync(join(dir, "common.zrow"), "id,name\n1,Alice\n2,Bob");
     const output = transpileNode({
-      mode: "acsv",
-      input: 'id,name\ninclude "common.acsv"',
+      mode: "zrow",
+      input: 'id,name\ninclude "common.zrow"',
       baseDir: dir,
       streaming: false,
       stats: false,
@@ -82,22 +82,22 @@ test("the default app fixture produces typed users and explicit edge cases", () 
 });
 
 test("includes reject cycles and paths outside the selected directory", () => {
-  const dir = mkdtempSync(join(tmpdir(), "acsv-bounds-"));
-  const outside = mkdtempSync(join(tmpdir(), "acsv-outside-"));
+  const dir = mkdtempSync(join(tmpdir(), "zrow-bounds-"));
+  const outside = mkdtempSync(join(tmpdir(), "zrow-outside-"));
   try {
-    writeFileSync(join(dir, "loop.acsv"), 'id\ninclude "loop.acsv"');
-    writeFileSync(join(outside, "secret.acsv"), "id\n42");
+    writeFileSync(join(dir, "loop.zrow"), 'id\ninclude "loop.zrow"');
+    writeFileSync(join(outside, "secret.zrow"), "id\n42");
     expect(() =>
       transpileNode({
-        input: 'id\ninclude "loop.acsv"',
-        mode: "acsv",
+        input: 'id\ninclude "loop.zrow"',
+        mode: "zrow",
         baseDir: dir,
       }),
     ).toThrow("Circular include");
     expect(() =>
       transpileNode({
-        input: `id\ninclude "${join(outside, "secret.acsv")}"`,
-        mode: "acsv",
+        input: `id\ninclude "${join(outside, "secret.zrow")}"`,
+        mode: "zrow",
         baseDir: dir,
       }),
     ).toThrow("Includes must stay inside");
@@ -122,31 +122,31 @@ test("literal editor example is unchanged and retains multiline values", () => {
 });
 
 test("typed includes share generator state and require matching type declarations", () => {
-  const dir = mkdtempSync(join(tmpdir(), "acsv-typed-includes-"));
+  const dir = mkdtempSync(join(tmpdir(), "zrow-typed-includes-"));
   try {
     writeFileSync(
-      join(dir, "users.acsv"),
+      join(dir, "users.zrow"),
       "id:int,name\n@set id=seq(),name=Player\n@rows 2",
     );
     const output = transpileNode({
-      input: 'id:int,name\n@expect 3\ninclude "users.acsv"\n@row name=Admin',
-      mode: "acsv",
+      input: 'id:int,name\n@expect 3\ninclude "users.zrow"\n@row name=Admin',
+      mode: "zrow",
       baseDir: dir,
     });
     expect(output).toBe("id,name\n1,Player\n2,Player\n3,Admin");
-    writeFileSync(join(dir, "users.acsv"), "id,name\n1,Player");
+    writeFileSync(join(dir, "users.zrow"), "id,name\n1,Player");
     expect(() =>
       transpileNode({
-        input: 'id:int,name\ninclude "users.acsv"',
-        mode: "acsv",
+        input: 'id:int,name\ninclude "users.zrow"',
+        mode: "zrow",
         baseDir: dir,
       }),
     ).toThrow("same header and column types");
-    writeFileSync(join(dir, "users.acsv"), "id:int,name\n@expect 2");
+    writeFileSync(join(dir, "users.zrow"), "id:int,name\n@expect 2");
     expect(() =>
       transpileNode({
-        input: 'id:int,name\ninclude "users.acsv"',
-        mode: "acsv",
+        input: 'id:int,name\ninclude "users.zrow"',
+        mode: "zrow",
         baseDir: dir,
       }),
     ).toThrow("Put @expect in the main document");

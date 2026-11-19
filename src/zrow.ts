@@ -2,7 +2,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { randomUUID } from "node:crypto";
-import { ACSVError, serializeJSON, type InputMode } from "./ACSVTranspiler.js";
+import { ZROWError, serializeJSON, type InputMode } from "./ZROWCompiler.js";
 import { compileNode } from "./node.js";
 
 const args = process.argv.slice(2);
@@ -21,8 +21,8 @@ if (formatIndex >= 0) {
 const modeIndex = args.indexOf("--mode");
 if (modeIndex >= 0) {
   const value = args[modeIndex + 1];
-  if (value !== "csv" && value !== "acsv" && value !== "xcsv" && value !== "zrow") {
-    console.error("--mode must be csv, zrow, xcsv or acsv");
+  if (value !== "csv" && value !== "zrow") {
+    console.error("--mode must be csv or zrow");
     process.exit(1);
   }
   mode = value;
@@ -30,18 +30,18 @@ if (modeIndex >= 0) {
 }
 if (args.includes("--help")) {
   console.log(
-    "Usage: zrow [--mode csv|zrow|xcsv|acsv] [--format csv|json] <input.csv|input.acsv> <output.csv|output.json>\nMode defaults to the input extension; format defaults to the output extension. CSV input is literal.",
+    "Usage: zrow [--mode csv|zrow] [--format csv|json] <input.csv|input.zrow> <output.csv|output.json>\nMode defaults to the input extension; format defaults to the output extension. CSV input is literal.",
   );
 } else if (args.length !== 2) {
   console.error(
-    "Usage: zrow [--mode csv|zrow|xcsv|acsv] [--format csv|json] <input.csv|input.acsv> <output.csv|output.json>",
+    "Usage: zrow [--mode csv|zrow] [--format csv|json] <input.csv|input.zrow> <output.csv|output.json>",
   );
   process.exitCode = 1;
 } else {
   let temporary: string | undefined;
   try {
     const [src, dest] = args;
-    mode ??= path.extname(src).toLowerCase() === ".acsv" || path.extname(src).toLowerCase() === ".xcsv" || path.extname(src).toLowerCase() === ".zrow" ? "acsv" : "csv";
+    mode ??= path.extname(src).toLowerCase() === ".zrow" ? "zrow" : "csv";
     const sourceName = fs.realpathSync(src);
     const result = compileNode({
       input: fs.readFileSync(src, "utf8"),
@@ -51,14 +51,14 @@ if (args.includes("--help")) {
     });
     format ??= path.extname(dest).toLowerCase() === ".json" ? "json" : "csv";
     const output = format === "json" ? serializeJSON(result) : result.csv;
-    temporary = path.join(path.dirname(dest), `.acsv-${randomUUID()}.tmp`);
+    temporary = path.join(path.dirname(dest), `.zrow-${randomUUID()}.tmp`);
     fs.writeFileSync(temporary, output, { flag: "wx" });
     fs.renameSync(temporary, dest);
     temporary = undefined;
   } catch (error) {
     if (temporary) fs.rmSync(temporary, { force: true });
     console.error(
-      error instanceof ACSVError
+      error instanceof ZROWError
         ? `${error.code} at line ${error.line}, column ${error.column}: ${error.message}`
         : error instanceof Error
           ? error.message

@@ -9,7 +9,7 @@ let passed = 0,
 for (const entry of fs.readdirSync(testsDir, { withFileTypes: true })) {
   if (!entry.isDirectory()) continue;
   const dir = path.join(testsDir, entry.name);
-  const inputFile = path.join(dir, "input.acsv"),
+  const inputFile = path.join(dir, "input.zrow"),
     expectedFile = path.join(dir, "expected.csv");
   if (!fs.existsSync(inputFile) || !fs.existsSync(expectedFile)) continue;
   try {
@@ -18,7 +18,7 @@ for (const entry of fs.readdirSync(testsDir, { withFileTypes: true })) {
       .replace(/\r?\n$/, "");
     const actual = transpileNode({
       input: fs.readFileSync(inputFile, "utf8"),
-      mode: "acsv",
+      mode: "zrow",
       baseDir: dir,
     });
     if (actual !== expected)
