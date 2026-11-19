@@ -30,11 +30,11 @@ No placeholder commas are required. Naming an override makes its meaning indepen
 ## Two input modes
 
 - **`csv` (library default):** every cell is literal. A valid document is returned unchanged, including quotes, whitespace, BOM, CRLF/LF/CR endings and final newline. Header text such as `id:int` is also literal.
-- **`acsv`:** the first non-comment, non-blank record declares columns. Records beginning with `@` are directives, `>` introduces supported legacy controls, `#` introduces comments, and `include "file.acsv"` is an explicit Node-only include.
+- **`zrow` (also `acsv` and `xcsv`):** the first non-comment, non-blank record declares columns. Records beginning with `@` are directives, `>` introduces supported legacy controls, `#` introduces comments, and `include "file.acsv"` is an explicit Node-only include.
 
 Both modes support comma-separated fields, doubled quotes and quoted multiline fields. Quotes surround the whole CSV field. Spaces inside CSV fields are significant. Data records must match the header width exactly; malformed quotes or ragged rows fail. Empty input is valid; a final newline does not create a row.
 
-Quote the first field when literal ZROW data begins with a reserved prefix. Prefixes inside quoted multiline data are never directives. Directives begin at column 1 and occupy one physical line. Use multiple `@set` lines to organize a recipe.
+Quote the first field when literal ZROW data begins with a reserved prefix, including a recognized parenthesized form in version 0.2. Prefixes inside quoted multiline data are never directives. Directives begin at column 1 and occupy one physical line. Use multiple `@set` lines to organize a recipe.
 
 ZROW output uses LF record endings and no final newline; typed annotations are removed from output headers. Literal CSV mode returns the original input instead of reserializing it. Browser text areas may normalize pasted line endings; use the CLI or library when byte preservation matters.
 
@@ -136,7 +136,7 @@ For new recipes prefer `seq`, `@rows` and named `@row` overrides. CSV rows and o
 
 ## Includes, diagnostics and limits
 
-The portable module never opens files. Use the CLI or `acsv/node` with `baseDir` to enable includes. Included headers and type declarations must match. Relative paths resolve from the including file and remain inside `baseDir`, including through symlinks; cycles fail. Rules and rows are applied inline. Origins currently expose line numbers, not included filenames.
+The portable module never opens files. Use the CLI or `zrow-js/node` with `baseDir` to enable includes. Included headers and type declarations must match. Relative paths resolve from the including file and remain inside `baseDir`, including through symlinks; cycles fail. Rules and rows are applied inline. Origins currently expose line numbers, not included filenames.
 
 `validate(config)` returns `{ valid, diagnostics }`; `isValid(config)` returns a boolean. The first diagnostic has `code`, `message`, one-based source `line` and `column`. CSV errors have field positions; directive errors usually identify the directive line. Type and uniqueness errors also identify the output row. Validation invokes no callbacks.
 
@@ -148,7 +148,7 @@ The CLI infers input mode from `.acsv` and output format from `.json`; `--mode c
 
 ## Compatibility and deferred work
 
-Literal CSV remains the default API mode. Recipe callers must pass `mode: 'acsv'`. The new `@` prefix and unquoted `:type` header suffixes are reserved in ZROW mode; quote literal fields that use them. Existing valid `>` recipes retain their behavior.
+Literal CSV remains the default API mode. Recipe callers must pass `mode: 'zrow'`. The new `@` prefix and unquoted `:type` header suffixes are reserved in ZROW mode; quote literal fields that use them. Existing valid `>` recipes retain their behavior.
 
 Random/Faker generators, implicit/nested scopes, null generators, custom dialects and spreadsheet-safety directives remain deferred. Tests reject unsupported syntax. Temporary named overrides are now supported through `@row` and `@rows ... with` with the explicit semantics above.
 
@@ -156,4 +156,38 @@ CSV quoting is not a spreadsheet formula-safety policy. Literal values are inten
 
 ## Version marker
 
-Put `# ZROW 0.1` on the first line of new recipes, before the column header. This optional declaration is excluded from CSV and JSON output. Missing declarations use the current language. Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is separate from the implementation package version. Use mode zrow; acsv and xcsv are compatibility aliases. Agent entry point: https://zrow.majaku.com/llms.txt .
+Put `# ZROW 0.2` on the first line of new recipes, before the column header. This optional declaration is excluded from CSV and JSON output. Missing declarations use the current language (0.2). Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is separate from the implementation package version. Use mode zrow; acsv and xcsv are compatibility aliases. Agent entry point: https://zrow.majaku.com/llms.txt .
+
+## Parenthesized notation (0.2)
+
+Version `# ZROW 0.2` adds the following spellings. Existing `@` directives remain supported and can be mixed with them.
+
+| Parenthesized form | Existing equivalent |
+| --- | --- |
+| `(cols id:int,name,role)` | `id:int,name,role` header |
+| `(id=seq(),role=member)` | `@set id=seq(),role=member` |
+| `(set role=member)` | `@set role=member` |
+| `(row name=Chris)` | `@row name=Chris` |
+| `(row)` | `@row` |
+| `(rows 10 with role=guest)` | `@rows 10 with role=guest` |
+| `(expect 12)` | `@expect 12` |
+| `(unique id)` | `@unique id` |
+
+A bare assignment form changes defaults and emits no row. Use `(row ...)` to emit a single row. Forms start in column 1 and occupy one physical line. Arguments retain the existing comma-separated expression syntax; this is parenthesized notation, not a Lisp evaluator.
+
+Ordinary CSV rows remain useful for individual records:
+
+```text
+# ZROW 0.2
+(cols id:int,name,role)
+(expect 4)
+(unique id)
+(id=seq(),name="User {id}",role=member)
+(rows 2)
+3,"Shelley, Chris",admin
+(row)
+```
+
+This emits two generated users, the literal CSV record, and a fourth user from the defaults. The literal row advances the sequence like any other emitted row. CSV data must match the header width. Quoted empty fields explicitly produce empty text; unquoted empty fields use defaults. Quote the first field when it would otherwise be recognized as a form: `"(rows 3)"` is a literal cell. Parentheses inside a quoted multiline CSV field are literal too.
+
+Documents explicitly declaring `# ZROW 0.1` retain their original parsing, including literal parenthesized cells. Missing declarations use the current language, 0.2. New documents should declare their version. Literal CSV mode remains unchanged. Parenthesized notation is available in the browser, API and repository source; npm 0.2.1 predates this syntax.

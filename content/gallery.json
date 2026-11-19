@@ -1,5 +1,15 @@
 [
   {
+    "id": "mixed-csv",
+    "label": "Recipes and ordinary CSV",
+    "title": "mixed-csv",
+    "category": "Data generation",
+    "description": "Generate regular rows, insert a literal CSV record, then resume the defaults.",
+    "expectedRows": 4,
+    "mode": "zrow",
+    "source": "# ZROW 0.2\n(cols id:int,name,role)\n(expect 4)\n(unique id)\n(id=seq(),name=\"User {id}\",role=member)\n(rows 2)\n3,\"Shelley, Chris\",admin\n(row)\n"
+  },
+  {
     "id": "product-catalogue",
     "label": "Product catalogue",
     "title": "product-catalogue",

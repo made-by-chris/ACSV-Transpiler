@@ -1,6 +1,6 @@
 # ZROW
 
-ZROW compiles data recipes into CSV and typed JSON. It includes a JavaScript library, a command-line tool, a browser editor and a conversion API.
+ZROW is an expressive extension of CSV for creating and storing data. People and LLMs can describe large datasets with compact recipes, then compile them into CSV and typed JSON. It includes a JavaScript library, a command-line tool, a browser editor and a conversion API.
 
 ```text
 # ZROW 0.1
@@ -71,3 +71,7 @@ Changes to language behavior should include tests and compatibility notes. See [
 ## License and maintainer
 
 [MIT](LICENSE). Maintained by [Christopher Shelley](https://x.com/househuman) at [Majaku](https://majaku.com).
+
+## Parenthesized notation
+
+Language version `# ZROW 0.2` adds `(cols id:int,name)`, `(id=seq(),name="User {id}")`, `(rows 10)` and `(row name=Chris)`. Assignments without a command set persistent defaults and emit no rows. Existing `@` directives remain supported. Ordinary CSV rows can be mixed in; see the [mixed CSV example](https://zrow.majaku.com/?example=mixed-csv). Explicit `0.1` documents retain their original parsing behavior.

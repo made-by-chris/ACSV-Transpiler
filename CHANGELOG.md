@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 — unreleased npm package
+
+- Add ZROW 0.2 parenthesized declarations, directives and implicit default assignments.
+- Preserve explicit 0.1 parenthesized literal data and existing @ directives.
+- Add a mixed generated/literal CSV example to the editor gallery and language documentation.
+
 ## 0.2.1 — 2026-11-19
 
 - Move the canonical site to zrow.majaku.com and the repository to made-by-chris/zrow.

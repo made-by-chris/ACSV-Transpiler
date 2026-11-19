@@ -40,7 +40,7 @@ function readDraft(): Draft {
       if (
         typeof draft.input === "string" &&
         typeof draft.title === "string" &&
-        ["csv", "acsv"].includes(draft.mode)
+        ["csv", "acsv", "xcsv", "zrow"].includes(draft.mode)
       )
         return {
           ...draft,
@@ -215,7 +215,7 @@ export default function ACSVEditor() {
   function chooseDownload(format: string) {
     if (format === "source") {
       const input = draft().input;
-      const source = draft().mode === "csv" || /^#\s*(?:ZROW|XCSV)\b/m.test(input) ? input : `# ZROW 0.1\n${input}`;
+      const source = draft().mode === "csv" || /^#\s*(?:ZROW|XCSV)\b/m.test(input) ? input : `# ZROW 0.2\n${input}`;
       void download(source, draft().mode === "csv" ? ".csv" : ".zrow");
     } else if (canExport() && (format === "csv" || format === "json")) {
       void download(format === "csv" ? result()!.csv : json().text, `.${format}`);
@@ -258,7 +258,7 @@ export default function ACSVEditor() {
               <label for="input-mode">Input</label>
               <select
                 id="input-mode"
-                value={draft().mode}
+                value={draft().mode === "csv" ? "csv" : "acsv"}
                 onChange={(e) =>
                   update({ mode: e.currentTarget.value as InputMode })
                 }
@@ -268,7 +268,7 @@ export default function ACSVEditor() {
               </select>
               <select
                 aria-label="Load example"
-                value=""
+                value={examples.find(example => example.source === draft().input && (example.mode === "csv") === (draft().mode === "csv"))?.id ?? ""}
                 onChange={(e) => {
                   const example = examples.find(
                     (item) => item.id === e.currentTarget.value,
@@ -280,7 +280,6 @@ export default function ACSVEditor() {
                       mode: example.mode,
                       format: draft().format,
                     });
-                  e.currentTarget.value = "";
                 }}
               >
                 <option value="" disabled>
@@ -315,7 +314,7 @@ export default function ACSVEditor() {
                   gutter.scrollTop = editor.scrollTop;
                 }}
                 placeholder={
-                  draft().mode === "acsv"
+                  draft().mode !== "csv"
                     ? "id:int,name\n@set id=seq(),name=Player\n@rows 5"
                     : "id,name\n1,Player"
                 }
@@ -335,7 +334,6 @@ export default function ACSVEditor() {
               <div class="output-actions">
                 <select class="download-select" aria-label="Download" value="" onChange={(e) => {
                   const format = e.currentTarget.value;
-                  e.currentTarget.value = "";
                   chooseDownload(format);
                 }}>
                   <option value="" disabled selected>Download</option>

@@ -6,18 +6,18 @@ export const examples = [
     label: "Account test data",
     title: "app-fixtures",
     mode: "acsv" as const,
-    source: `# ZROW 0.1
-id:int,email,role,active:bool
-@expect 25
-@unique id
+    source: `# ZROW 0.2
+(cols id:int,email,role,active:bool)
+(expect 25)
+(unique id)
 
-@set id=seq(),email="user{id}@example.test"
-@set role=cycle("member","reviewer"),active=true
-@rows 20
+(id=seq(),email="user{id}@example.test")
+(role=cycle("member","reviewer"),active=true)
+(rows 20)
 
-@row email="admin@example.test",role=admin
-@rows 3 with role=guest,active=false
-@row email="",role=guest
+(row email="admin@example.test",role=admin)
+(rows 3 with role=guest,active=false)
+25,"",guest,true
 `,
   },
   ...gallery.map(item => ({ ...item, mode: item.mode as InputMode })),

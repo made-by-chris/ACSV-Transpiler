@@ -132,7 +132,7 @@ let s = fs
   .readFileSync(dir + "/index.html", "utf8")
   .replace(
     "<title>ZROW</title>",
-    `<title>ZROW — CSV and JSON fixture generator</title><meta name="description" content="Describe tables with sequences, formulas and named exceptions. Generate CSV or typed JSON in your browser."><link rel="canonical" href="${host}/"><meta property="og:title" content="ZROW — CSV and JSON fixture generator"><meta property="og:type" content="website"><meta property="og:url" content="${host}/"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "ZROW", url: host + "/" })}</script>`,
+    `<title>ZROW — Expressive CSV</title><meta name="description" content="An expressive CSV extension for people and LLMs to create and store large datasets with compact recipes. Export CSV and typed JSON."><link rel="canonical" href="${host}/"><meta property="og:title" content="ZROW — Expressive CSV"><meta property="og:type" content="website"><meta property="og:url" content="${host}/"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "ZROW", url: host + "/" })}</script>`,
   );
 s = s.replace(
   "</body>",

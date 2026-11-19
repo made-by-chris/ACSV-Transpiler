@@ -80,7 +80,9 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
   const mode = (config.mode === "xcsv" || config.mode === "zrow") ? "acsv" : config.mode ?? "csv";
   if (mode !== "csv" && mode !== "acsv")
     fail("E_CONFIG", "Mode must be csv or acsv.");
+  // Explicit 0.1 documents keep their original literal-parenthesis behavior.
   const records = scanRecords(config.input, mode === "acsv");
+  const forms = !records.some(record => record.kind === "comment" && /^# (?:ZROW|XCSV) 0\.1\s*$/.test(record.raw));
   let headers: string[] = [];
   let columns: ColumnSchema[] = [];
   let expectation: { count: number; line: number } | undefined;
@@ -443,9 +445,11 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
       if (record.kind === "comment") {
         if (/^#\s*(?:ZROW|XCSV)\b/i.test(record.raw)) {
           if (declaredVersion || (haveHeader && !includeHeader))
-            fail("E_VERSION", "Place one # ZROW 0.1 declaration before the header.", record.line);
-          if (!/^# (?:ZROW|XCSV) 0\.1\s*$/.test(record.raw))
-            fail("E_VERSION", "Unsupported or malformed ZROW declaration. This compiler supports # ZROW 0.1.", record.line);
+            fail("E_VERSION", "Place one # ZROW declaration before the header.", record.line);
+          if (!/^# (?:ZROW 0\.[12]|XCSV 0\.1)\s*$/.test(record.raw))
+            fail("E_VERSION", "Unsupported or malformed ZROW declaration. This compiler supports # ZROW 0.1 and # ZROW 0.2.", record.line);
+          if (included && !forms && /^# ZROW 0\.2\s*$/.test(record.raw))
+            fail("E_VERSION", "A version 0.1 recipe cannot include a version 0.2 fragment.", record.line);
           declaredVersion = true;
         }
         if (/^#(?:dialect|safety)\b/.test(record.raw))
@@ -460,7 +464,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
       if (mode === "acsv" && record.kind === "data" && record.raw === "")
         continue;
       if (!haveHeader || includeHeader) {
-        if (record.kind !== "data")
+        if (record.kind !== "data" && record.kind !== "header")
           fail(
             "E_HEADER",
             "Place the CSV header before control lines or includes.",
@@ -496,6 +500,8 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
         haveHeader = true;
         continue;
       }
+      if (record.kind === "header")
+        fail("E_HEADER", "Declare columns once, before data and directives.", record.line);
       if (record.kind === "directive") directive(record, included);
       else if (record.kind === "control") control(record);
       else if (record.kind === "include") {
@@ -530,7 +536,7 @@ export function compile(config: ACSV_Transpilation_Config): Compilation {
             record.line,
           );
         consume(
-          scanRecords(resolved.input, true),
+          scanRecords(resolved.input, true, forms),
           resolved.source,
           [...stack, resolved.source],
           true,
