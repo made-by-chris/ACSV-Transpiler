@@ -51,7 +51,7 @@ node cli/ACSV.js existing.csv unchanged.csv
 
 ## Library
 
-The project is not yet published to npm. After `npm run build:lib`:
+A versioned package is available from [GitHub Releases](https://github.com/made-by-chris/ACSV-Transpiler/releases). It is not yet published to the npm registry. Build from source with `npm run build:lib`:
 
 ```js
 import { compile, toRecords, serializeJSON, validate } from './dist/ACSVTranspiler.js';
