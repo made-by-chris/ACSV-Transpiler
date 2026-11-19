@@ -2,6 +2,7 @@ const root = document.querySelector("#integrations");
 if (root) {
   const tabs = [...root.querySelectorAll('[role="tab"]')];
   function activate(tab, focus = false) {
+    root.querySelector('[role="status"]').textContent = "";
     for (const item of tabs) {
       const selected = item === tab;
       item.setAttribute("aria-selected", String(selected));
