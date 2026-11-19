@@ -1,5 +1,5 @@
 {
-  "name": "acsv",
+  "name": "zrow",
   "main": "worker/index.ts",
   "compatibility_date": "2026-11-19",
   "assets": {
@@ -10,7 +10,7 @@
   },
   "routes": [
     {
-      "pattern": "acsv.majaku.com",
+      "pattern": "zrow.majaku.com",
       "custom_domain": true,
     },
   ],

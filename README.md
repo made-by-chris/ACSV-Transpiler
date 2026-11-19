@@ -45,13 +45,13 @@ The portable core has no filesystem access or dynamic JavaScript evaluation. The
 
 ## Examples
 
-The [example gallery](https://acsv.majaku.com/examples/) covers catalogues, schedules, synthetic readings, invoice lines, test matrices, collection templates, shipping bands and inventory imports. Recipes live in `content/gallery.json` and are compiled during the site build.
+The [example gallery](https://zrow.majaku.com/examples/) covers catalogues, schedules, synthetic readings, invoice lines, test matrices, collection templates, shipping bands and inventory imports. Recipes live in `content/gallery.json` and are compiled during the site build.
 
 ## Editor and API
 
-The [editor](https://acsv.majaku.com/) runs locally in your browser and stores drafts on your device. It previews tables, CSV and JSON and exports the full generated output. The table preview displays the first 100 rows.
+The [editor](https://zrow.majaku.com/) runs locally in your browser and stores drafts on your device. It previews tables, CSV and JSON and exports the full generated output. The table preview displays the first 100 rows.
 
-The [conversion API](https://acsv.majaku.com/api/) runs on Cloudflare. Its [OpenAPI schema](https://acsv.majaku.com/openapi.json) documents requests, limits and diagnostics. The [agent index](https://acsv.majaku.com/llms.txt) links to machine-readable documentation.
+The [conversion API](https://zrow.majaku.com/api/) runs on Cloudflare. Its [OpenAPI schema](https://zrow.majaku.com/openapi.json) documents requests, limits and diagnostics. The [agent index](https://zrow.majaku.com/llms.txt) links to machine-readable documentation.
 
 ## Run locally
 

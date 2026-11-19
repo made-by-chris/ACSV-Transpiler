@@ -59,6 +59,8 @@ function readDraft(): Draft {
 }
 
 export default function ACSVEditor() {
+  let migrateLegacyDraft = false;
+  try { migrateLegacyDraft = localStorage.getItem(STORAGE_KEY) === null; } catch {}
   const [draft, setDraft] = createSignal(readDraft());
   const [undo, setUndo] = createSignal<Draft>();
   const [view, setView] = createSignal<"table" | "csv" | "json">("table");
@@ -189,7 +191,25 @@ export default function ACSVEditor() {
     if (example) {
       replace({ input: example.source, title: example.title, mode: example.mode, format: draft().format });
       history.replaceState(null, "", location.pathname);
+      return;
     }
+    if (!migrateLegacyDraft) return;
+    const frame = document.createElement("iframe");
+    frame.hidden = true;
+    frame.src = "https://acsv.majaku.com/_draft-migration";
+    const cleanup = () => { frame.remove(); window.removeEventListener("message", receive); clearTimeout(timer); };
+    const receive = (event: MessageEvent) => {
+      if (event.origin !== "https://acsv.majaku.com" || event.source !== frame.contentWindow || event.data?.type !== "zrow-draft-migration") return;
+      const legacy = event.data.draft;
+      if (legacy && typeof legacy.input === "string" && legacy.input.length <= 65536 && ["csv", "acsv", "xcsv", "zrow"].includes(legacy.mode)) {
+        replace({input:legacy.input, title:typeof legacy.title === "string" ? legacy.title : "Imported draft", mode:legacy.mode, format:legacy.format === "json" ? "json" : "csv"});
+      }
+      cleanup();
+    };
+    window.addEventListener("message", receive);
+    const timer = setTimeout(cleanup, 5000);
+    document.body.append(frame);
+    onCleanup(cleanup);
   });
 
   function chooseDownload(format: string) {

@@ -156,4 +156,4 @@ CSV quoting is not a spreadsheet formula-safety policy. Literal values are inten
 
 ## Version marker
 
-Put `# ZROW 0.1` on the first line of new recipes, before the column header. This optional declaration is excluded from CSV and JSON output. Missing declarations use the current language. Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is separate from the implementation package version. Use mode zrow; acsv and xcsv are compatibility aliases. Agent entry point: https://acsv.majaku.com/llms.txt .
+Put `# ZROW 0.1` on the first line of new recipes, before the column header. This optional declaration is excluded from CSV and JSON output. Missing declarations use the current language. Unsupported, malformed, repeated or misplaced declarations fail with E_VERSION. The language version is separate from the implementation package version. Use mode zrow; acsv and xcsv are compatibility aliases. Agent entry point: https://zrow.majaku.com/llms.txt .

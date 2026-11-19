@@ -10,7 +10,7 @@ export default function UtilityBar() {
         <a href="/examples/">Examples</a>
         <a href="/about/">About</a>
         <a href="https://majaku.com/account/">Account</a>
-        <a class="github-link" href="https://github.com/made-by-chris/ACSV-Transpiler" aria-label="ZROW on GitHub"><img src="/github.svg" alt="" width="18" height="18" />GitHub</a>
+        <a class="github-link" href="https://github.com/made-by-chris/zrow" aria-label="ZROW on GitHub"><img src="/github.svg" alt="" width="18" height="18" />GitHub</a>
         <a class="majaku-link" href="https://majaku.com" aria-label="Majaku"><img src="/majaku.svg" alt="Majaku frog" width="32" height="32" /></a>
       </nav>
     </header>

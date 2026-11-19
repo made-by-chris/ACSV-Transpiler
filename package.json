@@ -26,7 +26,8 @@
     "test:watch": "vitest",
     "deploy": "npm run build && npx wrangler@4.165.0 deploy",
     "dev:worker": "npm run build && npx wrangler@4.165.0 dev",
-    "prepack": "npm run build:lib && npm run build:cli"
+    "prepack": "npm run build:lib && npm run build:cli",
+    "deploy:redirect": "npx wrangler@4.165.0 deploy --config wrangler.redirect.jsonc"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
@@ -41,10 +42,10 @@
     "solid-js": "^1.7.8"
   },
   "license": "MIT",
-  "homepage": "https://acsv.majaku.com",
+  "homepage": "https://zrow.majaku.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/made-by-chris/ACSV-Transpiler.git"
+    "url": "git+https://github.com/made-by-chris/zrow.git"
   },
   "files": [
     "dist/*.js",
