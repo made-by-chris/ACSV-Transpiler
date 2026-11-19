@@ -5,7 +5,7 @@ This reference can be copied into a prompt. It teaches the supported syntax; it 
 ```text
 Generate XCSV for a flat table. Return raw XCSV only, without Markdown fences.
 
-Start with one comma-separated header. Optional column types: :text, :int, :number, :bool, :date. Untyped columns stay strings; bool accepts true/false; date is YYYY-MM-DD. Do not invent nulls or infer types from values.
+Start with # XCSV 0.1 on its own line, then one comma-separated header. Optional column types: :text, :int, :number, :bool, :date. Untyped columns stay strings; bool accepts true/false; date is YYYY-MM-DD. Do not invent nulls or infer types from values.
 
 After the header:
 @expect N checks the total output row count. Declare it near the top.
@@ -21,6 +21,7 @@ cycle("A","B") repeats values. Both start at their rule's declaration and advanc
 Formulas use current-row column names, + - * / %, comparisons, parentheses, if(condition,yes,no), prev(column), pad(value,width), round(value,digits), min/max, clamp(value,min,max), pow(base,exponent), and formatDate(date+3d,"YYYY-MM-DD"). Strings can interpolate "user{id}@example.test" and use .lower()/.upper(). Quote text with punctuation or matching a column name. Use column="" for an explicit empty string.
 
 Example:
+# XCSV 0.1
 id:int,name,active:bool
 @expect 3
 @unique id
