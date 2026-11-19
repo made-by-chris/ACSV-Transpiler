@@ -219,8 +219,15 @@ export default function ACSVEditor() {
           if (canExport()) void copy(output(), draft().format.toUpperCase());
         }}
         onDownloadFormat={(format) => {
-          try { if (result()) download(format === "csv" ? result()!.csv : serializeJSON(result()!), `.${format}`); }
-          catch (error) { announce(error instanceof Error ? error.message : "Export failed"); }
+          try {
+            if (result())
+              download(
+                format === "csv" ? result()!.csv : serializeJSON(result()!),
+                `.${format}`,
+              );
+          } catch (error) {
+            announce(error instanceof Error ? error.message : "Export failed");
+          }
         }}
         onDownloadData={() => {
           if (canExport()) download(output(), `.${draft().format}`);
@@ -233,7 +240,10 @@ export default function ACSVEditor() {
               <div class="panel-label">
                 <h2 id="source-heading">Source</h2>
               </div>
-              <div class="source-actions"><button onClick={() => void copy(draft().input, "Source")}>Copy source</button>
+              <div class="source-actions">
+                <button onClick={() => void copy(draft().input, "Source")}>
+                  Copy source
+                </button>
                 <Show when={undo()}>
                   <button class="text-button" onClick={restore}>
                     Undo
@@ -326,7 +336,13 @@ export default function ACSVEditor() {
                 <h2 id="output-heading">Output</h2>
                 <span classList={{ "status-dot": true, invalid: !!error() }} />
               </div>
-              <div class="segmented" role="group" aria-label="Output view"><button disabled={!canExport()} onClick={() => void copy(output(), "Output")}>Copy {draft().format.toUpperCase()}</button>
+              <div class="segmented" role="group" aria-label="Output view">
+                <button
+                  disabled={!canExport()}
+                  onClick={() => void copy(output(), "Output")}
+                >
+                  Copy {draft().format.toUpperCase()}
+                </button>
                 <button
                   aria-pressed={view() === "table"}
                   onClick={() => chooseView("table")}

@@ -1,4 +1,11 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist/web"
+  "outputDirectory": "dist/web",
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://acsv.majaku.com/",
+      "permanent": true
+    }
+  ]
 }
