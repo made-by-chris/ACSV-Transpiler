@@ -4,7 +4,7 @@
     "label": "Product catalogue",
     "title": "product-catalogue",
     "category": "Retail and imports",
-    "description": "Create predictable SKUs and size variants, with a single premium-product exception.",
+    "description": "Ten product rows: nine size variants and a premium-item override.",
     "expectedRows": 10,
     "mode": "zrow",
     "source": "# ZROW 0.1\nid:int,sku,size,price:number\n@unique sku\n@set id=seq(),sku=\"SKU-{id}\"\n@set size=cycle(\"S\",\"M\",\"L\"),price=19.95\n@rows 9\n@row sku=\"PREMIUM\",size=\"one-size\",price=29.95\n"
@@ -14,7 +14,7 @@
     "label": "Work schedule",
     "title": "work-schedule",
     "category": "Operations",
-    "description": "Generate five dated work slots. Times and timezone are explicit labels; no holiday or timezone inference is performed.",
+    "description": "Five dated work slots with explicit local times and timezone.",
     "expectedRows": 5,
     "mode": "zrow",
     "source": "# ZROW 0.1\ndate:date,start,end,timezone,team\n@set date=seq(\"2026-11-23\",1)\n@set start=\"09:00\",end=\"17:00\",timezone=\"Europe/Berlin\",team=\"support\"\n@rows 5\n"
@@ -24,7 +24,7 @@
     "label": "Synthetic sensor readings",
     "title": "daily-readings",
     "category": "Analysis and charts",
-    "description": "Generate a simple linear series for chart tests. These are synthetic values, not measured observations or a statistical simulation.",
+    "description": "A synthetic daily temperature series for chart fixtures.",
     "expectedRows": 14,
     "mode": "zrow",
     "source": "# ZROW 0.1\nday:int,date:date,temperature:number\n@set day=seq(),date=seq(\"2026-01-01\",1)\n@set temperature=round(20+day*0.5,1)\n@rows 14\n"
@@ -34,7 +34,7 @@
     "label": "Invoice line items",
     "title": "invoice-lines",
     "category": "Finance workflows",
-    "description": "Exercise quantity, unit-price and line-total imports with reproducible values. No tax or accounting rules are inferred.",
+    "description": "Line totals computed from quantities and unit prices.",
     "expectedRows": 6,
     "mode": "zrow",
     "source": "# ZROW 0.1\nline:int,description,quantity:int,unit_price:number,total:number\n@set line=seq(),description=\"Item {line}\"\n@set quantity=cycle(1,2,5),unit_price=12.5\n@set total=round(quantity*unit_price,2)\n@rows 6\n"
@@ -44,7 +44,7 @@
     "label": "Browser test matrix",
     "title": "browser-matrix",
     "category": "Software testing",
-    "description": "Enumerate two browsers across desktop and mobile layouts. Each combination appears once.",
+    "description": "Two browsers across desktop and mobile layouts.",
     "expectedRows": 4,
     "mode": "zrow",
     "source": "# ZROW 0.1\ncase_id:int,browser,layout\n@set case_id=seq(),browser=cycle(\"chrome\",\"firefox\")\n@set layout=if(case_id<=2,\"desktop\",\"mobile\")\n@rows 4\n"
@@ -54,7 +54,7 @@
     "label": "Survey collection template",
     "title": "survey-template",
     "category": "Research operations",
-    "description": "Prepare numbered collection rows with assigned cohorts and deliberately empty response fields. This is a blank template, not fabricated survey evidence.",
+    "description": "Numbered collection rows with assigned cohorts and empty response fields.",
     "expectedRows": 12,
     "mode": "zrow",
     "source": "# ZROW 0.1\nparticipant_id:int,cohort,rating,comment\n@unique participant_id\n@set participant_id=seq(),cohort=cycle(\"A\",\"B\")\n@set rating=\"\",comment=\"\"\n@rows 12\n"
@@ -64,7 +64,7 @@
     "label": "Shipping weight bands",
     "title": "shipping-grid",
     "category": "Configuration",
-    "description": "Describe illustrative weight bands and their prices. Replace the example rates with your actual tariff before use.",
+    "description": "Example weight bands use inclusive lower limits and exclusive upper limits.",
     "expectedRows": 5,
     "mode": "zrow",
     "source": "# ZROW 0.1\nband:int,min_kg:number,max_kg:number,price:number\n@set band=seq(),min_kg=(band-1)*2,max_kg=band*2\n@set price=round(3.5+band*1.25,2)\n@rows 5\n"
@@ -74,7 +74,7 @@
     "label": "Inventory import batch",
     "title": "inventory-import",
     "category": "Warehouse operations",
-    "description": "Create a fixture import with generated item IDs, alternating locations and an explicit zero-stock exception.",
+    "description": "Generated item IDs, alternating locations and a zero-stock exception.",
     "expectedRows": 11,
     "mode": "zrow",
     "source": "# ZROW 0.1\nitem_id:int,location,stock:int\n@unique item_id\n@set item_id=seq(1001),location=cycle(\"A-01\",\"B-02\"),stock=50\n@rows 10\n@row location=\"QUARANTINE\",stock=0\n"

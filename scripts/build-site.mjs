@@ -32,7 +32,7 @@ function html(title, source, path) {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${title} — ZROW</title><meta name="description" content="${description}"><link rel="canonical" href="${host}${path}"><meta property="og:title" content="${title} — ZROW"><meta property="og:url" content="${host}${path}"><meta property="og:type" content="website"><meta property="og:image" content="${host}/social.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@househuman"><link rel="stylesheet" href="/sponsor.css"><style>body{font:17px/1.65 system-ui;max-width:1000px;margin:36px auto;padding:0 24px;color:#18212c}nav,footer{margin:24px 0}footer{text-align:center}a{color:#175bc0}pre{overflow:auto;background:#f1f4f7;padding:20px}table{border-collapse:collapse;display:block;overflow:auto;max-width:100%}main{min-width:0;overflow-wrap:anywhere}td,th{border:1px solid #ddd;padding:8px}</style></head><body>${links}<main>${marked.parse(source)}</main>${path === "/privacy/" || path === "/about/" || path === "/404.html" ? "" : ad}${footer}${analytics}</body></html>`;
 }
 const gallery = JSON.parse(fs.readFileSync("content/gallery.json", "utf8"));
-const galleryMarkdown = "# Example gallery\n\nZROW describes repeated values, sequences, formulas and exceptions in a table. These examples show generated data, configuration and blank templates. It does not infer rules from an arbitrary CSV file.\n\n" + gallery.map(item => {
+const galleryMarkdown = "# Example gallery\n\nRecipes, generated CSV previews and editable examples.\n\n" + gallery.map(item => {
   const result = compile({ input: item.source, mode: "zrow" });
   if (result.rows.length !== item.expectedRows) throw Error(`Invalid gallery example: ${item.id}`);
   return `## ${item.label}\n\n${item.category}. ${item.description}\n\n\`\`\`text\n${item.source}\`\`\`\n\nProduces ${result.rows.length} rows. First rows:\n\n\`\`\`csv\n${result.csv.split("\n").slice(0, 5).join("\n")}\n\`\`\`\n\n[Open this example in the editor](/?example=${item.id}).\n\n`;
@@ -73,7 +73,7 @@ for (const [path, title, file] of docs) {
     .replace(
       /\]\(([^)]+)\)/g,
       (_, u) =>
-        `](${map[u] ?? (u.startsWith("http") ? u : "https://github.com/made-by-chris/ACSV-Transpiler/blob/main/" + u.replace(/^\.\.\//, ""))})`,
+        `](${map[u] ?? (u.startsWith("http") || u.startsWith("/") || u.startsWith("#") ? u : "https://github.com/made-by-chris/ACSV-Transpiler/blob/main/" + u.replace(/^\.\.\//, ""))})`,
     );
   page(path, title, s);
 }
