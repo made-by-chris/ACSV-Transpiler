@@ -84,10 +84,6 @@ Created by Christopher Shelley. [MIT license](LICENSE).
 
 [Christopher Shelley on X](https://x.com/househuman) · [GitHub](https://github.com/made-by-chris) · [majaku](https://majaku.com). See [CONTRIBUTING.md](CONTRIBUTING.md) for bug reports and review expectations.
 
-## Moving from the old editor
-
-Browser drafts are scoped to their website. Before moving an old draft, use [the export page on the old host](https://acsv.vercel.app/migration.html), then paste the saved source into the new editor. Exported source files work across hosts.
-
 ## Guides
 
 - [App fixtures with named exceptions](https://acsv.majaku.com/guides/app-fixtures/)
