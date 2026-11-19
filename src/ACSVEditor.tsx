@@ -15,6 +15,7 @@ import {
 } from "./ACSVTranspiler";
 import { examples } from "./exampleACSV";
 import UtilityBar from "./UtilityBar";
+import { saveFile } from "./saveFile";
 
 interface Draft {
   input: string;
@@ -58,7 +59,6 @@ function readDraft(): Draft {
 
 export default function ACSVEditor() {
   const [draft, setDraft] = createSignal(readDraft());
-  const [saved, setSaved] = createSignal(true);
   const [undo, setUndo] = createSignal<Draft>();
   const [view, setView] = createSignal<"table" | "csv" | "json">("table");
   const [notice, setNotice] = createSignal("");
@@ -107,10 +107,6 @@ export default function ACSVEditor() {
   const canExport = () => !!result()?.headers.length && !error();
   const output = () =>
     draft().format === "json" ? json().text : (result()?.csv ?? "");
-  function chooseFormat(format: "csv" | "json") {
-    update({ format });
-    if (view() !== "table") setView(format);
-  }
   function chooseView(next: "table" | "csv" | "json") {
     setView(next);
     if (next !== "table") update({ format: next });
@@ -129,9 +125,8 @@ export default function ACSVEditor() {
   createEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(draft()));
-      setSaved(true);
     } catch {
-      setSaved(false);
+      announce("Browser storage unavailable. Download to keep a copy.");
     }
   });
 
@@ -177,62 +172,27 @@ export default function ACSVEditor() {
       );
     }
   }
-  function download(text: string, extension: string) {
-    const name =
-      (draft()
-        .title.trim()
-        .replace(/\.(?:a?csv|json)$/i, "")
-        .replace(/[<>:"/\\|?*\x00-\x1f]/g, "-") || "untitled") + extension;
-    const url = URL.createObjectURL(
-      new Blob([text], {
-        type:
-          extension === ".csv"
-            ? "text/csv;charset=utf-8"
-            : extension === ".json"
-              ? "application/json;charset=utf-8"
-              : "text/plain;charset=utf-8",
-      }),
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = name;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    announce(`Downloaded ${name}.`);
+  async function download(text: string, extension: string) {
+    try {
+      const name = await saveFile(text, extension);
+      if (name) announce(`Saved ${name}.`);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      announce(error instanceof Error ? `Save failed: ${error.message}` : "Save failed. Try again.");
+    }
+  }
+
+  function chooseDownload(format: string) {
+    if (format === "source") {
+      void download(draft().input, draft().mode === "csv" ? ".csv" : ".acsv");
+    } else if (canExport() && (format === "csv" || format === "json")) {
+      void download(format === "csv" ? result()!.csv : json().text, `.${format}`);
+    }
   }
 
   return (
     <div class="workbench">
-      <UtilityBar
-        title={draft().title}
-        saved={saved()}
-        canExport={canExport()}
-        hasSource={!!draft().input}
-        onTitle={(title) => update({ title })}
-        onCopySource={() => void copy(draft().input, "Source")}
-        onSaveSource={() =>
-          download(draft().input, draft().mode === "csv" ? ".csv" : ".acsv")
-        }
-        format={draft().format}
-        onFormat={chooseFormat}
-        onCopyData={() => {
-          if (canExport()) void copy(output(), draft().format.toUpperCase());
-        }}
-        onDownloadFormat={(format) => {
-          try {
-            if (result())
-              download(
-                format === "csv" ? result()!.csv : serializeJSON(result()!),
-                `.${format}`,
-              );
-          } catch (error) {
-            announce(error instanceof Error ? error.message : "Export failed");
-          }
-        }}
-        onDownloadData={() => {
-          if (canExport()) download(output(), `.${draft().format}`);
-        }}
-      />
+      <UtilityBar />
       <main>
         <aside class="sponsor-card" aria-label="Advertisement">
           <span class="sponsor-label">Advertisement</span>
@@ -340,6 +300,17 @@ export default function ACSVEditor() {
                 <h2 id="output-heading">Output</h2>
                 <span classList={{ "status-dot": true, invalid: !!error() }} />
               </div>
+              <div class="output-actions">
+                <select class="download-select" aria-label="Download" value="" onChange={(e) => {
+                  const format = e.currentTarget.value;
+                  e.currentTarget.value = "";
+                  chooseDownload(format);
+                }}>
+                  <option value="" disabled selected>Download</option>
+                  <option value="source" disabled={!draft().input}>Source</option>
+                  <option value="csv" disabled={!canExport()}>CSV</option>
+                  <option value="json" disabled={!canExport()}>JSON</option>
+                </select>
               <div class="segmented" role="group" aria-label="Output view">
                 <button
                   disabled={!canExport()}
@@ -365,6 +336,7 @@ export default function ACSVEditor() {
                 >
                   JSON
                 </button>
+              </div>
               </div>
             </div>
             <div class="output-summary">

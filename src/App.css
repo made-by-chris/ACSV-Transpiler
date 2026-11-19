@@ -80,31 +80,7 @@ input:focus-visible {
 .brand-mark span {
   color: #21334d;
 }
-.document-name {
-  border-left: 1px solid var(--border);
-  padding-left: 26px;
-  min-width: 150px;
-  flex: 1;
-}
-.document-name input {
-  display: block;
-  width: 100%;
-  min-width: 90px;
-  max-width: 300px;
-  border: 0;
-  padding: 0 0 3px;
-  background: transparent;
-  font-size: 13px;
-  font-weight: 600;
-}
-.save-state {
-  display: block;
-  font-size: 10px;
-  color: var(--muted);
-}
-.save-warning {
-  color: #b54826;
-}
+.creator{flex:1;font-size:12px;color:var(--muted);white-space:nowrap}.creator a{color:#304767;text-decoration:none}.creator a:hover{text-decoration:underline}
 .export-actions {
   display: flex;
   gap: 7px;
@@ -474,9 +450,6 @@ tbody th {
     padding: 15px 22px;
     flex-wrap: wrap;
   }
-  .document-name {
-    flex: 1;
-  }
   .export-actions {
     margin-left: auto;
   }
@@ -494,9 +467,6 @@ tbody th {
   }
   .brand {
     gap: 10px;
-  }
-  .document-name {
-    padding-left: 16px;
   }
   .export-actions {
     width: 100%;
@@ -591,3 +561,9 @@ tbody th {
 }
 
 .export-actions>a{font-size:13px;color:var(--muted);text-decoration:none;padding:8px}.export-actions>a:hover{color:var(--accent)}.export-actions .majaku-link{padding:4px}.majaku-link img{display:block}.export-actions select{font-size:12px;padding:8px;border:1px solid var(--border);border-radius:7px;background:white}@media(max-width:760px){.export-actions{display:flex;flex-wrap:wrap;gap:5px}.export-actions .majaku-link{margin-left:auto}}
+
+.github-link{display:inline-flex;align-items:center;gap:6px}
+.output-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;min-width:0}
+.download-select{font-size:11px;border:1px solid var(--border);border-radius:6px;padding:7px;background:white;color:#304767;max-width:110px}
+.output-panel>.panel-heading{height:auto;min-height:57px;flex-basis:auto;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
+@media(max-width:760px){.creator{font-size:11px}.export-actions{width:auto;margin-left:auto}.app-header{gap:10px 16px}.export-actions .majaku-link{margin-left:0}.output-actions{gap:5px}.download-select{padding:6px}.output-panel>.panel-heading{align-items:flex-start}.output-panel .panel-label{padding-top:7px}}
