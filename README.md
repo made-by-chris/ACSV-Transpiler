@@ -40,8 +40,16 @@ Library files live in `dist/`, CLI files in `cli/`, and the website in `dist/web
 
 ## Install the released package
 
+The first npm release (0.1.0) has been submitted. While npm reviews its staged release, use the [GitHub release package](https://github.com/made-by-chris/ACSV-Transpiler/releases/tag/v0.1.0):
+
 ```sh
 npm install https://github.com/made-by-chris/ACSV-Transpiler/releases/download/v0.1.0/acsv-transpiler-0.1.0.tgz
+```
+
+Once the [npm release](https://www.npmjs.com/package/acsv-transpiler) is available:
+
+```sh
+npm install acsv-transpiler
 npx acsv users.acsv users.csv
 ```
 
@@ -60,10 +68,10 @@ node cli/ACSV.js existing.csv unchanged.csv
 
 ## Library
 
-A versioned package is available from [GitHub Releases](https://github.com/made-by-chris/ACSV-Transpiler/releases). It is not yet published to the npm registry. Build from source with `npm run build:lib`:
+Install `acsv-transpiler` from npm, then import its portable core:
 
 ```js
-import { compile, toRecords, serializeJSON, validate } from './dist/ACSVTranspiler.js';
+import { compile, toRecords, serializeJSON, validate } from 'acsv-transpiler';
 const input = 'id:int,active:bool\n@set id=seq(),active=true\n@rows 3';
 const result = compile({ input, mode: 'acsv' });
 console.log(result.csv);

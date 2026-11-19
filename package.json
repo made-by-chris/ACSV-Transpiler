@@ -25,10 +25,8 @@
     "test": "npm run build:lib && npm run build:cli && vitest run",
     "test:watch": "vitest",
     "deploy": "npm run build && npx wrangler@4.165.0 deploy",
-    "dev:worker": "npm run build && npx wrangler@4.165.0 dev"
-  },
-  "dependencies": {
-    "solid-js": "^1.7.8"
+    "dev:worker": "npm run build && npx wrangler@4.165.0 dev",
+    "prepack": "npm run build:lib && npm run build:cli"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
@@ -39,13 +37,14 @@
     "typescript": "^5.0.2",
     "vite": "^7.3.8",
     "vite-plugin-solid": "^2.11.17",
-    "vitest": "^4.0.5"
+    "vitest": "^4.0.5",
+    "solid-js": "^1.7.8"
   },
   "license": "MIT",
   "homepage": "https://acsv.majaku.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/made-by-chris/ACSV-Transpiler.git"
+    "url": "git+https://github.com/made-by-chris/ACSV-Transpiler.git"
   },
   "files": [
     "dist/*.js",
@@ -56,5 +55,14 @@
   ],
   "bin": {
     "acsv": "cli/ACSV.js"
-  }
+  },
+  "description": "Readable, deterministic recipes for CSV and typed JSON fixtures.",
+  "keywords": [
+    "csv",
+    "json",
+    "fixtures",
+    "test-data",
+    "game-data",
+    "acsv"
+  ]
 }

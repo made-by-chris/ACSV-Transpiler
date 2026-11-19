@@ -137,7 +137,7 @@ main {
   border-radius: 11px;
   background: #fff;
   overflow: hidden;
-  height: max(450px, calc(100dvh - 142px));
+  height: max(450px, calc(100dvh - 246px));
   min-height: 450px;
   display: flex;
   flex-direction: column;
@@ -589,3 +589,5 @@ tbody th {
     font-size: 9px;
   }
 }
+
+.export-actions>a{font-size:13px;color:var(--muted);text-decoration:none;padding:8px}.export-actions>a:hover{color:var(--accent)}.export-actions .majaku-link{padding:4px}.majaku-link img{display:block}.export-actions select{font-size:12px;padding:8px;border:1px solid var(--border);border-radius:7px;background:white}@media(max-width:760px){.export-actions{display:flex;flex-wrap:wrap;gap:5px}.export-actions .majaku-link{margin-left:auto}}

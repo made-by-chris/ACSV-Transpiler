@@ -234,6 +234,10 @@ export default function ACSVEditor() {
         }}
       />
       <main>
+        <aside class="sponsor-card" aria-label="Advertisement">
+          <span class="sponsor-label">Advertisement</span>
+          <a href="https://paperboy.now" target="_blank" rel="sponsored noopener noreferrer"><strong>paperboy<span>.now</span></strong><span>A printer in your pocket</span><span class="sponsor-arrow" aria-hidden="true">↗</span></a>
+        </aside>
         <div class="editor-grid">
           <section class="panel source-panel" aria-labelledby="source-heading">
             <div class="panel-heading">

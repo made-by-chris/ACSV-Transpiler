@@ -37,6 +37,7 @@ export default function UtilityBar(props: Props) {
       </div>
       <nav class="export-actions" aria-label="Main navigation">
         <a href="/docs/">Docs</a>
+        <a href="https://x.com/househuman" target="_blank" rel="noopener noreferrer" aria-label="Christopher Shelley on X">X</a>
         <a href="/about/">About</a>
         <a href="https://majaku.com/account/">Account</a>
         <select
@@ -62,6 +63,7 @@ export default function UtilityBar(props: Props) {
             JSON
           </option>
         </select>
+        <a class="majaku-link" href="https://majaku.com" aria-label="Majaku"><img src="/majaku.svg" alt="Majaku frog" width="32" height="32" /></a>
       </nav>
     </header>
   );
