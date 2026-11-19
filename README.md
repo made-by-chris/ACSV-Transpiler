@@ -43,17 +43,17 @@ Library files live in `dist/`, CLI files in `cli/`, and the website in `dist/web
 The first npm release (0.1.0) has been submitted. While npm reviews its staged release, use the [GitHub release package](https://github.com/made-by-chris/ACSV-Transpiler/releases/tag/v0.1.0):
 
 ```sh
-npm install https://github.com/made-by-chris/ACSV-Transpiler/releases/download/v0.1.0/acsv-transpiler-0.1.0.tgz
+npm install acsv@https://github.com/made-by-chris/ACSV-Transpiler/releases/download/v0.1.0/acsv-transpiler-0.1.0.tgz
 ```
 
-Once the [npm release](https://www.npmjs.com/package/acsv-transpiler) is available:
+Once the [npm release](https://www.npmjs.com/package/acsv) is available:
 
 ```sh
-npm install acsv-transpiler
+npm install acsv
 npx acsv users.acsv users.csv
 ```
 
-The installed library exports `compile`, `validate`, `serializeJSON` and `toRecords` from `acsv-transpiler`. The release package is versioned and the website API reports its version in responses.
+The installed library exports `compile`, `validate`, `serializeJSON` and `toRecords` from `acsv`. The release package is versioned and the website API reports its version in responses.
 
 ## CLI
 
@@ -68,10 +68,10 @@ node cli/ACSV.js existing.csv unchanged.csv
 
 ## Library
 
-Install `acsv-transpiler` from npm, then import its portable core:
+Install `acsv` from npm, then import its portable core:
 
 ```js
-import { compile, toRecords, serializeJSON, validate } from 'acsv-transpiler';
+import { compile, toRecords, serializeJSON, validate } from 'acsv';
 const input = 'id:int,active:bool\n@set id=seq(),active=true\n@rows 3';
 const result = compile({ input, mode: 'acsv' });
 console.log(result.csv);
@@ -80,7 +80,7 @@ console.log(serializeJSON(result));
 console.log(validate({ input, mode: 'acsv' }));
 ```
 
-The default export still returns CSV text. The default **input** mode is literal CSV: it never interprets formulas or directives and returns valid input unchanged. File includes require the explicit `./dist/node.js` adapter (package export `acsv-transpiler/node`); the portable core has no filesystem access or dynamic JavaScript evaluation.
+The default export still returns CSV text. The default **input** mode is literal CSV: it never interprets formulas or directives and returns valid input unchanged. File includes require the explicit `./dist/node.js` adapter (package export `acsv/node`); the portable core has no filesystem access or dynamic JavaScript evaluation.
 
 ## Compatibility
 

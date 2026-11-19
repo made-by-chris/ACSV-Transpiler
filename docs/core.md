@@ -136,7 +136,7 @@ For new recipes prefer `seq`, `@rows` and named `@row` overrides. CSV rows and o
 
 ## Includes, diagnostics and limits
 
-The portable module never opens files. Use the CLI or `acsv-transpiler/node` with `baseDir` to enable includes. Included headers and type declarations must match. Relative paths resolve from the including file and remain inside `baseDir`, including through symlinks; cycles fail. Rules and rows are applied inline. Origins currently expose line numbers, not included filenames.
+The portable module never opens files. Use the CLI or `acsv/node` with `baseDir` to enable includes. Included headers and type declarations must match. Relative paths resolve from the including file and remain inside `baseDir`, including through symlinks; cycles fail. Rules and rows are applied inline. Origins currently expose line numbers, not included filenames.
 
 `validate(config)` returns `{ valid, diagnostics }`; `isValid(config)` returns a boolean. The first diagnostic has `code`, `message`, one-based source `line` and `column`. CSV errors have field positions; directive errors usually identify the directive line. Type and uniqueness errors also identify the output row. Validation invokes no callbacks.
 

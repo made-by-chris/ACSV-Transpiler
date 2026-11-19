@@ -1,5 +1,5 @@
 {
-  "name": "acsv-transpiler",
+  "name": "acsv",
   "main": "dist/ACSVTranspiler.js",
   "module": "dist/ACSVTranspiler.js",
   "types": "dist/ACSVTranspiler.d.ts",
