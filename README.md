@@ -40,10 +40,10 @@ Library files live in `dist/`, CLI files in `cli/`, and the website in `dist/web
 
 ## Install the released package
 
-The npm package is `xcsv`. The 0.2.0 release is being submitted to npm; until accepted, the existing [0.1.0 package](https://www.npmjs.com/package/acsv-transpiler) remains available.
+The npm package is `@basiclaser/xcsv`. The 0.2.0 release is being submitted to npm; until accepted, the existing [0.1.0 package](https://www.npmjs.com/package/acsv-transpiler) remains available.
 
 ```sh
-npm install xcsv
+npm install @basiclaser/xcsv
 npx xcsv users.xcsv users.csv
 ```
 
@@ -63,7 +63,7 @@ node cli/ACSV.js existing.csv unchanged.csv
 The GitHub installation above exposes the portable core as `xcsv`:
 
 ```js
-import { compile, toRecords, serializeJSON, validate } from 'xcsv';
+import { compile, toRecords, serializeJSON, validate } from '@basiclaser/xcsv';
 const input = 'id:int,active:bool\n@set id=seq(),active=true\n@rows 3';
 const result = compile({ input, mode: 'acsv' });
 console.log(result.csv);
@@ -72,7 +72,7 @@ console.log(serializeJSON(result));
 console.log(validate({ input, mode: 'acsv' }));
 ```
 
-The default export still returns CSV text. The default **input** mode is literal CSV: it never interprets formulas or directives and returns valid input unchanged. File includes require the explicit `./dist/node.js` adapter (package export `xcsv/node`); the portable core has no filesystem access or dynamic JavaScript evaluation.
+The default export still returns CSV text. The default **input** mode is literal CSV: it never interprets formulas or directives and returns valid input unchanged. File includes require the explicit `./dist/node.js` adapter (package export `@basiclaser/xcsv/node`); the portable core has no filesystem access or dynamic JavaScript evaluation.
 
 ## Compatibility
 
