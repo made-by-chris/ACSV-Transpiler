@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { createHash } from "node:crypto";
 import { marked } from "marked";
 import { compile, serializeJSON } from "../dist/ZROWCompiler.js";
+const { version } = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 const cssHash = createHash("sha256").update(fs.readFileSync("public/sponsor.css")).digest("hex").slice(0,12);
 const dir = "dist/web",
   host = "https://zrow.majaku.com";
@@ -99,7 +100,7 @@ page(
 page(
   "/about/",
   "About",
-  `# About ZROW\n\nZROW is CSV-as-a-programming-language. Generate data with formulas, parameters and related tables, then export each table as CSV or the whole dataset as JSON. Created by [Christopher Shelley](https://x.com/made_by_chris) at [majaku](https://majaku.com).\n\nThe implementation runs in browsers and Node.js. Python can consume its generated output. The editor processes recipes locally.\n\n[Source and issues](https://github.com/made-by-chris/zrow) · [GitHub profile](https://github.com/made-by-chris). MIT license. Version 0.6.0.\n\nReport bugs through GitHub without including private data.`,
+  `# About ZROW\n\nZROW is CSV-as-a-programming-language. Generate data with formulas, parameters and related tables, then export each table as CSV or the whole dataset as JSON. Created by [Christopher Shelley](https://x.com/made_by_chris) at [majaku](https://majaku.com).\n\nThe implementation runs in browsers and Node.js. Python can consume its generated output. The editor processes recipes locally.\n\n[Source and issues](https://github.com/made-by-chris/zrow) · [GitHub profile](https://github.com/made-by-chris). MIT license. Version ${version}.\n\nReport bugs through GitHub without including private data.`,
 );
 page(
   "/privacy/",

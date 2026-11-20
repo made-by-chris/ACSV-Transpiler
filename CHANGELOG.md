@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1 — 2026-11-20
+
+- Update creator links and social metadata to @made_by_chris.
+- Update the published README and display the current package version on the About page.
+
 ## 0.5.0 — 2026-11-19
 
 - Add keyword/function examples and separate feature and use-case groups.
