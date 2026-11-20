@@ -1,6 +1,14 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/made-by-chris/zrow/main/docs/logo.svg" alt="ZROW" width="192" height="192">
+</p>
+
 # ZROW
 
-ZROW is the CSV programming language. Create data with parameters, reusable functions and linked tables, then export ordinary CSV or typed JSON. People and LLMs can describe large datasets with compact recipes, then compile them into CSV and typed JSON. It includes a JavaScript library, a command-line tool, a browser editor and a conversion API.
+**CSV-as-a-programming-language.**
+
+ZROW extends CSV with formulas, parameters, reusable functions and data generators. Write a short program to generate a dataset, then export ordinary CSV or typed JSON. Use it through the JavaScript library, CLI, [live editor](https://zrow.majaku.com) or conversion API.
+
+Unlike regular CSV, a ZROW document can contain multiple named tables and relationships between them. Export each table as a separate CSV file, or export all tables together as JSON.
 
 ```text
 # ZROW 0.4
@@ -14,7 +22,7 @@ ZROW is the CSV programming language. Create data with parameters, reusable func
 (rows 2 with role=guest,active=false)
 ```
 
-This recipe produces six rows. Assignments define defaults, `(rows N)` generates rows, and `(row ...)` supplies named overrides. Numeric and boolean types are preserved in JSON. CSV output contains ordinary fields and no recipe directives.
+This program produces six rows. Assignments define defaults, `(rows N)` generates rows, and `(row ...)` supplies named overrides. Numeric and boolean types are preserved in JSON. CSV output contains the generated headers and rows.
 
 [Language reference](docs/core.md) · [Authoring guide](docs/authoring.md) · [Examples](examples.md) · [Feature status](FEATURES.md) · [Enums and generators](docs/generators.md) · [Portable profile](docs/portable-profile.md) · [Parameters, functions and tables](docs/programs.md)
 
@@ -25,6 +33,35 @@ npm install zrow-js
 npx zrow users.zrow users.csv
 npx zrow users.zrow users.json
 ```
+
+## Multiple tables
+
+Define customers and orders in one document. Each order references an existing customer ID:
+
+```text
+# ZROW 0.4
+(table customers
+  (cols id:int,name)
+  (id=seq(),name="Customer {id}")
+  (rows 3)
+)
+(table orders
+  (cols id:int,customer_id:int,total:number)
+  (ref customer_id=customers.id)
+  (id=seq(),customer_id=cycle(customers.id),total=49.99)
+  (rows 6)
+)
+```
+
+Save this as `shop.zrow`. Export the tables as individual CSV files, or keep the entire dataset in one JSON file:
+
+```sh
+zrow --table customers shop.zrow customers.csv
+zrow --table orders shop.zrow orders.csv
+zrow shop.zrow shop.json
+```
+
+The compiler checks that every order's `customer_id` exists in `customers.id`. The editor has a table selector for CSV previews and downloads; its JSON download includes all tables. See [parameters, functions and tables](docs/programs.md) for library and API usage.
 
 ## JavaScript
 
@@ -39,7 +76,7 @@ console.log(serializeJSON(result));
 console.log(validate({ input, mode: 'zrow' }));
 ```
 
-The default input mode is literal CSV, which preserves valid input without interpreting recipe syntax. Use `mode: "zrow"` to compile recipes. The optional `# ZROW 0.4` declaration identifies the language version independently of the npm package version. Unsupported, malformed, repeated or misplaced declarations are rejected.
+The default input mode is literal CSV, which preserves valid input without interpreting ZROW syntax. Use `mode: "zrow"` to compile ZROW programs. The optional `# ZROW 0.4` declaration identifies the language version independently of the npm package version. Unsupported, malformed, repeated or misplaced declarations are rejected.
 
 The portable core has no filesystem access or dynamic JavaScript evaluation. The `zrow-js/node` adapter enables confined file includes.
 
@@ -90,7 +127,7 @@ Changes to language behavior should include tests and compatibility notes. See [
 
 ### Inline comments
 
-Explain a recipe next to the instructions:
+Add comments next to the instructions:
 
 ```text
 # ZROW 0.4

@@ -56,7 +56,7 @@
   "bin": {
     "zrow": "cli/zrow.js"
   },
-  "description": "The CSV programming language. Parameters, reusable functions, related tables, JavaScript library, CLI and live editor.",
+  "description": "CSV-as-a-programming-language. Generate related tables with formulas, parameters and reusable functions. Export CSV or JSON.",
   "keywords": [
     "zrow",
     "csv",
