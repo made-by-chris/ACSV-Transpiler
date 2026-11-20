@@ -124,7 +124,7 @@ Changes to language behavior should include tests and compatibility notes. See [
 
 ## License and maintainer
 
-[MIT](LICENSE). Maintained by [Christopher Shelley](https://x.com/househuman) at [Majaku](https://majaku.com).
+[MIT](LICENSE). Maintained by [Christopher Shelley](https://x.com/made_by_chris) at [Majaku](https://majaku.com).
 
 ### Inline comments
 
