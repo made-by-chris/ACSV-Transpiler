@@ -4,3 +4,5 @@ CC0-1.0: https://creativecommons.org/publicdomain/zero/1.0/
 GitHub is a trademark of GitHub, Inc.
 
 Discord icon: Simple Icons (CC0), https://simpleicons.org/ . Discord is a trademark of Discord Inc.
+
+X icon: Simple Icons (CC0), https://simpleicons.org/ .
