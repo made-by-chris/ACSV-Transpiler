@@ -1,5 +1,5 @@
 import { version } from "../package.json";
-import { compile, serializeJSON, selectTable, ZROWError } from "../src/ZROWCompiler";
+import { toZROW, compile, serializeJSON, selectTable, ZROWError } from "../src/ZROWCompiler";
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -57,10 +57,15 @@ export default {
       if (
         !b ||
         typeof b.input !== "string" ||
-        !["csv", "zrow"].includes(b.mode ?? "zrow") ||
-        !["csv", "json"].includes(b.format ?? "csv")
+        !["csv", "json", "zrow"].includes(b.mode ?? "zrow") ||
+        !["csv", "json", "zrow"].includes(b.format ?? "csv")
       )
         return json({ error: "Invalid input, mode or format" }, 400);
+      if (b.format === "zrow") {
+        if (!["csv", "json"].includes(b.mode)) return json({error:"ZROW output requires csv or json mode"},400);
+        return json({version, format:"zrow", data:toZROW({input:b.input,format:b.mode})});
+      }
+      if (b.mode === "json") return json({error:"JSON input requires zrow output"},400);
       const c = compile({
         input: b.input,
         mode: b.mode ?? "zrow",

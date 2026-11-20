@@ -8,6 +8,7 @@ import {
   onMount,
 } from "solid-js";
 import {
+  toZROW,
   compile,
   serializeJSON,
   selectTable,
@@ -55,9 +56,11 @@ function readDraft(): Draft {
 }
 
 export default function ZROWEditor() {
-  const [draft, setDraft] = createSignal<Draft>({ ...readDraft(), format: "csv" });
+  const [draft, setDraft] = createSignal<Draft>({ ...readDraft(), mode: "zrow", format: "csv" });
   const [undo, setUndo] = createSignal<Draft>();
   const [view, setView] = createSignal<"table" | "csv" | "json">("csv");
+  const [importText, setImportText] = createSignal<string>();
+  const [importError, setImportError] = createSignal("");
   const [notice, setNotice] = createSignal("");
   const [selection, setSelection] = createSignal<{
     row: number;
@@ -72,7 +75,7 @@ export default function ZROWEditor() {
     () => {
       try {
         return {
-          result: compile({ input: draft().input, mode: draft().mode }),
+          result: compile({ input: draft().input, mode: "zrow" }),
         };
       } catch (error) {
         return {
@@ -194,7 +197,7 @@ export default function ZROWEditor() {
       replace({
         input: example.source,
         title: example.title,
-        mode: example.mode,
+        mode: "zrow",
         format: draft().format,
       });
       history.replaceState(null, "", location.pathname);
@@ -263,24 +266,12 @@ export default function ZROWEditor() {
               </div>
             </div>
             <div class="source-settings">
-              <label for="input-mode">Input</label>
-              <select
-                id="input-mode"
-                value={draft().mode === "csv" ? "csv" : "zrow"}
-                onChange={(e) =>
-                  update({ mode: e.currentTarget.value as InputMode })
-                }
-              >
-                <option value="zrow">ZROW recipe</option>
-                <option value="csv">Literal CSV</option>
-              </select>
               <select
                 aria-label="Load example"
                 value={
                   examples.find(
                     (example) =>
-                      example.source === draft().input &&
-                      (example.mode === "csv") === (draft().mode === "csv"),
+                      example.source === draft().input,
                   )?.id ?? ""
                 }
                 onChange={(e) => {
@@ -291,7 +282,7 @@ export default function ZROWEditor() {
                     replace({
                       input: example.source,
                       title: example.title,
-                      mode: example.mode,
+                      mode: "zrow",
                       format: draft().format,
                     });
                 }}
@@ -363,6 +354,8 @@ export default function ZROWEditor() {
                 <span classList={{ "status-dot": true, invalid: !!error() }} />
               </div>
               <div class="output-actions">
+                <button onClick={() => { setImportText(output()); setImportError(""); }}>Paste CSV / JSON</button>
+
                 <Show when={tableNames().length}>
                   <select aria-label="Output table" value={activeTable()} onChange={e => { setTableName(e.currentTarget.value); setSelection(undefined); }}>
                     <For each={tableNames()}>{name => <option value={name}>{name}</option>}</For>
@@ -418,6 +411,19 @@ export default function ZROWEditor() {
                 </div>
               </div>
             </div>
+            <Show when={importText() !== undefined}>
+              <div class="source-settings">
+                <textarea aria-label="Data to convert to ZROW" value={importText()} onInput={e => setImportText(e.currentTarget.value)} />
+                <select id="reverse-format" aria-label="Pasted data format"><option value="csv">CSV</option><option value="json">JSON</option></select>
+                <button onClick={() => { try {
+                  const format = (document.getElementById("reverse-format") as HTMLSelectElement).value as "csv" | "json";
+                  const input = toZROW({input: importText()!, format});
+                  replace({...draft(),input,mode:"zrow"}); setImportText(undefined); setImportError("");
+                } catch(e) { setImportError(e instanceof Error ? e.message : "Conversion failed"); } }}>Convert to ZROW</button>
+                <button onClick={() => setImportText(undefined)}>Cancel</button>
+                <Show when={importError()}><p role="alert">{importError()}</p></Show>
+              </div>
+            </Show>
             <div class="output-summary">
               <Show when={tableNames().length}><span>{view() === "json" ? "JSON includes all tables" : activeTable()}</span></Show>
               <span>

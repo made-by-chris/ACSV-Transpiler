@@ -838,3 +838,5 @@ export function isValid(config: CompileConfig): boolean {
 export default function transpile(config: CompileConfig): string {
   return compile(config).csv;
 }
+
+export { toZROW } from "./reverse.js";

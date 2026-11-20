@@ -138,3 +138,11 @@ Add comments next to the instructions:
 ```
 
 Comments after instructions do not appear in the output. Hashes in quoted strings and literal CSV fields remain data.
+
+## Reverse conversion
+
+Convert CSV or JSON to literal ZROW with `toZROW({input, format: "csv"})`. [Supported data and API usage](docs/reverse.md).
+
+## Community
+
+[Join the Discord](https://discord.gg/qmZu8tdYbV) to ask questions, share examples and discuss ZROW.

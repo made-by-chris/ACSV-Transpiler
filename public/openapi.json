@@ -30,14 +30,16 @@
                   "mode": {
                     "enum": [
                       "csv",
-                      "zrow"
+                      "zrow",
+                      "json"
                     ],
                     "default": "zrow"
                   },
                   "format": {
                     "enum": [
                       "csv",
-                      "json"
+                      "json",
+                      "zrow"
                     ],
                     "default": "csv"
                   },

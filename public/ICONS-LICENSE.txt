@@ -2,3 +2,5 @@ GitHub SVG: Simple Icons v16.38.0
 https://github.com/simple-icons/simple-icons/blob/16.38.0/icons/github.svg
 CC0-1.0: https://creativecommons.org/publicdomain/zero/1.0/
 GitHub is a trademark of GitHub, Inc.
+
+Discord icon: Simple Icons (CC0), https://simpleicons.org/ . Discord is a trademark of Discord Inc.
