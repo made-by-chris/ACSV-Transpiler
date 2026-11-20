@@ -5,6 +5,7 @@
 # ZROW
 
 **CSV-as-a-programming-language.**
+ZROW was primarily made to help people working with AIs who are trying to generate large datasets. An AI might get confused and lost if you ask it to generate 1,000 lines of CSV, but that 1,000 lines of CSV might only be 5 lines of ZROW
 
 ZROW extends CSV with formulas, parameters, reusable functions and data generators. Write a short program to generate a dataset, then export ordinary CSV or typed JSON. Use it through the JavaScript library, CLI, [live editor](https://zrow.majaku.com) or conversion API.
 
